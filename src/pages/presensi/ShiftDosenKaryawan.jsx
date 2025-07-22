@@ -1,0 +1,380 @@
+import { useEffect, useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import axios from "axios";
+import Swal from "sweetalert2";
+import {
+  fetchPegawai,
+  assignPegawaiToShift,
+} from "../../redux/actions/shiftAction";
+
+export default function ShiftDosenKaryawan() {
+  const dispatch = useDispatch();
+  const token = useSelector((state) => state.auth.token);
+  const user = useSelector((state) => state.auth.user);
+  const isSuperAdmin = user?.role === "super_admin";
+  const pegawai = useSelector((state) => state.shift.pegawai);
+  const pagination = useSelector((state) => state.shift.pegawaiPagination);
+  const loading = useSelector((state) => state.shift.loading);
+
+  const [search, setSearch] = useState("");
+  const [showCount, setShowCount] = useState(10);
+  const [page, setPage] = useState(1);
+  const [shifts, setShifts] = useState([]);
+  const [selectedShift, setSelectedShift] = useState("");
+  const [selectedPegawai, setSelectedPegawai] = useState([]);
+  const [assignLoading, setAssignLoading] = useState(false);
+  const [tab, setTab] = useState("data"); // default: data karyawan
+
+  // Fetch karyawan redux
+  useEffect(() => {
+    dispatch(fetchPegawai(page));
+  }, [dispatch, page]);
+
+  // Fetch shift list
+  useEffect(() => {
+    axios
+      .get(`${import.meta.env.VITE_API_URL}/api/shift`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then((res) => setShifts(res.data))
+      .catch(() => setShifts([]));
+  }, [token]);
+
+  // Filter
+  const filtered = pegawai.filter(
+    (row) =>
+      (row.nama_depan + " " + (row.nama_belakang || ""))
+        .toLowerCase()
+        .includes(search.toLowerCase()) ||
+      (row.nipy || "").toLowerCase().includes(search.toLowerCase()) ||
+      (row.jabatan || "").toLowerCase().includes(search.toLowerCase())
+  );
+  const paginated = isSuperAdmin ? filtered : filtered.slice(0, showCount);
+
+  // Assign shift
+  const handleAssignShift = () => {
+    if (!selectedShift || selectedPegawai.length === 0) {
+      Swal.fire({ icon: "warning", title: "Pilih shift dan karyawan!" });
+      return;
+    }
+    setAssignLoading(true);
+    dispatch(
+      assignPegawaiToShift(selectedShift, selectedPegawai, () =>
+        setSelectedPegawai([])
+      )
+    ).finally(() => setAssignLoading(false));
+  };
+
+  return (
+    <div className="w-full min-h-screen font-sans bg-gray-50">
+      <div className="px-4 sticky z-40 top-0 py-4 border-b border-gray-200 bg-white flex items-center gap-4">
+        <span className="material-icons text-lg text-green-200 bg-primary p-2 rounded opacity-80">
+          event
+        </span>
+        <div>
+          <div className="text-2xl font-extrabold text-emerald-700 tracking-tight drop-shadow-sm uppercase">
+            Shift Dosen/Karyawan
+          </div>
+          <div className="text-gray-600 text-base font-medium">
+            Manajemen karyawan & pembagian shift
+          </div>
+        </div>
+      </div>
+      <div className="mx-auto p-4 max-w-5xl flex flex-col gap-8 px-2 md:px-0">
+        {/* Tab menu */}
+        <div className="flex gap-2 mb-4">
+          <button
+            className={`px-4 py-2 rounded-t font-bold text-sm border-b-2 ${
+              tab === "data"
+                ? "border-emerald-600 text-emerald-700 bg-white"
+                : "border-transparent text-gray-500 bg-gray-100"
+            }`}
+            onClick={() => setTab("data")}
+          >
+            Data Karyawan
+          </button>
+          <button
+            className={`px-4 py-2 rounded-t font-bold text-sm border-b-2 ${
+              tab === "atur"
+                ? "border-emerald-600 text-emerald-700 bg-white"
+                : "border-transparent text-gray-500 bg-gray-100"
+            }`}
+            onClick={() => setTab("atur")}
+          >
+            Atur Shift
+          </button>
+        </div>
+        {/* Tab content */}
+        {tab === "data" && (
+          <div className="border border-gray-300 bg-white p-4 rounded shadow">
+            <div className="font-bold text-emerald-700 mb-2 text-lg flex items-center gap-2">
+              <span className="material-icons text-emerald-400 text-xl">
+                people
+              </span>
+              Data Karyawan
+            </div>
+            <div className="flex items-center gap-2 mb-2">
+              <label
+                htmlFor="show-entries-data"
+                className="text-xs text-gray-600 font-semibold"
+              >
+                Show entries
+              </label>
+              <select
+                id="show-entries-data"
+                className="border border-gray-300 rounded px-2 py-1 text-xs"
+                value={showCount}
+                onChange={(e) => setShowCount(Number(e.target.value))}
+              >
+                {[5, 10, 25, 50, 100].map((opt) => (
+                  <option key={opt} value={opt}>
+                    {opt}
+                  </option>
+                ))}
+              </select>
+              <label
+                htmlFor="search-data"
+                className="text-xs text-gray-600 font-semibold ml-auto"
+              >
+                Search:
+              </label>
+              <input
+                id="search-data"
+                type="text"
+                className="border border-gray-300 rounded px-2 py-1 text-xs"
+                placeholder="Cari nama/NIP/jabatan"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+            </div>
+            {loading ? (
+              <div className="text-center py-8 text-emerald-600 font-bold">
+                Memuat data...
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="min-w-full text-xs border border-gray-200 rounded-md overflow-hidden shadow-sm">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-3 py-2 text-left font-bold text-gray-500">
+                        No
+                      </th>
+                      <th className="px-3 py-2 text-left font-bold text-gray-500">
+                        Nama
+                      </th>
+                      <th className="px-3 py-2 text-left font-bold text-gray-500">
+                        NIP
+                      </th>
+                      <th className="px-3 py-2 text-left font-bold text-gray-500">
+                        Jabatan
+                      </th>
+                      <th className="px-3 py-2 text-left font-bold text-gray-500">
+                        Shift
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {paginated.length > 0 ? (
+                      paginated.map((row, idx) => (
+                        <tr
+                          key={row.id}
+                          className={idx % 2 === 0 ? "bg-white" : "bg-gray-50"}
+                        >
+                          <td className="px-3 py-2">
+                            {idx +
+                              1 +
+                              ((pagination.current_page - 1) * 20 || 0)}
+                          </td>
+                          <td className="px-3 py-2 font-semibold">
+                            {[
+                              row.gelar_depan,
+                              row.nama_depan,
+                              row.nama_tengah,
+                              row.nama_belakang,
+                              row.gelar_belakang,
+                            ]
+                              .filter(Boolean)
+                              .join(" ")}
+                          </td>
+                          <td className="px-3 py-2">
+                            {row.nipy || row.no_ktp}
+                          </td>
+                          <td className="px-3 py-2">{row.jabatan}</td>
+                          <td className="px-3 py-2">
+                            {row.shift_detail_id
+                              ? shifts.find(
+                                  (s) =>
+                                    s.shift_detail?.id === row.shift_detail_id
+                                )?.name || "-"
+                              : "-"}
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td
+                          colSpan={5}
+                          className="text-center text-gray-400 py-4"
+                        >
+                          Tidak ada data ditemukan.
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            )}
+            {isSuperAdmin && pagination.last_page > 1 && (
+              <div className="flex flex-wrap gap-1 justify-center mt-4">
+                {pagination.links.map((link, i) => (
+                  <button
+                    key={i}
+                    className={`px-3 py-1 rounded text-xs font-bold border transition ${
+                      link.active
+                        ? "bg-emerald-600 text-white border-emerald-600"
+                        : "bg-white text-emerald-700 border-gray-300 hover:bg-gray-100"
+                    }`}
+                    onClick={() => {
+                      if (link.url) {
+                        const url = new URL(link.url);
+                        const p = url.searchParams.get("page");
+                        if (p) setPage(Number(p));
+                      }
+                    }}
+                    disabled={!link.url || link.active}
+                    dangerouslySetInnerHTML={{ __html: link.label }}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+        {tab === "atur" && (
+          <div className="border border-gray-300 bg-white p-4 rounded shadow">
+            <div className="font-bold text-emerald-700 mb-2 text-lg flex items-center gap-2">
+              <span className="material-icons text-emerald-400 text-xl">
+                tune
+              </span>
+              Atur Shift
+            </div>
+            <div className="flex flex-col md:flex-row md:items-center gap-2 mb-4">
+              <select
+                className="border border-emerald-400 rounded px-2 py-1 text-xs"
+                value={selectedShift}
+                onChange={(e) => setSelectedShift(e.target.value)}
+              >
+                <option value="">Pilih Shift</option>
+                {shifts.map((s) => (
+                  <option
+                    key={s.shift_detail?.id || s.id}
+                    value={s.shift_detail?.id || s.id}
+                  >
+                    {s.name}
+                  </option>
+                ))}
+              </select>
+              <button
+                className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded disabled:opacity-60"
+                onClick={handleAssignShift}
+                disabled={
+                  assignLoading ||
+                  !selectedShift ||
+                  selectedPegawai.length === 0
+                }
+              >
+                {assignLoading ? "Menyimpan..." : "Atur Shift"}
+              </button>
+            </div>
+            {loading ? (
+              <div className="text-center py-8 text-emerald-600 font-bold">
+                Memuat data...
+              </div>
+            ) : (
+              <div className="overflow-x-auto max-h-[420px] md:max-h-[520px]">
+                <table className="min-w-full text-xs border border-gray-200 rounded-md overflow-hidden shadow-sm">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-3 py-2 text-left font-bold text-gray-500">
+                        No
+                      </th>
+                      <th className="px-3 py-2 text-left font-bold text-gray-500">
+                        Nama
+                      </th>
+                      <th className="px-3 py-2 text-left font-bold text-gray-500">
+                        Shift
+                      </th>
+                      <th className="px-3 py-2 text-center font-bold text-gray-500">
+                        Pilih
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {paginated.length > 0 ? (
+                      paginated.map((row, idx) => (
+                        <tr
+                          key={row.id}
+                          className={idx % 2 === 0 ? "bg-white" : "bg-gray-50"}
+                        >
+                          <td className="px-3 py-2">
+                            {idx +
+                              1 +
+                              ((pagination.current_page - 1) * 20 || 0)}
+                          </td>
+                          <td className="px-3 py-2 font-semibold">
+                            {[
+                              row.gelar_depan,
+                              row.nama_depan,
+                              row.nama_tengah,
+                              row.nama_belakang,
+                              row.gelar_belakang,
+                            ]
+                              .filter(Boolean)
+                              .join(" ")}
+                          </td>
+                          <td className="px-3 py-2">
+                            {row.shift_detail_id
+                              ? shifts.find(
+                                  (s) =>
+                                    s.shift_detail?.id === row.shift_detail_id
+                                )?.name || "-"
+                              : "-"}
+                          </td>
+                          <td className="px-3 py-2 text-center">
+                            <input
+                              type="checkbox"
+                              checked={selectedPegawai.includes(row.id)}
+                              onChange={(e) => {
+                                if (e.target.checked)
+                                  setSelectedPegawai((prev) => [
+                                    ...prev,
+                                    row.id,
+                                  ]);
+                                else
+                                  setSelectedPegawai((prev) =>
+                                    prev.filter((id) => id !== row.id)
+                                  );
+                              }}
+                            />
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td
+                          colSpan={4}
+                          className="text-center text-gray-400 py-4"
+                        >
+                          Tidak ada data ditemukan.
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
