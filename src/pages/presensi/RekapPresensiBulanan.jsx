@@ -9,10 +9,8 @@ export default function RekapPresensiBulanan() {
   const dispatch = useDispatch();
   const data = useSelector((state) => state.presensi.data);
   const loading = useSelector((state) => state.presensi.loading);
-  const error = useSelector((state) => state.presensi.error);
   const rekapData = useSelector((state) => state.presensi.rekapData);
   const rekapLoading = useSelector((state) => state.presensi.rekapLoading);
-  const rekapError = useSelector((state) => state.presensi.rekapError);
   const user = useSelector((state) => state.auth.user);
 
   const [tab, setTab] = useState("history");
@@ -22,14 +20,18 @@ export default function RekapPresensiBulanan() {
   });
 
   useEffect(() => {
-    if (user) {
+    if (user !== null) {
       dispatch(fetchPresensiHistoryByUnit());
     }
   }, [dispatch, user]);
 
   useEffect(() => {
-    if (tab === "rekap" && tanggal) {
-      dispatch(fetchPresensiRekapByUnit(tanggal));
+    if (tab === "rekap") {
+      if (tanggal) {
+        dispatch(fetchPresensiRekapByUnit(tanggal));
+      } else {
+        dispatch(fetchPresensiRekapByUnit());
+      }
     }
   }, [tab, tanggal, dispatch]);
 
@@ -37,7 +39,7 @@ export default function RekapPresensiBulanan() {
     <div className="w-full min-h-screen font-sans bg-gray-50">
       {/* Header */}
       <div className="px-4 sticky z-40 top-0 py-4 border-b border-gray-200 bg-white flex items-center gap-4">
-        <span className="material-icons text-lg text-green-200 bg-primary p-2 rounded opacity-80">
+        <span className="material-icons text-green-200 bg-primary p-2 rounded opacity-80">
           table_chart
         </span>
         <div>
@@ -78,31 +80,27 @@ export default function RekapPresensiBulanan() {
               <div className="text-center py-8 text-emerald-600 font-bold">
                 Memuat data...
               </div>
-            ) : error ? (
-              <div className="text-center py-8 text-red-500 font-bold">
-                {error}
-              </div>
             ) : (
               <div className="overflow-x-auto">
                 <table className="min-w-full text-xs border border-gray-200 rounded-md overflow-hidden shadow-sm">
-                  <thead className="bg-gray-50">
+                  <thead className="sticky top-0 z-10 bg-white border-b-2 border-emerald-100">
                     <tr>
-                      <th className="px-3 py-2 text-left font-bold text-gray-500">
+                      <th className="px-4 py-4 text-center font-extrabold text-emerald-700 tracking-wide uppercase w-12 text-base">
                         No
                       </th>
-                      <th className="px-3 py-2 text-left font-bold text-gray-500">
+                      <th className="px-4 py-4 text-left font-extrabold text-emerald-700 tracking-wide uppercase w-32 text-base">
                         No KTP
                       </th>
-                      <th className="px-3 py-2 text-left font-bold text-gray-500">
+                      <th className="px-4 py-4 text-left font-extrabold text-emerald-700 tracking-wide uppercase w-56 text-base">
                         Nama
                       </th>
-                      <th className="px-3 py-2 text-left font-bold text-gray-500">
+                      <th className="px-4 py-4 text-left font-extrabold text-emerald-700 tracking-wide uppercase w-32 text-base">
                         Status
                       </th>
-                      <th className="px-3 py-2 text-left font-bold text-gray-500">
+                      <th className="px-4 py-4 text-left font-extrabold text-emerald-700 tracking-wide uppercase w-40 text-base">
                         Waktu
                       </th>
-                      <th className="px-3 py-2 text-left font-bold text-gray-500">
+                      <th className="px-4 py-4 text-left font-extrabold text-emerald-700 tracking-wide uppercase w-40 text-base">
                         Keterangan
                       </th>
                     </tr>
@@ -112,16 +110,46 @@ export default function RekapPresensiBulanan() {
                       data.map((row, idx) => (
                         <tr
                           key={row.id}
-                          className={idx % 2 === 0 ? "bg-white" : "bg-gray-50"}
+                          className={
+                            "transition hover:bg-emerald-50 " +
+                            (idx % 2 === 0 ? "bg-white" : "bg-gray-50")
+                          }
                         >
-                          <td className="px-3 py-2">{idx + 1}</td>
-                          <td className="px-3 py-2">{row.no_ktp}</td>
-                          <td className="px-3 py-2">{row.nama}</td>
-                          <td className="px-3 py-2">{row.status}</td>
-                          <td className="px-3 py-2">
+                          <td className="px-4 py-4 text-center align-middle border-b border-gray-100 font-semibold text-sm">
+                            {idx + 1}
+                          </td>
+                          <td className="px-4 py-4 align-middle border-b border-gray-100 text-sm">
+                            {row.no_ktp}
+                          </td>
+                          <td className="px-4 py-4 align-middle border-b border-gray-100 font-bold text-emerald-800 text-sm">
+                            {row.nama}
+                          </td>
+                          <td className="px-4 py-4 align-middle border-b border-gray-100 font-bold text-emerald-800 text-sm">
+                            {row.status}
+                          </td>
+                          {/* <td className="px-4 py-4 align-middle border-b border-gray-100 text-sm font-bold">
+                            {row.status === "hadir" && (
+                              <span className="text-emerald-700">Hadir</span>
+                            )}
+                            {row.status === "izin" && (
+                              <span className="text-sky-700">Izin</span>
+                            )}
+                            {row.status === "cuti" && (
+                              <span className="text-yellow-700">Cuti</span>
+                            )}
+                            {row.status === "sakit" && (
+                              <span className="text-red-700">Sakit</span>
+                            )}
+                            {row.status === "tidak masuk" && (
+                              <span className="text-gray-500">Tidak Masuk</span>
+                            )}
+                          </td> */}
+                          <td className="px-4 py-4 align-middle border-b border-gray-100 text-sm">
                             {new Date(row.waktu).toLocaleString("id-ID")}
                           </td>
-                          <td className="px-3 py-2">{row.keterangan || "-"}</td>
+                          <td className="px-4 py-4 align-middle border-b border-gray-100 text-sm">
+                            {row.keterangan || "-"}
+                          </td>
                         </tr>
                       ))
                     ) : (
@@ -147,46 +175,53 @@ export default function RekapPresensiBulanan() {
                 <input
                   type="date"
                   className="border border-gray-300 rounded px-2 py-1 text-sm"
-                  value={tanggal}
+                  value={tanggal || ""}
                   onChange={(e) => setTanggal(e.target.value)}
                   max={new Date().toISOString().slice(0, 10)}
+                  placeholder="Pilih tanggal"
                 />
+                {tanggal && (
+                  <button
+                    type="button"
+                    className="ml-2 px-2 py-1 text-xs bg-gray-200 rounded hover:bg-gray-300"
+                    onClick={() => setTanggal("")}
+                    title="Kosongkan tanggal"
+                  >
+                    HAPUS FILTER TANGGAL
+                  </button>
+                )}
               </div>
               {rekapLoading ? (
                 <div className="text-center py-8 text-emerald-600 font-bold">
                   Memuat rekap...
                 </div>
-              ) : rekapError ? (
-                <div className="text-center py-8 text-red-500 font-bold">
-                  {rekapError}
-                </div>
               ) : (
                 <div className="overflow-x-auto">
                   <table className="min-w-full text-xs border border-gray-200 rounded-md overflow-hidden shadow-sm">
-                    <thead className="bg-gray-50">
+                    <thead className="sticky top-0 z-10 bg-white border-b-2 border-emerald-100">
                       <tr>
-                        <th className="px-3 py-2 text-left font-bold text-gray-500">
+                        <th className="px-4 py-4 text-center font-extrabold text-emerald-700 tracking-wide uppercase w-12 text-base">
                           No
                         </th>
-                        <th className="px-3 py-2 text-left font-bold text-gray-500">
+                        <th className="px-4 py-4 text-left font-extrabold text-emerald-700 tracking-wide uppercase w-32 text-base">
                           No KTP
                         </th>
-                        <th className="px-3 py-2 text-left font-bold text-gray-500">
+                        <th className="px-4 py-4 text-left font-extrabold text-emerald-700 tracking-wide uppercase w-56 text-base">
                           Nama
                         </th>
-                        <th className="px-3 py-2 text-center font-bold text-gray-500">
+                        <th className="px-4 py-4 text-center font-extrabold text-emerald-700 tracking-wide uppercase w-24 text-base">
                           Hadir
                         </th>
-                        <th className="px-3 py-2 text-center font-bold text-gray-500">
+                        <th className="px-4 py-4 text-center font-extrabold text-emerald-700 tracking-wide uppercase w-32 text-base">
                           Tidak Masuk
                         </th>
-                        <th className="px-3 py-2 text-center font-bold text-gray-500">
+                        <th className="px-4 py-4 text-center font-extrabold text-emerald-700 tracking-wide uppercase w-24 text-base">
                           Izin
                         </th>
-                        <th className="px-3 py-2 text-center font-bold text-gray-500">
+                        <th className="px-4 py-4 text-center font-extrabold text-emerald-700 tracking-wide uppercase w-24 text-base">
                           Cuti
                         </th>
-                        <th className="px-3 py-2 text-center font-bold text-gray-500">
+                        <th className="px-4 py-4 text-center font-extrabold text-emerald-700 tracking-wide uppercase w-24 text-base">
                           Sakit
                         </th>
                       </tr>
@@ -197,26 +232,43 @@ export default function RekapPresensiBulanan() {
                           <tr
                             key={row.id}
                             className={
-                              idx % 2 === 0 ? "bg-white" : "bg-gray-50"
+                              "transition hover:bg-emerald-50 " +
+                              (idx % 2 === 0 ? "bg-white" : "bg-gray-50")
                             }
                           >
-                            <td className="px-3 py-2">{idx + 1}</td>
-                            <td className="px-3 py-2">{row.no_ktp}</td>
-                            <td className="px-3 py-2">{row.nama}</td>
-                            <td className="px-3 py-2 text-center">
-                              {row.total_hadir}
+                            <td className="px-4 py-4 text-center align-middle border-b border-gray-100 font-semibold text-sm">
+                              {idx + 1}
                             </td>
-                            <td className="px-3 py-2 text-center">
-                              {row.total_tidak_masuk}
+                            <td className="px-4 py-4 align-middle border-b border-gray-100 text-sm">
+                              {row.no_ktp}
                             </td>
-                            <td className="px-3 py-2 text-center">
-                              {row.total_izin}
+                            <td className="px-4 py-4 align-middle border-b border-gray-100 font-bold text-emerald-800 text-sm">
+                              {row.nama}
                             </td>
-                            <td className="px-3 py-2 text-center">
-                              {row.total_cuti}
+                            <td className="px-4 py-4 text-center align-middle border-b border-gray-100 text-sm">
+                              <span className="inline-block px-2 py-0.5 rounded bg-emerald-100 text-emerald-700 font-bold">
+                                {row.total_hadir}
+                              </span>
                             </td>
-                            <td className="px-3 py-2 text-center">
-                              {row.total_sakit}
+                            <td className="px-4 py-4 text-center align-middle border-b border-gray-100 text-sm">
+                              <span className="inline-block px-2 py-0.5 rounded bg-gray-200 text-gray-700 font-bold">
+                                {row.total_tidak_masuk}
+                              </span>
+                            </td>
+                            <td className="px-4 py-4 text-center align-middle border-b border-gray-100 text-sm">
+                              <span className="inline-block px-2 py-0.5 rounded bg-sky-100 text-sky-700 font-bold">
+                                {row.total_izin}
+                              </span>
+                            </td>
+                            <td className="px-4 py-4 text-center align-middle border-b border-gray-100 text-sm">
+                              <span className="inline-block px-2 py-0.5 rounded bg-yellow-100 text-yellow-700 font-bold">
+                                {row.total_cuti}
+                              </span>
+                            </td>
+                            <td className="px-4 py-4 text-center align-middle border-b border-gray-100 text-sm">
+                              <span className="inline-block px-2 py-0.5 rounded bg-red-100 text-red-700 font-bold">
+                                {row.total_sakit}
+                              </span>
                             </td>
                           </tr>
                         ))

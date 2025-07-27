@@ -42,7 +42,7 @@ export default function AturLokasi() {
       dispatch(fetchAllUnit());
     }
     if (user?.role !== "super_admin" && editLoading == false) {
-      dispatch(fetchUnitDetailByUserId(user?.id));
+      dispatch(fetchUnitDetailByUserId(user?.unit_id));
     }
   }, [dispatch, isSuperAdmin, user, editLoading]);
 

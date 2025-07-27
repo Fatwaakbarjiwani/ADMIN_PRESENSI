@@ -13,6 +13,7 @@ import ShiftDetail from "./pages/presensi/ShiftDetail";
 import Protected from "./components/Protected";
 import MainLayout from "./components/MainLayout";
 import Pegawai from "./pages/data_pegawai/Pegawai";
+import ManajemenAdmin from "./pages/data_pegawai/ManajemenAdmin";
 
 function App() {
   return (
@@ -72,6 +73,16 @@ function App() {
             <Protected>
               <MainLayout>
                 <Pegawai />
+              </MainLayout>
+            </Protected>
+          }
+        />
+        <Route
+          path="/menejemen_admin"
+          element={
+            <Protected>
+              <MainLayout>
+                <ManajemenAdmin />
               </MainLayout>
             </Protected>
           }

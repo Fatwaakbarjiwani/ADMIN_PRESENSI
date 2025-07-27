@@ -29,15 +29,14 @@ export const fetchPresensiHistoryByUnit = () => async (dispatch, getState) => {
 
 export const fetchPresensiRekapByUnit =
   (tanggal) => async (dispatch, getState) => {
-    
     dispatch(setRekapLoading(true));
     dispatch(setRekapError(null));
     const { token } = getState().auth;
     try {
       const response = await axios.get(
-        `${
-          import.meta.env.VITE_API_URL
-        }/api/presensi/rekap-by-unit?tanggal=${tanggal}`,
+        `${import.meta.env.VITE_API_URL}/api/presensi/rekap-by-unit?${
+          tanggal ? `tanggal=${tanggal}` : ""
+        }`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }

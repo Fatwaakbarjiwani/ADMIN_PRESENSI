@@ -8,6 +8,7 @@ import {
   updateShift,
 } from "../../redux/actions/shiftAction";
 import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
 
 function ActionButton({ onClick, title, icon, color }) {
   const colorClass =
@@ -50,7 +51,7 @@ function formatDateTime(dt) {
 
 export default function AturShift() {
   const dispatch = useDispatch();
-  const { data: shifts, loading, error } = useSelector((state) => state.shift);
+  const { data: shifts, loading } = useSelector((state) => state.shift);
   const { user } = useSelector((state) => state.auth);
   const [selected, setSelected] = useState(null);
   const [newShift, setNewShift] = useState("");
@@ -59,7 +60,7 @@ export default function AturShift() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (user && loading == false) {
+    if (user !== null || loading == false) {
       dispatch(fetchShifts());
     }
   }, [dispatch, loading, user]);
@@ -92,8 +93,8 @@ export default function AturShift() {
       <div className="mx-auto p-4 max-w-5xl flex flex-col gap-8 px-2 md:px-0">
         {/* Data Shift (atas) */}
         <div className="border border-gray-300 bg-white p-4 mb-2 w-full">
-          <div className="font-bold text-primary mb-4 text-lg flex items-center gap-2 tracking-wide">
-            <span className="material-icons text-primary text-xl">
+          <div className="font-bold text-emerald-600 mb-4 text-lg flex items-center gap-2 tracking-wide">
+            <span className="material-icons text-emerald-600 text-xl">
               table_chart
             </span>
             DATA SHIFT
@@ -116,22 +117,27 @@ export default function AturShift() {
               </button>
             </div>
             <div className="overflow-x-auto">
-              <table className="min-w-full text-sm border border-gray-200 rounded-md overflow-hidden shadow-sm bg-white">
-                <thead className="bg-emerald-50">
+              <table className="min-w-full text-sm bg-white">
+                <thead className="sticky top-0 z-10 bg-white border-b-2 border-emerald-100">
                   <tr>
-                    <th className="px-3 py-2 border-b text-left font-bold text-emerald-700">
+                    <th className="px-2 py-3 text-center font-extrabold text-emerald-700 tracking-wide text-base uppercase w-12">
                       No
                     </th>
-                    <th className="px-3 py-2 border-b text-left font-bold text-emerald-700">
+                    <th className="px-2 py-3 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-56">
                       Nama Shift
                     </th>
-                    <th className="px-3 py-2 border-b text-left font-bold text-emerald-700">
+                    <th className="px-2 py-3 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-40">
                       Unit
                     </th>
-                    <th className="px-3 py-2 border-b text-left font-bold text-emerald-700">
-                      Unit Detail
+                    <th className="px-2 py-3 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-48">
+                      <div className="flex flex-col leading-tight">
+                        <span>Unit Detail</span>
+                        <span className="text-xs font-normal text-gray-400 normal-case">
+                          (Sub Unit/Bagian)
+                        </span>
+                      </div>
                     </th>
-                    <th className="px-3 py-2 border-b text-center font-bold text-emerald-700">
+                    <th className="px-2 py-3 text-center font-extrabold text-emerald-700 tracking-wide text-base uppercase w-32">
                       Aksi
                     </th>
                   </tr>
@@ -144,15 +150,6 @@ export default function AturShift() {
                         className="text-center py-6 text-emerald-600 font-bold"
                       >
                         Memuat data shift...
-                      </td>
-                    </tr>
-                  ) : error ? (
-                    <tr>
-                      <td
-                        colSpan={5}
-                        className="text-center py-6 text-red-600 font-bold"
-                      >
-                        {error}
                       </td>
                     </tr>
                   ) : shifts.length === 0 ? (
@@ -169,19 +166,20 @@ export default function AturShift() {
                       <tr
                         key={shift.id}
                         className={
-                          selected?.id === shift.id
-                            ? "bg-emerald-50/40"
-                            : "hover:bg-emerald-50/20 cursor-pointer"
+                          (selected?.id === shift.id
+                            ? "bg-emerald-50/40 "
+                            : "") +
+                          "transition hover:bg-emerald-50 cursor-pointer"
                         }
                         onClick={() => setSelected(shift)}
                       >
-                        <td className="px-3 py-2 border-b text-left align-middle">
+                        <td className="px-2 py-3 text-center align-middle border-b border-gray-100 font-semibold">
                           {i + 1}
                         </td>
-                        <td className="px-3 py-2 border-b align-middle">
+                        <td className="px-2 py-3 align-middle border-b border-gray-100 font-bold text-emerald-800">
                           {editId === shift.id ? (
                             <input
-                              className="border border-emerald-300 rounded px-2 py-1 text-sm w-full"
+                              className="border border-emerald-300 px-2 py-1 text-sm w-full"
                               value={editName}
                               autoFocus
                               onChange={(e) => setEditName(e.target.value)}
@@ -204,13 +202,13 @@ export default function AturShift() {
                             </span>
                           )}
                         </td>
-                        <td className="px-3 py-2 border-b align-middle text-gray-700">
+                        <td className="px-2 py-3 align-middle border-b border-gray-100 text-emerald-700 font-bold">
                           {shift.unit_name}
                         </td>
-                        <td className="px-3 py-2 border-b align-middle text-gray-700">
+                        <td className="px-2 py-3 align-middle border-b border-gray-100 font-bold text-emerald-700">
                           {shift.unit_detail_name}
                         </td>
-                        <td className="px-3 py-2 flex items-center justify-center border-b align-middle text-center gap-1">
+                        <td className="px-2 py-3 flex items-center justify-center border-b border-gray-100 align-middle text-center gap-1">
                           <ActionButton
                             onClick={(e) => {
                               e.stopPropagation();
@@ -224,7 +222,19 @@ export default function AturShift() {
                           <ActionButton
                             onClick={(e) => {
                               e.stopPropagation();
-                              dispatch(deleteShift(shift.id));
+                              Swal.fire({
+                                title: "Yakin hapus shift ini?",
+                                icon: "warning",
+                                showCancelButton: true,
+                                confirmButtonColor: "#d33",
+                                cancelButtonColor: "#3085d6",
+                                confirmButtonText: "Ya, Hapus",
+                                cancelButtonText: "Batal",
+                              }).then((result) => {
+                                if (result.isConfirmed) {
+                                  dispatch(deleteShift(shift.id));
+                                }
+                              });
                             }}
                             title="Hapus Shift"
                             icon="delete"
@@ -234,9 +244,7 @@ export default function AturShift() {
                             <ActionButton
                               onClick={(e) => {
                                 e.stopPropagation();
-                                navigate(
-                                  `/shift-detail/${shift.id}`
-                                );
+                                navigate(`/shift-detail/${shift.id}`);
                               }}
                               title="Edit Detail"
                               icon="tune"
@@ -263,103 +271,151 @@ export default function AturShift() {
           </div>
         </div>
         {/* Panel Info (bawah) */}
-        <div className="border border-gray-300 bg-white p-8 flex flex-col items-center justify-center transition-all duration-300 w-full">
-          <div className="font-bold text-primary text-lg w-full text-left tracking-wide flex items-center gap-2">
-            <span className="material-icons text-primary text-xl">info</span>
-            PANEL INFO
+        <div className="border border-emerald-200 bg-white p-8 flex flex-col items-center justify-center transition-all duration-300 w-full shadow-sm">
+          <div className="w-full flex items-center gap-3 mb-6">
+            <span className="material-icons text-emerald-600 text-3xl bg-emerald-100 rounded-full p-2 shadow-sm">
+              info
+            </span>
+            <div>
+              <div className="text-xl md:text-2xl font-extrabold text-emerald-700 tracking-tight uppercase">
+                Panel Info Shift
+              </div>
+              <div className="text-gray-500 text-xs md:text-sm font-medium">
+                Lihat detail dan ringkasan shift yang dipilih
+              </div>
+            </div>
           </div>
           {selected ? (
             <div className="w-full flex flex-col items-center justify-center animate-fade-in">
-              <div className="flex items-center gap-4 mb-4">
-                <span className="material-icons text-white bg-gradient-to-tr from-emerald-400 to-green-600 p-2 rounded-full text-3xl shadow">
-                  event_available
-                </span>
-                <div className="text-emerald-700 font-extrabold text-2xl tracking-wide">
-                  {selected.name}
+              {/* Ringkasan shift */}
+              <div className="w-full max-w-2xl bg-gradient-to-tr from-emerald-50 to-white rounded-xl p-6 mb-6 shadow border border-emerald-100 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div className="flex items-center gap-4">
+                  <span className="material-icons text-white bg-gradient-to-tr from-emerald-400 to-green-600 p-3 rounded-full text-4xl shadow">
+                    event_available
+                  </span>
+                  <div>
+                    <div className="text-emerald-700 font-extrabold text-2xl tracking-wide mb-1">
+                      {selected.name}
+                    </div>
+                    <div className="text-xs text-gray-500 font-semibold uppercase tracking-wider">
+                      ID:{" "}
+                      <span className="font-mono text-gray-700">
+                        {selected.id}
+                      </span>
+                    </div>
+                  </div>
                 </div>
-              </div>
-              <div className="w-full max-w-xl bg-emerald-50/40 rounded-lg p-4 mb-4 shadow-sm border border-emerald-100">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-3">
-                  <div className="flex items-center gap-2 text-gray-700 text-sm">
-                    <span className="material-icons text-emerald-400 text-base">
-                      tag
-                    </span>
-                    <span className="font-bold">ID:</span>
-                    <span className="font-mono">{selected.id}</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-gray-700 text-sm">
-                    <span className="material-icons text-emerald-400 text-base">
-                      badge
-                    </span>
-                    <span className="font-bold">Nama Shift:</span>
-                    <span>{selected.name}</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-gray-700 text-sm">
+                <div className="flex flex-col gap-1 text-xs text-gray-600 font-semibold">
+                  <div className="flex items-center gap-2">
                     <span className="material-icons text-emerald-400 text-base">
                       business
                     </span>
-                    <span className="font-bold">Unit:</span>
-                    <span className="font-mono">{selected.unit_name}</span>
+                    Unit:{" "}
+                    <span className="font-mono text-gray-700">
+                      {selected.unit_name}
+                    </span>
                   </div>
-                  <div className="flex items-center gap-2 text-gray-700 text-sm">
+                  <div className="flex items-center gap-2">
                     <span className="material-icons text-emerald-400 text-base">
                       location_on
                     </span>
-                    <span className="font-bold">Unit Detail:</span>
-                    <span className="font-mono">
+                    Unit Detail:{" "}
+                    <span className="font-mono text-gray-700">
                       {selected.unit_detail_name}
                     </span>
                   </div>
-                  <div className="flex items-center gap-2 text-gray-700 text-sm">
+                  <div className="flex items-center gap-2">
                     <span className="material-icons text-emerald-400 text-base">
                       calendar_month
                     </span>
-                    <span className="font-bold">Created At:</span>
+                    Dibuat:{" "}
                     <span className="font-mono">
                       {formatDateTime(selected.created_at)}
                     </span>
                   </div>
-                  <div className="flex items-center gap-2 text-gray-700 text-sm">
+                  <div className="flex items-center gap-2">
                     <span className="material-icons text-emerald-400 text-base">
                       update
                     </span>
-                    <span className="font-bold">Updated At:</span>
+                    Update:{" "}
                     <span className="font-mono">
                       {formatDateTime(selected.updated_at)}
                     </span>
                   </div>
                 </div>
               </div>
+              {/* Card detail shift */}
               {selected.shift_detail && (
-                <div className="w-full max-w-xl bg-white rounded-lg p-4 mb-4 shadow border border-emerald-100">
-                  <div className="font-bold text-emerald-700 mb-2 flex items-center gap-2">
-                    <span className="material-icons text-emerald-400 text-xl">schedule</span>
+                <div className="w-full max-w-2xl bg-white rounded-xl p-6 mb-4 shadow border border-emerald-200">
+                  <div className="font-bold text-emerald-700 mb-3 flex items-center gap-2 text-lg">
+                    <span className="material-icons text-emerald-400 text-xl">
+                      schedule
+                    </span>
                     Detail Shift
                   </div>
-                  <div className="mb-2 text-xs text-gray-500 font-semibold uppercase tracking-wider">Jam Kerja per Hari</div>
-                  <div className="grid grid-cols-2 gap-x-8 gap-y-2 mb-4">
-                    {["senin","selasa","rabu","kamis","jumat","sabtu","minggu"].map((hari) => (
+                  <div className="mb-2 text-xs text-gray-500 font-semibold uppercase tracking-wider">
+                    Jam Kerja per Hari
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-8 gap-y-2 mb-4">
+                    {[
+                      "senin",
+                      "selasa",
+                      "rabu",
+                      "kamis",
+                      "jumat",
+                      "sabtu",
+                      "minggu",
+                    ].map((hari) => (
                       <div key={hari} className="flex items-center gap-2">
-                        <span className="capitalize w-14">{hari}</span>
-                        <span className="text-xs">{selected.shift_detail[`${hari}_masuk`] || "-"}</span>
-                        <span>-</span>
-                        <span className="text-xs">{selected.shift_detail[`${hari}_pulang`] || "-"}</span>
+                        <span className="capitalize w-16 font-semibold text-gray-700">
+                          {hari}
+                        </span>
+                        <span
+                          className={`text-xs px-2 py-0.5 rounded font-mono ${
+                            selected.shift_detail[`${hari}_masuk`] === "libur"
+                              ? "bg-red-100 text-red-500"
+                              : "bg-emerald-50 text-emerald-700"
+                          }`}
+                        >
+                          {selected.shift_detail[`${hari}_masuk`] || "-"}
+                        </span>
+                        <span className="text-xs">-</span>
+                        <span
+                          className={`text-xs px-2 py-0.5 rounded font-mono ${
+                            selected.shift_detail[`${hari}_pulang`] === "libur"
+                              ? "bg-red-100 text-red-500"
+                              : "bg-emerald-50 text-emerald-700"
+                          }`}
+                        >
+                          {selected.shift_detail[`${hari}_pulang`] || "-"}
+                        </span>
                       </div>
                     ))}
                   </div>
-                  <div className="flex gap-4 mb-2">
+                  <div className="flex flex-col sm:flex-row gap-4 mb-2">
                     <div className="flex items-center gap-2">
-                      <span className="text-xs font-bold text-gray-600">Toleransi Terlambat</span>
-                      <span className="text-xs">{selected.shift_detail.toleransi_terlambat ?? "-"} menit</span>
+                      <span className="text-xs font-bold text-gray-600">
+                        Toleransi Terlambat
+                      </span>
+                      <span className="text-xs bg-gray-100 rounded px-2 py-0.5">
+                        {selected.shift_detail.toleransi_terlambat ?? "-"} menit
+                      </span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="text-xs font-bold text-gray-600">Toleransi Pulang</span>
-                      <span className="text-xs">{selected.shift_detail.toleransi_pulang ?? "-"} menit</span>
+                      <span className="text-xs font-bold text-gray-600">
+                        Toleransi Pulang
+                      </span>
+                      <span className="text-xs bg-gray-100 rounded px-2 py-0.5">
+                        {selected.shift_detail.toleransi_pulang ?? "-"} menit
+                      </span>
                     </div>
                   </div>
                 </div>
               )}
-              <div className="mt-2 text-gray-700 text-center max-w-md">
+              <div className="mt-2 text-gray-700 text-center max-w-md bg-emerald-50 border border-emerald-100 rounded p-3 text-sm flex items-center gap-2 mx-auto">
+                <span className="material-icons text-emerald-400 text-base">
+                  info
+                </span>
                 Silakan atur detail shift ini melalui menu pengaturan atau
                 lakukan perubahan sesuai kebutuhan administrasi.
               </div>

@@ -14,7 +14,7 @@ export default function ShiftDosenKaryawan() {
   const isSuperAdmin = user?.role === "super_admin";
   const pegawai = useSelector((state) => state.shift.pegawai);
   const pagination = useSelector((state) => state.shift.pegawaiPagination);
-  const loading = useSelector((state) => state.shift.loading);
+  // const loading = useSelector((state) => state.shift.loading);
 
   const [search, setSearch] = useState("");
   const [showCount, setShowCount] = useState(10);
@@ -27,18 +27,22 @@ export default function ShiftDosenKaryawan() {
 
   // Fetch karyawan redux
   useEffect(() => {
-    dispatch(fetchPegawai(page));
-  }, [dispatch, page]);
+    if (token || assignLoading == false) {
+      dispatch(fetchPegawai(page));
+    }
+  }, [dispatch, page, token, assignLoading]);
 
   // Fetch shift list
   useEffect(() => {
-    axios
-      .get(`${import.meta.env.VITE_API_URL}/api/shift`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      .then((res) => setShifts(res.data))
-      .catch(() => setShifts([]));
-  }, [token]);
+    if (token || assignLoading == false) {
+      axios
+        .get(`${import.meta.env.VITE_API_URL}/api/shift`, {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+        .then((res) => setShifts(res.data))
+        .catch(() => setShifts([]));
+    }
+  }, [token, assignLoading]);
 
   // Filter
   const filtered = pegawai.filter(
@@ -82,11 +86,11 @@ export default function ShiftDosenKaryawan() {
       </div>
       <div className="mx-auto p-4 max-w-5xl flex flex-col gap-8 px-2 md:px-0">
         {/* Tab menu */}
-        <div className="flex gap-2 mb-4">
+        <div className="flex gap-2 mb-4 border-b border-gray-200">
           <button
-            className={`px-4 py-2 rounded-t font-bold text-sm border-b-2 ${
+            className={`px-6 py-2 rounded-t-lg font-bold text-base border-b-4 transition-all duration-150 focus:outline-none ${
               tab === "data"
-                ? "border-emerald-600 text-emerald-700 bg-white"
+                ? "border-emerald-600 text-emerald-600 bg-white shadow-sm"
                 : "border-transparent text-gray-500 bg-gray-100"
             }`}
             onClick={() => setTab("data")}
@@ -94,9 +98,9 @@ export default function ShiftDosenKaryawan() {
             Data Karyawan
           </button>
           <button
-            className={`px-4 py-2 rounded-t font-bold text-sm border-b-2 ${
+            className={`px-6 py-2 rounded-t-lg font-bold text-base border-b-4 transition-all duration-150 focus:outline-none ${
               tab === "atur"
-                ? "border-emerald-600 text-emerald-700 bg-white"
+                ? "border-emerald-600 text-emerald-600 bg-white shadow-sm"
                 : "border-transparent text-gray-500 bg-gray-100"
             }`}
             onClick={() => setTab("atur")}
@@ -106,125 +110,138 @@ export default function ShiftDosenKaryawan() {
         </div>
         {/* Tab content */}
         {tab === "data" && (
-          <div className="border border-gray-300 bg-white p-4 rounded shadow">
-            <div className="font-bold text-emerald-700 mb-2 text-lg flex items-center gap-2">
-              <span className="material-icons text-emerald-400 text-xl">
+          <div className="border border-gray-200 bg-white p-6 shadow flex flex-col gap-4">
+            <div className="font-bold text-emerald-600 mb-2 text-xl flex items-center gap-2">
+              <span className="material-icons text-emerald-600 text-2xl">
                 people
               </span>
               Data Karyawan
             </div>
-            <div className="flex items-center gap-2 mb-2">
-              <label
-                htmlFor="show-entries-data"
-                className="text-xs text-gray-600 font-semibold"
-              >
-                Show entries
-              </label>
-              <select
-                id="show-entries-data"
-                className="border border-gray-300 rounded px-2 py-1 text-xs"
-                value={showCount}
-                onChange={(e) => setShowCount(Number(e.target.value))}
-              >
-                {[5, 10, 25, 50, 100].map((opt) => (
-                  <option key={opt} value={opt}>
-                    {opt}
-                  </option>
-                ))}
-              </select>
-              <label
-                htmlFor="search-data"
-                className="text-xs text-gray-600 font-semibold ml-auto"
-              >
-                Search:
-              </label>
-              <input
-                id="search-data"
-                type="text"
-                className="border border-gray-300 rounded px-2 py-1 text-xs"
-                placeholder="Cari nama/NIP/jabatan"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-              />
-            </div>
-            {loading ? (
-              <div className="text-center py-8 text-emerald-600 font-bold">
-                Memuat data...
+            <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-2">
+              <div className="flex items-center gap-2">
+                <label
+                  htmlFor="show-entries-data"
+                  className="text-xs text-gray-600 font-semibold"
+                >
+                  Show
+                </label>
+                <select
+                  id="show-entries-data"
+                  className="border border-gray-300 rounded px-2 py-1 text-xs"
+                  value={showCount}
+                  onChange={(e) => setShowCount(Number(e.target.value))}
+                >
+                  {[5, 10, 25, 50, 100].map((opt) => (
+                    <option key={opt} value={opt}>
+                      {opt}
+                    </option>
+                  ))}
+                </select>
+                <span className="text-xs text-gray-600 font-semibold">
+                  entries
+                </span>
               </div>
-            ) : (
-              <div className="overflow-x-auto">
-                <table className="min-w-full text-xs border border-gray-200 rounded-md overflow-hidden shadow-sm">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="px-3 py-2 text-left font-bold text-gray-500">
-                        No
-                      </th>
-                      <th className="px-3 py-2 text-left font-bold text-gray-500">
-                        Nama
-                      </th>
-                      <th className="px-3 py-2 text-left font-bold text-gray-500">
-                        NIP
-                      </th>
-                      <th className="px-3 py-2 text-left font-bold text-gray-500">
-                        Jabatan
-                      </th>
-                      <th className="px-3 py-2 text-left font-bold text-gray-500">
-                        Shift
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {paginated.length > 0 ? (
-                      paginated.map((row, idx) => (
-                        <tr
-                          key={row.id}
-                          className={idx % 2 === 0 ? "bg-white" : "bg-gray-50"}
-                        >
-                          <td className="px-3 py-2">
-                            {idx +
-                              1 +
-                              ((pagination.current_page - 1) * 20 || 0)}
-                          </td>
-                          <td className="px-3 py-2 font-semibold">
-                            {[
-                              row.gelar_depan,
-                              row.nama_depan,
-                              row.nama_tengah,
-                              row.nama_belakang,
-                              row.gelar_belakang,
-                            ]
-                              .filter(Boolean)
-                              .join(" ")}
-                          </td>
-                          <td className="px-3 py-2">
-                            {row.nipy || row.no_ktp}
-                          </td>
-                          <td className="px-3 py-2">{row.jabatan}</td>
-                          <td className="px-3 py-2">
-                            {row.shift_detail_id
-                              ? shifts.find(
-                                  (s) =>
-                                    s.shift_detail?.id === row.shift_detail_id
-                                )?.name || "-"
-                              : "-"}
-                          </td>
-                        </tr>
-                      ))
-                    ) : (
-                      <tr>
-                        <td
-                          colSpan={5}
-                          className="text-center text-gray-400 py-4"
-                        >
-                          Tidak ada data ditemukan.
+              <div className="flex items-center gap-2 ml-auto">
+                <label
+                  htmlFor="search-data"
+                  className="text-xs text-gray-600 font-semibold"
+                >
+                  Search:
+                </label>
+                <input
+                  id="search-data"
+                  type="text"
+                  className="border border-gray-300 rounded px-2 py-1 text-xs"
+                  placeholder="Cari nama/NIP/jabatan"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                />
+              </div>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="min-w-full text-sm bg-white">
+                <thead className="sticky top-0 z-10 bg-white border-b-2 border-emerald-100">
+                  <tr>
+                    <th className="px-2 py-3 text-center font-extrabold text-emerald-700 tracking-wide text-base uppercase w-12">
+                      No
+                    </th>
+                    <th className="px-2 py-3 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-56">
+                      Nama Lengkap
+                      <div className="text-xs font-normal text-gray-400 normal-case">
+                        (dengan gelar)
+                      </div>
+                    </th>
+                    <th className="px-2 py-3 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-32">
+                      NIP
+                    </th>
+                    <th className="px-2 py-3 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-40">
+                      Jabatan
+                    </th>
+                    <th className="px-2 py-3 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-40">
+                      Shift
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {paginated.length > 0 ? (
+                    paginated.map((row, idx) => (
+                      <tr
+                        key={row.id}
+                        className={
+                          "transition hover:bg-emerald-50 " +
+                          (idx % 2 === 0 ? "bg-white" : "bg-gray-50")
+                        }
+                      >
+                        <td className="px-2 py-3 text-center align-middle border-b border-gray-100 font-semibold">
+                          {idx + 1 + ((pagination.current_page - 1) * 20 || 0)}
+                        </td>
+                        <td className="px-2 py-3 font-bold align-middle border-b border-gray-100 text-emerald-800">
+                          {[
+                            row.gelar_depan,
+                            row.nama_depan,
+                            row.nama_tengah,
+                            row.nama_belakang,
+                            row.gelar_belakang,
+                          ]
+                            .filter(Boolean)
+                            .join(" ")}
+                        </td>
+                        <td className="px-2 py-3 align-middle border-b border-gray-100">
+                          {row.nipy || row.no_ktp}
+                        </td>
+                        <td className="px-2 py-3 align-middle border-b border-gray-100">
+                          {row.jabatan}
+                        </td>
+                        <td className="px-2 py-3 align-middle border-b border-gray-100">
+                          {row.shift_detail_id ? (
+                            <span className="inline-block bg-emerald-100 text-emerald-700 px-2 py-0.5 text-xs font-bold">
+                              {shifts.find(
+                                (s) =>
+                                  s.shift_detail?.id === row.shift_detail_id
+                              )?.name || "-"}
+                            </span>
+                          ) : (
+                            <span className="inline-block bg-gray-100 text-gray-400 px-2 py-0.5 text-xs">
+                              -
+                            </span>
+                          )}
                         </td>
                       </tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
-            )}
-            {isSuperAdmin && pagination.last_page > 1 && (
+                    ))
+                  ) : (
+                    <tr>
+                      <td
+                        colSpan={5}
+                        className="text-center text-gray-400 py-4"
+                      >
+                        Tidak ada data ditemukan.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+            {pagination.last_page > 1 && (
               <div className="flex flex-wrap gap-1 justify-center mt-4">
                 {pagination.links.map((link, i) => (
                   <button
@@ -250,9 +267,9 @@ export default function ShiftDosenKaryawan() {
           </div>
         )}
         {tab === "atur" && (
-          <div className="border border-gray-300 bg-white p-4 rounded shadow">
-            <div className="font-bold text-emerald-700 mb-2 text-lg flex items-center gap-2">
-              <span className="material-icons text-emerald-400 text-xl">
+          <div className="border border-gray-200 bg-white p-6 shadow flex flex-col gap-4">
+            <div className="font-bold text-emerald-600 mb-2 text-xl flex items-center gap-2">
+              <span className="material-icons text-emerald-600 text-2xl">
                 tune
               </span>
               Atur Shift
@@ -282,94 +299,125 @@ export default function ShiftDosenKaryawan() {
                   selectedPegawai.length === 0
                 }
               >
-                {assignLoading ? "Menyimpan..." : "Atur Shift"}
+                {assignLoading ? (
+                  <span className="flex items-center gap-2">
+                    <span className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></span>{" "}
+                    Menyimpan...
+                  </span>
+                ) : (
+                  "Atur Shift"
+                )}
               </button>
             </div>
-            {loading ? (
-              <div className="text-center py-8 text-emerald-600 font-bold">
-                Memuat data...
-              </div>
-            ) : (
-              <div className="overflow-x-auto max-h-[420px] md:max-h-[520px]">
-                <table className="min-w-full text-xs border border-gray-200 rounded-md overflow-hidden shadow-sm">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="px-3 py-2 text-left font-bold text-gray-500">
-                        No
-                      </th>
-                      <th className="px-3 py-2 text-left font-bold text-gray-500">
-                        Nama
-                      </th>
-                      <th className="px-3 py-2 text-left font-bold text-gray-500">
-                        Shift
-                      </th>
-                      <th className="px-3 py-2 text-center font-bold text-gray-500">
-                        Pilih
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {paginated.length > 0 ? (
-                      paginated.map((row, idx) => (
-                        <tr
-                          key={row.id}
-                          className={idx % 2 === 0 ? "bg-white" : "bg-gray-50"}
-                        >
-                          <td className="px-3 py-2">
-                            {idx +
-                              1 +
-                              ((pagination.current_page - 1) * 20 || 0)}
-                          </td>
-                          <td className="px-3 py-2 font-semibold">
-                            {[
-                              row.gelar_depan,
-                              row.nama_depan,
-                              row.nama_tengah,
-                              row.nama_belakang,
-                              row.gelar_belakang,
-                            ]
-                              .filter(Boolean)
-                              .join(" ")}
-                          </td>
-                          <td className="px-3 py-2">
-                            {row.shift_detail_id
-                              ? shifts.find(
-                                  (s) =>
-                                    s.shift_detail?.id === row.shift_detail_id
-                                )?.name || "-"
-                              : "-"}
-                          </td>
-                          <td className="px-3 py-2 text-center">
-                            <input
-                              type="checkbox"
-                              checked={selectedPegawai.includes(row.id)}
-                              onChange={(e) => {
-                                if (e.target.checked)
-                                  setSelectedPegawai((prev) => [
-                                    ...prev,
-                                    row.id,
-                                  ]);
-                                else
-                                  setSelectedPegawai((prev) =>
-                                    prev.filter((id) => id !== row.id)
-                                  );
-                              }}
-                            />
-                          </td>
-                        </tr>
-                      ))
-                    ) : (
-                      <tr>
-                        <td
-                          colSpan={4}
-                          className="text-center text-gray-400 py-4"
-                        >
-                          Tidak ada data ditemukan.
+            <div className="overflow-x-auto max-h-[420px] md:max-h-[520px]">
+              <table className="min-w-full text-sm bg-white">
+                <thead className="sticky top-0 z-10 bg-white border-b-2 border-emerald-100">
+                  <tr>
+                    <th className="px-2 py-3 text-center font-extrabold text-emerald-700 tracking-wide text-base uppercase w-12">
+                      No
+                    </th>
+                    <th className="px-2 py-3 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-56">
+                      Nama Lengkap
+                      <div className="text-xs font-normal text-gray-400 normal-case">
+                        (dengan gelar)
+                      </div>
+                    </th>
+                    <th className="px-2 py-3 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-40">
+                      Shift
+                    </th>
+                    <th className="px-2 py-3 text-center font-extrabold text-emerald-700 tracking-wide text-base uppercase w-24">
+                      Pilih
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {paginated.length > 0 ? (
+                    paginated.map((row, idx) => (
+                      <tr
+                        key={row.id}
+                        className={
+                          "transition hover:bg-emerald-50 " +
+                          (idx % 2 === 0 ? "bg-white" : "bg-gray-50")
+                        }
+                      >
+                        <td className="px-2 py-3 text-center align-middle border-b border-gray-100 font-semibold">
+                          {idx + 1 + ((pagination.current_page - 1) * 20 || 0)}
+                        </td>
+                        <td className="px-2 py-3 font-bold align-middle border-b border-gray-100 text-emerald-800">
+                          {[
+                            row.gelar_depan,
+                            row.nama_depan,
+                            row.nama_tengah,
+                            row.nama_belakang,
+                            row.gelar_belakang,
+                          ]
+                            .filter(Boolean)
+                            .join(" ")}
+                        </td>
+                        <td className="px-2 py-3 align-middle border-b border-gray-100">
+                          {row.shift_detail_id ? (
+                            <span className="inline-block bg-emerald-100 text-emerald-700 px-2 py-0.5 text-xs font-bold">
+                              {shifts.find(
+                                (s) =>
+                                  s.shift_detail?.id === row.shift_detail_id
+                              )?.name || "-"}
+                            </span>
+                          ) : (
+                            <span className="inline-block bg-gray-100 text-gray-400 px-2 py-0.5 text-xs">
+                              -
+                            </span>
+                          )}
+                        </td>
+                        <td className="px-2 py-3 text-center align-middle border-b border-gray-100">
+                          <input
+                            type="checkbox"
+                            checked={selectedPegawai.includes(row.id)}
+                            onChange={(e) => {
+                              if (e.target.checked)
+                                setSelectedPegawai((prev) => [...prev, row.id]);
+                              else
+                                setSelectedPegawai((prev) =>
+                                  prev.filter((id) => id !== row.id)
+                                );
+                            }}
+                          />
                         </td>
                       </tr>
-                    )}
-                  </tbody>
-                </table>
+                    ))
+                  ) : (
+                    <tr>
+                      <td
+                        colSpan={4}
+                        className="text-center text-gray-400 py-4"
+                      >
+                        Tidak ada data ditemukan.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+            {pagination.last_page > 1 && (
+              <div className="flex flex-wrap gap-1 justify-center mt-4">
+                {pagination.links.map((link, i) => (
+                  <button
+                    key={i}
+                    className={`px-3 py-1 rounded text-xs font-bold border transition ${
+                      link.active
+                        ? "bg-emerald-600 text-white border-emerald-600"
+                        : "bg-white text-emerald-700 border-gray-300 hover:bg-gray-100"
+                    }`}
+                    onClick={() => {
+                      if (link.url) {
+                        const url = new URL(link.url);
+                        const p = url.searchParams.get("page");
+                        if (p) setPage(Number(p));
+                      }
+                    }}
+                    disabled={!link.url || link.active}
+                    dangerouslySetInnerHTML={{ __html: link.label }}
+                  />
+                ))}
               </div>
             )}
           </div>

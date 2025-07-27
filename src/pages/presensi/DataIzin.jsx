@@ -12,22 +12,20 @@ export default function DataIzin() {
 
   const [jenis, setJenis] = useState("sakit");
   const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  // const [error, setError] = useState(null);
   const [form, setForm] = useState({ id: null, jenis: "" });
   const [formLoading, setFormLoading] = useState(false);
 
   useEffect(() => {
     if (!isSuperAdmin) return;
-    setLoading(true);
-    setError(null);
-    axios
-      .get(`${import.meta.env.VITE_API_URL}/api/${jenis}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      .then((res) => setData(res.data))
-      .catch(() => setError("Gagal mengambil data izin"))
-      .finally(() => setLoading(false));
+    if (token) {
+      axios
+        .get(`${import.meta.env.VITE_API_URL}/api/${jenis}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+        .then((res) => setData(res.data));
+      // .catch(() => setError("Gagal mengambil data izin"));
+    }
   }, [jenis, token, isSuperAdmin]);
 
   const handleSubmit = (e) => {
@@ -59,7 +57,7 @@ export default function DataIzin() {
       })
       .then((res) => setData(res.data))
       .catch(() => {
-        setError("Gagal menyimpan data izin");
+        // setError("Gagal menyimpan data izin");
         Swal.fire({ icon: "error", title: "Gagal menyimpan data izin" });
       })
       .finally(() => setFormLoading(false));
@@ -80,7 +78,6 @@ export default function DataIzin() {
       cancelButtonText: "Batal",
     }).then((result) => {
       if (result.isConfirmed) {
-        setLoading(true);
         axios
           .delete(`${import.meta.env.VITE_API_URL}/api/${jenis}/delete/${id}`, {
             headers: { Authorization: `Bearer ${token}` },
@@ -98,10 +95,9 @@ export default function DataIzin() {
           })
           .then((res) => setData(res.data))
           .catch(() => {
-            setError("Gagal menghapus data izin");
+            // setError("Gagal menghapus data izin");
             Swal.fire({ icon: "error", title: "Gagal menghapus data izin" });
-          })
-          .finally(() => setLoading(false));
+          });
       }
     });
   };
@@ -175,7 +171,7 @@ export default function DataIzin() {
           .catch(() =>
             Swal.fire({ icon: "error", title: "Gagal memproses pengajuan" })
           )
-          .finally(() => setPengajuanPagination(false));
+          .finally(() => setLoadingPengajuan(false));
       }
     });
   };
@@ -196,15 +192,16 @@ export default function DataIzin() {
             </div>
           </div>
         </div>
-        <div className="mx-auto p-4 max-w-4xl flex flex-col gap-8 px-2 md:px-0">
-          <div className="flex gap-2 mb-4">
+        <div className="mx-auto p-4 max-w-5xl flex flex-col gap-8 px-2 md:px-0">
+          {/* Tab menu modern */}
+          <div className="flex gap-2 mb-4 border-b border-gray-200">
             {["izin", "cuti", "sakit"].map((j) => (
               <button
                 key={j}
-                className={`px-4 py-2 rounded font-bold text-sm transition border ${
+                className={`px-6 py-2 rounded-t-lg font-bold text-base border-b-4 transition-all duration-150 focus:outline-none ${
                   pengajuanTab === j
-                    ? "bg-emerald-600 text-white border-emerald-600"
-                    : "bg-white text-emerald-700 border-gray-300 hover:bg-gray-50"
+                    ? "border-emerald-600 text-emerald-600 bg-white shadow-sm"
+                    : "border-transparent text-gray-500 bg-gray-100"
                 }`}
                 onClick={() => {
                   setPengajuanTab(j);
@@ -218,30 +215,30 @@ export default function DataIzin() {
           <div className="border border-gray-300 bg-white p-4 rounded shadow">
             <div className="overflow-x-auto">
               <table className="min-w-full text-xs border border-gray-200 rounded-md overflow-hidden shadow-sm">
-                <thead className="bg-gray-50">
+                <thead className="sticky top-0 z-10 bg-white border-b-2 border-emerald-100">
                   <tr>
-                    <th className="px-3 py-2 text-left font-bold text-gray-500">
+                    <th className="px-4 py-4 text-center font-extrabold text-emerald-700 tracking-wide text-base uppercase w-12">
                       No
                     </th>
-                    <th className="px-3 py-2 text-left font-bold text-gray-500">
+                    <th className="px-2 py-3 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-32">
                       Pegawai ID
                     </th>
-                    <th className="px-3 py-2 text-left font-bold text-gray-500">
+                    <th className="px-2 py-3 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-32">
                       Tanggal Mulai
                     </th>
-                    <th className="px-3 py-2 text-left font-bold text-gray-500">
+                    <th className="px-2 py-3 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-32">
                       Tanggal Selesai
                     </th>
-                    <th className="px-3 py-2 text-left font-bold text-gray-500">
+                    <th className="px-2 py-3 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-40">
                       Alasan
                     </th>
-                    <th className="px-3 py-2 text-left font-bold text-gray-500">
+                    <th className="px-2 py-3 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-32">
                       Dokumen
                     </th>
-                    <th className="px-3 py-2 text-left font-bold text-gray-500">
+                    <th className="px-2 py-3 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-24">
                       Status
                     </th>
-                    <th className="px-3 py-2 text-center font-bold text-gray-500">
+                    <th className="px-2 py-3 text-center font-extrabold text-emerald-700 tracking-wide text-base uppercase w-24">
                       Aksi
                     </th>
                   </tr>
@@ -251,23 +248,32 @@ export default function DataIzin() {
                     pengajuan.map((row, idx) => (
                       <tr
                         key={row.id}
-                        className={idx % 2 === 0 ? "bg-white" : "bg-gray-50"}
+                        className={
+                          "transition hover:bg-emerald-50 " +
+                          (idx % 2 === 0 ? "bg-white" : "bg-gray-50")
+                        }
                       >
-                        <td className="px-3 py-2">
+                        <td className="px-4 py-4 text-center align-middle border-b border-gray-100 text-sm">
                           {idx +
                             1 +
                             ((pengajuanPagination.current_page - 1) * 10 || 0)}
                         </td>
-                        <td className="px-3 py-2">{row.pegawai_id}</td>
-                        <td className="px-3 py-2">{row.tanggal_mulai}</td>
-                        <td className="px-3 py-2">{row.tanggal_selesai}</td>
-                        <td className="px-3 py-2">{row.alasan}</td>
-                        <td className="px-3 py-2">
+                        <td className="px-2 py-3 align-middle border-b border-gray-100 text-sm">
+                          {row.pegawai_id}
+                        </td>
+                        <td className="px-2 py-3 align-middle border-b border-gray-100 text-sm">
+                          {row.tanggal_mulai}
+                        </td>
+                        <td className="px-2 py-3 align-middle border-b border-gray-100 text-sm">
+                          {row.tanggal_selesai}
+                        </td>
+                        <td className="px-2 py-3 align-middle border-b border-gray-100 text-sm">
+                          {row.alasan}
+                        </td>
+                        <td className="px-2 py-3 align-middle border-b border-gray-100">
                           {row.dokumen ? (
                             <a
-                              href={`${import.meta.env.VITE_API_URL}/storage/${
-                                row.dokumen
-                              }`}
+                              href={`http://103.23.103.43/prototype/tes/storage/${row.dokumen}`}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="text-emerald-600 underline"
@@ -278,10 +284,18 @@ export default function DataIzin() {
                             "-"
                           )}
                         </td>
-                        <td className="px-3 py-2 capitalize font-bold">
-                          {row.status}
+                        <td className="px-2 py-3 capitalize font-bold align-middle border-b border-gray-100 text-sm">
+                          {row.status === "pending" && (
+                            <span className="text-yellow-500">Pending</span>
+                          )}
+                          {row.status === "diterima" && (
+                            <span className="text-emerald-500">Diterima</span>
+                          )}
+                          {row.status === "ditolak" && (
+                            <span className="text-red-500">Ditolak</span>
+                          )}
                         </td>
-                        <td className="px-3 py-2 text-center">
+                        <td className="px-2 py-3 text-center align-middle border-b border-gray-100 flex gap-1 justify-center">
                           {row.status === "pending" && (
                             <>
                               <button
@@ -360,21 +374,22 @@ export default function DataIzin() {
           </div>
         </div>
       </div>
-      <div className="mx-auto p-4 max-w-3xl flex flex-col gap-8 px-2 md:px-0">
+      <div className="mx-auto p-4 max-w-5xl flex flex-col gap-8 px-2 md:px-0">
         <div className="border border-gray-300 bg-white p-4 rounded shadow">
-          <div className="flex gap-2 mb-4">
+          {/* Tab menu modern untuk superadmin */}
+          <div className="flex gap-2 mb-4 border-b border-gray-200">
             {jenisList.map((j) => (
               <button
                 key={j}
-                className={`px-4 py-2 rounded font-bold text-sm transition border ${
+                className={`px-6 py-2 rounded-t-lg font-bold text-base border-b-4 transition-all duration-150 focus:outline-none ${
                   jenis === j
-                    ? "bg-emerald-600 text-white border-emerald-600"
-                    : "bg-white text-emerald-700 border-gray-300 hover:bg-gray-50"
+                    ? "border-emerald-600 text-emerald-600 bg-white shadow-sm"
+                    : "border-transparent text-gray-500 bg-gray-100"
                 }`}
                 onClick={() => {
                   setJenis(j);
                   setForm({ id: null, jenis: "" });
-                  setError(null);
+                  // setError(null);
                 }}
               >
                 {j.charAt(0).toUpperCase() + j.slice(1)}
@@ -419,83 +434,81 @@ export default function DataIzin() {
               </button>
             )}
           </form>
-          {loading ? (
-            <div className="text-center py-8 text-emerald-600 font-bold">
-              Memuat data...
-            </div>
-          ) : error ? (
-            <div className="text-center py-8 text-red-500 font-bold">
-              {error}
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="min-w-full text-xs border border-gray-200 rounded-md overflow-hidden shadow-sm">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-3 py-2 text-left font-bold text-gray-500">
-                      No
-                    </th>
-                    <th className="px-3 py-2 text-left font-bold text-gray-500">
-                      Jenis Izin
-                    </th>
-                    <th className="px-3 py-2 text-left font-bold text-gray-500">
-                      Created
-                    </th>
-                    <th className="px-3 py-2 text-left font-bold text-gray-500">
-                      Updated
-                    </th>
-                    <th className="px-3 py-2 text-center font-bold text-gray-500">
-                      Aksi
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {data.length > 0 ? (
-                    data.map((row, idx) => (
-                      <tr
-                        key={row.id}
-                        className={idx % 2 === 0 ? "bg-white" : "bg-gray-50"}
-                      >
-                        <td className="px-3 py-2">{idx + 1}</td>
-                        <td className="px-3 py-2 font-semibold">{row.jenis}</td>
-                        <td className="px-3 py-2">
-                          {new Date(row.created_at).toLocaleString("id-ID")}
-                        </td>
-                        <td className="px-3 py-2">
-                          {new Date(row.updated_at).toLocaleString("id-ID")}
-                        </td>
-                        <td className="px-3 py-2 text-center flex gap-1 justify-center">
-                          <button
-                            className="px-2 py-1 rounded bg-yellow-100 text-yellow-700 font-bold text-xs hover:bg-yellow-200"
-                            onClick={() => handleEdit(row)}
-                            disabled={formLoading}
-                          >
-                            Edit
-                          </button>
-                          <button
-                            className="px-2 py-1 rounded bg-red-100 text-red-700 font-bold text-xs hover:bg-red-200"
-                            onClick={() => handleDelete(row.id)}
-                            disabled={formLoading}
-                          >
-                            Hapus
-                          </button>
-                        </td>
-                      </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td
-                        colSpan={5}
-                        className="text-center text-gray-400 py-4"
-                      >
-                        Tidak ada data ditemukan.
+          <div className="overflow-x-auto">
+            <table className="min-w-full text-xs border border-gray-200 rounded-md overflow-hidden shadow-sm">
+              <thead className="sticky top-0 z-10 bg-white border-b-2 border-emerald-100">
+                <tr>
+                  <th className="px-4 py-4 text-center font-extrabold text-emerald-700 tracking-wide text-base uppercase w-12">
+                    No
+                  </th>
+                  <th className="px-2 py-3 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-40">
+                    Jenis Izin
+                  </th>
+                  <th className="px-2 py-3 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-32">
+                    Created
+                  </th>
+                  <th className="px-2 py-3 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-32">
+                    Updated
+                  </th>
+                  <th className="px-2 py-3 text-center font-extrabold text-emerald-700 tracking-wide text-base uppercase w-24">
+                    Aksi
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {data.length > 0 ? (
+                  data.map((row, idx) => (
+                    <tr
+                      key={row.id}
+                      className={
+                        "transition hover:bg-emerald-50" +
+                        (idx % 2 === 0 ? "bg-white" : "bg-gray-50")
+                      }
+                    >
+                      <td className="px-2 py-3 text-center align-middle border-b border-gray-100 font-semibold text-base">
+                        {idx + 1}
+                      </td>
+                      <td className="px-2 py-3 font-bold align-middle border-b border-gray-100 text-emerald-800 text-sm">
+                        {row.jenis}
+                      </td>
+                      <td className="px-2 py-3 align-middle border-b border-gray-100 text-sm">
+                        {new Date(row.created_at).toLocaleString("id-ID")}
+                      </td>
+                      <td className="px-2 py-3 align-middle border-b border-gray-100 text-sm">
+                        {new Date(row.updated_at).toLocaleString("id-ID")}
+                      </td>
+                      <td className="px-2 py-3 text-center align-middle border-b border-gray-100 flex gap-1 justify-center text-sm">
+                        <button
+                          className="w-8 h-8 flex items-center justify-center text-yellow-600 hover:text-yellow-800 rounded transition"
+                          onClick={() => handleEdit(row)}
+                          disabled={formLoading}
+                          title="Edit"
+                        >
+                          <span className="material-icons text-base">edit</span>
+                        </button>
+                        <button
+                          className="w-8 h-8 flex items-center justify-center text-red-600 hover:text-red-800 rounded transition"
+                          onClick={() => handleDelete(row.id)}
+                          disabled={formLoading}
+                          title="Hapus"
+                        >
+                          <span className="material-icons text-base">
+                            delete
+                          </span>
+                        </button>
                       </td>
                     </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
-          )}
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={5} className="text-center text-gray-400 py-4">
+                      Tidak ada data ditemukan.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>

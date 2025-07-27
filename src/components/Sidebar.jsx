@@ -4,49 +4,69 @@ import { useLocation, Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { getMe, logout } from "../redux/actions/authAction";
 
-const menu = [
-  {
-    section: null,
-    items: [{ icon: "dashboard", label: "Dashboard", link: "/" }],
-  },
-  {
-    section: "DATA PEGAWAI",
-    items: [
-      {
-        icon: "person",
-        label: "Pegawai",
-        link: "/management_pegawai",
-      },
-    ],
-  },
-  {
-    section: "MENEJEMEN PRESENSI",
-    items: [
-      { icon: "add_location_alt", label: "Atur Lokasi", link: "/lokasi" },
-      { icon: "event", label: "Shift", link: "/atur_shift" },
-      {
-        icon: "tune",
-        label: "Atur Shift",
-        link: "/shift_dosen_karyawan",
-      },
-      // { icon: "holiday_village", label: "Daftar Libur", link: "/daftar_libur" },
-      { icon: "analytics", label: "Rekap Presensi", link: "/rekap_presensi" },
-      { icon: "insert_chart", label: "Rekap Izin", link: "/rekap_izin" },
-      { icon: "upload_file", label: "Import Data CSV", link: "/import_csv" },
-    ],
-  },
-  {
-    section: "REPORT",
-    items: [{ icon: "pie_chart", label: "Sistem Presensi", link: "/report" }],
-  },
-];
-
 export default function Sidebar() {
   const location = useLocation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [openSub, setOpenSub] = useState({});
   const { user } = useSelector((state) => state.auth);
+  const isSuperAdmin = user?.role === "super_admin";
+  const menu = [
+    {
+      section: null,
+      items: [{ icon: "dashboard", label: "Dashboard", link: "/" }],
+    },
+    {
+      section: "DATA PEGAWAI",
+      items: [
+        {
+          icon: "person",
+          label: "Pegawai",
+          link: "/management_pegawai",
+        },
+        // Menu Manajemen Admin hanya untuk superadmin
+        ...(isSuperAdmin
+          ? [
+              {
+                icon: "admin_panel_settings",
+                label: "Menejemen Admin",
+                link: "/menejemen_admin",
+              },
+            ]
+          : []),
+      ],
+    },
+    {
+      section: "MENEJEMEN PRESENSI",
+      items: [
+        { icon: "add_location_alt", label: "Atur Lokasi", link: "/lokasi" },
+        { icon: "event", label: "Shift", link: "/atur_shift" },
+        {
+          icon: "tune",
+          label: "Atur Shift",
+          link: "/shift_dosen_karyawan",
+        },
+        // { icon: "holiday_village", label: "Daftar Libur", link: "/daftar_libur" },
+        // Rekap Presensi hanya untuk non-superadmin
+        ...(!isSuperAdmin
+          ? [
+              {
+                icon: "analytics",
+                label: "Rekap Presensi",
+                link: "/rekap_presensi",
+              },
+            ]
+          : []),
+        { icon: "insert_chart", label: "Rekap Izin", link: "/rekap_izin" },
+        { icon: "upload_file", label: "Import Data CSV", link: "/import_csv" },
+      ],
+    },
+    {
+      section: "REPORT",
+      items: [{ icon: "pie_chart", label: "Sistem Presensi", link: "/report" }],
+    },
+  ];
+
   useEffect(() => {
     dispatch(getMe());
   }, [dispatch]);
@@ -96,28 +116,30 @@ export default function Sidebar() {
                 </button>
               </div>
             )}
-            {group.items.map((item) => (
-              <Link
-                to={item.link}
-                key={item.label}
-                style={{ textDecoration: "none" }}
-              >
-                <SidebarItem
-                  icon={item.icon}
-                  label={item.label}
-                  active={location.pathname === item.link}
-                  hasSub={item.label === "Listing Report List"}
-                  openSub={openSub[item.label]}
-                  toggleSub={() =>
-                    setOpenSub((prev) => ({
-                      ...prev,
-                      [item.label]: !prev[item.label],
-                    }))
-                  }
-                  onClick={() => {}}
-                />
-              </Link>
-            ))}
+            {group.items
+              .filter((item) => item.label)
+              .map((item) => (
+                <Link
+                  to={item.link}
+                  key={item.label}
+                  style={{ textDecoration: "none" }}
+                >
+                  <SidebarItem
+                    icon={item.icon}
+                    label={item.label}
+                    active={location.pathname === item.link}
+                    hasSub={item.label === "Listing Report List"}
+                    openSub={openSub[item.label]}
+                    toggleSub={() =>
+                      setOpenSub((prev) => ({
+                        ...prev,
+                        [item.label]: !prev[item.label],
+                      }))
+                    }
+                    onClick={() => {}}
+                  />
+                </Link>
+              ))}
           </div>
         ))}
       </nav>
