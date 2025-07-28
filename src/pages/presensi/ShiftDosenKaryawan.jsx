@@ -27,10 +27,10 @@ export default function ShiftDosenKaryawan() {
 
   // Fetch karyawan redux
   useEffect(() => {
-    if (token || assignLoading == false) {
+    if (assignLoading == false) {
       dispatch(fetchPegawai(page));
     }
-  }, [dispatch, page, token, assignLoading]);
+  }, [dispatch, page, assignLoading]);
 
   // Fetch shift list
   useEffect(() => {

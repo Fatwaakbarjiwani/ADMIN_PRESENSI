@@ -46,7 +46,7 @@ export default function Sidebar() {
           label: "Atur Shift",
           link: "/shift_dosen_karyawan",
         },
-        // { icon: "holiday_village", label: "Daftar Libur", link: "/daftar_libur" },
+        { icon: "holiday_village", label: "Daftar Libur", link: "/daftar_libur" },
         // Rekap Presensi hanya untuk non-superadmin
         ...(!isSuperAdmin
           ? [

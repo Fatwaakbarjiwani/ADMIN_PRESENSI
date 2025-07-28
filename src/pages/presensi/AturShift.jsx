@@ -208,7 +208,7 @@ export default function AturShift() {
                         <td className="px-2 py-3 align-middle border-b border-gray-100 font-bold text-emerald-700">
                           {shift.unit_detail_name}
                         </td>
-                        <td className="px-2 py-3 flex items-center justify-center border-b border-gray-100 align-middle text-center gap-1">
+                        <td className="px-2 py-3 flex items-center justify-start border-b border-gray-100 align-middle text-center gap-1">
                           <ActionButton
                             onClick={(e) => {
                               e.stopPropagation();
@@ -241,15 +241,28 @@ export default function AturShift() {
                             color="red"
                           />
                           {shift.shift_detail && shift.shift_detail.id ? (
-                            <ActionButton
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                navigate(`/shift-detail/${shift.id}`);
-                              }}
-                              title="Edit Detail"
-                              icon="tune"
-                              color="emerald"
-                            />
+                            <>
+                              <ActionButton
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  navigate(`/shift-detail/${shift.id}`);
+                                }}
+                                title="Edit Detail"
+                                icon="tune"
+                                color="emerald"
+                              />
+                              <ActionButton
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  navigate(
+                                    `/tambah-karyawan-ke-shift/${shift?.shift_detail?.id}`
+                                  );
+                                }}
+                                title="Tambah Karyawan ke Shift"
+                                icon="person_add"
+                                color="emerald"
+                              />
+                            </>
                           ) : (
                             <ActionButton
                               onClick={(e) => {

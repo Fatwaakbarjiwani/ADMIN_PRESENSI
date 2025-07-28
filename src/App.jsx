@@ -14,6 +14,7 @@ import Protected from "./components/Protected";
 import MainLayout from "./components/MainLayout";
 import Pegawai from "./pages/data_pegawai/Pegawai";
 import ManajemenAdmin from "./pages/data_pegawai/ManajemenAdmin";
+import TambahKaryawanKeShift from "./pages/presensi/TambahKaryawanKeShift";
 
 function App() {
   return (
@@ -133,6 +134,16 @@ function App() {
             <Protected>
               <MainLayout>
                 <ShiftDetail />
+              </MainLayout>
+            </Protected>
+          }
+        />
+        <Route
+          path="/tambah-karyawan-ke-shift/:id"
+          element={
+            <Protected>
+              <MainLayout>
+                <TambahKaryawanKeShift />
               </MainLayout>
             </Protected>
           }
