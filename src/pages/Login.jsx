@@ -59,12 +59,12 @@ export default function Login() {
             </h1>
             <p className="text-green-100 text-lg max-w-md mb-8">
               Kelola kehadiran pegawai dan dosen dengan mudah, cepat, dan aman
-              melalui sistem presensi online UNISSULA.
+              melalui sistem presensi online YBWSA.
             </p>
           </div>
         </div>
         <div className="text-green-200 text-xs mt-8">
-          © 2025 Presensi UNISSULA.
+          © 2025 Presensi YAYASAN BADAN WAKAF SULTAN AGUNG.
         </div>
       </div>
       {/* Kanan: Login Form */}
@@ -72,14 +72,10 @@ export default function Login() {
         <div className="w-full max-w-md mx-auto p-8">
           <div className="mb-4">
             <div className="text-2xl font-extrabold text-primary">
-              Presensi UNISSULA
+              Presensi YBWSA
             </div>
             <div className="text-gray-500 text-sm mb-2">
-              Belum punya akun?{" "}
-              <a href="#" className="text-primary font-bold hover:underline">
-                Daftar di sini
-              </a>
-              <br />
+              login dengan email dan katasandi <br />
             </div>
           </div>
           {(localError || error) && (
@@ -119,9 +115,9 @@ export default function Login() {
           </form>
           <div className="flex justify-between mt-4 text-sm">
             <div></div>
-            <a href="#" className="text-primary hover:underline">
+            {/* <a href="#" className="text-primary hover:underline">
               Lupa kata sandi? <span className="font-bold">Klik di sini</span>
-            </a>
+            </a> */}
           </div>
         </div>
       </div>

@@ -278,16 +278,16 @@ export default function ManajemenAdmin() {
         </span>
         <div>
           <div className="text-2xl font-extrabold text-emerald-700 tracking-tight drop-shadow-sm uppercase">
-            Menejemen Admin & Unit
+            Manajemen Admin & Unit
           </div>
           <div className="text-gray-600 text-base font-medium">
             Kelola data admin unit dan unit
           </div>
         </div>
       </div>
-      <div className="mx-auto p-4 max-w-5xl flex flex-col gap-8 px-2 md:px-0">
+      <div className="mx-auto py-4 max-w-5xl flex flex-col gap-6">
         {/* Tab Navigation */}
-        <div className="flex border-b border-gray-200 bg-white shadow-sm">
+        <div className="flex border-b border-gray-200 bg-white shadow-sm rounded-t-lg">
           <button
             className={`px-6 py-3 font-semibold text-sm transition-colors ${
               activeTab === "admin"
@@ -316,23 +316,23 @@ export default function ManajemenAdmin() {
 
         {/* Admin Tab */}
         {activeTab === "admin" && (
-          <div className="border border-gray-200 bg-white p-6 shadow flex flex-col gap-4">
-            <div className="font-bold text-emerald-600 text-xl flex items-center gap-2 mb-2">
+          <div className="border border-gray-200 bg-white p-6 shadow-sm rounded-b-lg">
+            <div className="font-bold text-emerald-600 text-xl flex items-center gap-2 mb-4">
               <span className="material-icons text-emerald-600 text-2xl">
                 admin_panel_settings
               </span>
               DATA ADMIN UNIT
             </div>
             <form
-              className="flex flex-wrap gap-4 mb-4 items-end"
+              className="flex flex-wrap gap-4 mb-6 items-end"
               onSubmit={handleSubmit}
             >
               <div className="flex flex-col flex-1 min-w-[160px]">
-                <label className="text-xs font-semibold text-gray-600 mb-1">
+                <label className="text-sm font-semibold text-gray-600 mb-2">
                   Nama
                 </label>
                 <input
-                  className="border border-gray-300 px-3 py-2 text-sm"
+                  className="border border-gray-300 px-3 py-2 text-sm rounded"
                   placeholder="Nama"
                   value={form.name}
                   onChange={(e) =>
@@ -343,11 +343,11 @@ export default function ManajemenAdmin() {
                 />
               </div>
               <div className="flex flex-col flex-1 min-w-[160px]">
-                <label className="text-xs font-semibold text-gray-600 mb-1">
+                <label className="text-sm font-semibold text-gray-600 mb-2">
                   Email
                 </label>
                 <input
-                  className="border border-gray-300 px-3 py-2 text-sm"
+                  className="border border-gray-300 px-3 py-2 text-sm rounded"
                   placeholder="Email"
                   value={form.email}
                   onChange={(e) =>
@@ -358,11 +358,11 @@ export default function ManajemenAdmin() {
                 />
               </div>
               <div className="flex flex-col flex-1 min-w-[120px] relative">
-                <label className="text-xs font-semibold text-gray-600 mb-1">
+                <label className="text-sm font-semibold text-gray-600 mb-2">
                   Password
                 </label>
                 <input
-                  className="border border-gray-300 px-3 py-2 text-sm pr-10"
+                  className="border border-gray-300 px-3 py-2 text-sm pr-10 rounded"
                   placeholder="Password"
                   type={showPassword ? "text" : "password"}
                   value={form.password}
@@ -374,7 +374,7 @@ export default function ManajemenAdmin() {
                 />
                 <button
                   type="button"
-                  className="absolute right-2 top-7 text-gray-400 hover:text-emerald-600"
+                  className="absolute right-2 top-1/2 text-gray-400 hover:text-emerald-600"
                   tabIndex={-1}
                   onClick={() => setShowPassword((v) => !v)}
                   style={{ background: "none", border: "none", padding: 0 }}
@@ -388,11 +388,11 @@ export default function ManajemenAdmin() {
                 </button>
               </div>
               <div className="flex flex-col min-w-[120px]">
-                <label className="text-xs font-semibold text-gray-600 mb-1">
+                <label className="text-sm font-semibold text-gray-600 mb-2">
                   Unit
                 </label>
                 <select
-                  className="border border-gray-300 px-3 py-2 text-sm"
+                  className="border border-gray-300 px-3 py-2 text-sm rounded"
                   value={form.unit_id}
                   onChange={(e) =>
                     setForm((f) => ({ ...f, unit_id: e.target.value }))
@@ -409,11 +409,11 @@ export default function ManajemenAdmin() {
                 </select>
               </div>
               <div className="flex flex-col min-w-[100px]">
-                <label className="text-xs font-semibold text-gray-600 mb-1">
+                <label className="text-sm font-semibold text-gray-600 mb-2">
                   Status
                 </label>
                 <select
-                  className="border border-gray-300 px-3 py-2 text-sm"
+                  className="border border-gray-300 px-3 py-2 text-sm rounded"
                   value={form.status}
                   onChange={(e) =>
                     setForm((f) => ({ ...f, status: e.target.value }))
@@ -428,7 +428,7 @@ export default function ManajemenAdmin() {
               <div className="flex flex-col justify-end min-w-[120px]">
                 <button
                   type="submit"
-                  className={`px-4 py-2 font-bold text-sm transition flex items-center gap-2 ${
+                  className={`px-4 py-2 font-bold text-sm transition-colors rounded ${
                     form.id
                       ? "bg-yellow-500 hover:bg-yellow-600 text-white"
                       : "bg-emerald-600 hover:bg-emerald-700 text-white"
@@ -451,7 +451,7 @@ export default function ManajemenAdmin() {
                 <div className="flex flex-col justify-end min-w-[80px]">
                   <button
                     type="button"
-                    className="px-4 py-2 font-bold text-sm bg-gray-300 hover:bg-gray-400 text-gray-700"
+                    className="px-4 py-2 font-bold text-sm bg-gray-300 hover:bg-gray-400 text-gray-700 rounded transition-colors"
                     onClick={() =>
                       setForm({
                         id: null,
@@ -471,45 +471,47 @@ export default function ManajemenAdmin() {
               )}
             </form>
             {form.id && (
-              <div className="mb-2 text-sm text-yellow-700 font-semibold">
+              <div className="mb-4 text-sm text-yellow-700 font-semibold bg-yellow-50 px-3 py-2 rounded">
                 Edit Admin: {form.name} ({form.email})
               </div>
             )}
-            <div className="overflow-x-auto">
-              {/* Legend di atas tabel, lebih menarik */}
-              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
-                <div className="flex items-center gap-2 bg-white border border-gray-200 shadow-sm px-4 py-2 rounded">
-                  <label className="text-xs font-semibold text-gray-600">
-                    Filter Unit:
-                  </label>
-                  <select
-                    className="border border-gray-300 px-3 py-1 text-sm min-w-[160px]"
-                    value={filterUnit}
-                    onChange={(e) => setFilterUnit(e.target.value)}
-                  >
-                    <option value="">Semua Unit</option>
-                    {units.map((u) => (
-                      <option key={u.id} value={u.id}>
-                        {u.name}
-                      </option>
-                    ))}
-                  </select>
+
+            {/* Filter Section */}
+            <div className="mb-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+              <div className="flex items-center gap-2 bg-white">
+                <label className="text-sm font-semibold text-gray-600">
+                  Filter Unit:
+                </label>
+                <select
+                  className="border border-gray-300 px-3 py-2 text-sm min-w-[160px] rounded"
+                  value={filterUnit}
+                  onChange={(e) => setFilterUnit(e.target.value)}
+                >
+                  <option value="">Semua Unit</option>
+                  {units.map((u) => (
+                    <option key={u.id} value={u.id}>
+                      {u.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-1 bg-white border border-gray-200 shadow-sm px-3 py-1.5 rounded">
+                  <span className="material-icons text-emerald-600 text-lg">
+                    verified_user
+                  </span>
+                  <span className="text-xs text-emerald-600">Super Admin</span>
                 </div>
-                <div className="flex items-center gap-3">
-                  <div className="flex items-center gap-1 bg-white border border-gray-200 shadow-sm px-3 py-1.5 rounded">
-                    <span className="material-icons text-pink-600 text-xl">
-                      verified_user
-                    </span>
-                    <span className="text-xs text-pink-600">Super Admin</span>
-                  </div>
-                  <div className="flex items-center gap-1 bg-white border border-gray-200 shadow-sm px-3 py-1.5 rounded">
-                    <span className="material-icons text-yellow-500 text-xl">
-                      person
-                    </span>
-                    <span className="text-xs text-yellow-500">Admin Unit</span>
-                  </div>
+                <div className="flex items-center gap-1 bg-white border border-gray-200 shadow-sm px-3 py-1.5 rounded">
+                  <span className="material-icons text-gray-600 text-lg">
+                    person
+                  </span>
+                  <span className="text-xs text-gray-600">Admin Unit</span>
                 </div>
               </div>
+            </div>
+
+            <div className="overflow-x-auto">
               <table className="min-w-full text-sm bg-white">
                 <thead className="sticky top-0 z-10 bg-white border-b-2 border-emerald-100">
                   <tr>
@@ -568,14 +570,14 @@ export default function ManajemenAdmin() {
                         <td className="px-4 py-4 align-middle border-b border-gray-100 text-base text-center">
                           {row.role === "super_admin" ? (
                             <span
-                              className="material-icons text-pink-600 text-2xl"
+                              className="material-icons text-emerald-600 text-2xl"
                               title="Super Admin"
                             >
                               verified_user
                             </span>
                           ) : (
                             <span
-                              className="material-icons text-yellow-500 text-2xl"
+                              className="material-icons text-gray-600 text-2xl"
                               title="Admin Unit"
                             >
                               person
@@ -592,27 +594,29 @@ export default function ManajemenAdmin() {
                             <span className="text-red-700">Nonaktif</span>
                           )}
                         </td>
-                        <td className="px-4 py-4 text-center align-middle border-b border-gray-100 flex gap-1 justify-center text-base">
-                          <button
-                            className="w-8 h-8 flex items-center justify-center text-yellow-600 hover:text-yellow-800 rounded transition"
-                            onClick={() => row && handleEdit(row)}
-                            disabled={formLoading}
-                            title="Edit"
-                          >
-                            <span className="material-icons text-base">
-                              edit
-                            </span>
-                          </button>
-                          <button
-                            className="w-8 h-8 flex items-center justify-center text-red-600 hover:text-red-800 rounded transition"
-                            onClick={() => handleDelete(row?.id)}
-                            disabled={formLoading}
-                            title="Hapus"
-                          >
-                            <span className="material-icons text-base">
-                              delete
-                            </span>
-                          </button>
+                        <td className="px-4 py-4 text-center align-middle border-b border-gray-100">
+                          <div className="flex gap-1 justify-center">
+                            <button
+                              className="w-8 h-8 flex items-center justify-center text-yellow-600 hover:text-yellow-800 rounded transition-colors"
+                              onClick={() => row && handleEdit(row)}
+                              disabled={formLoading}
+                              title="Edit"
+                            >
+                              <span className="material-icons text-base">
+                                edit
+                              </span>
+                            </button>
+                            <button
+                              className="w-8 h-8 flex items-center justify-center text-red-600 hover:text-red-800 rounded transition-colors"
+                              onClick={() => handleDelete(row?.id)}
+                              disabled={formLoading}
+                              title="Hapus"
+                            >
+                              <span className="material-icons text-base">
+                                delete
+                              </span>
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     ))
@@ -620,9 +624,16 @@ export default function ManajemenAdmin() {
                     <tr>
                       <td
                         colSpan={7}
-                        className="text-center text-gray-400 py-4"
+                        className="text-center text-gray-400 py-8"
                       >
-                        Tidak ada data admin.
+                        <div className="flex flex-col items-center gap-2">
+                          <span className="material-icons text-4xl text-gray-300">
+                            admin_panel_settings
+                          </span>
+                          <div className="font-semibold text-gray-600">
+                            Tidak ada data admin.
+                          </div>
+                        </div>
                       </td>
                     </tr>
                   )}
@@ -634,23 +645,23 @@ export default function ManajemenAdmin() {
 
         {/* Unit Tab */}
         {activeTab === "unit" && (
-          <div className="border border-gray-200 bg-white p-6 shadow flex flex-col gap-4">
-            <div className="font-bold text-emerald-600 text-xl flex items-center gap-2 mb-2">
+          <div className="border border-gray-200 bg-white p-6 shadow-sm rounded-b-lg">
+            <div className="font-bold text-emerald-600 text-xl flex items-center gap-2 mb-4">
               <span className="material-icons text-emerald-600 text-2xl">
                 business
               </span>
-              DATA UNIT
+              Data Unit
             </div>
             <form
-              className="flex flex-wrap gap-4 mb-4 items-end"
+              className="flex flex-wrap gap-4 mb-6 items-end"
               onSubmit={handleUnitSubmit}
             >
               <div className="flex flex-col flex-1 min-w-[200px]">
-                <label className="text-xs font-semibold text-gray-600 mb-1">
+                <label className="text-sm font-semibold text-gray-600 mb-2">
                   Nama Unit
                 </label>
                 <input
-                  className="border border-gray-300 px-3 py-2 text-sm"
+                  className="border border-gray-300 px-3 py-2 text-sm rounded"
                   placeholder="Nama Unit"
                   value={unitForm?.name || ""}
                   onChange={(e) =>
@@ -663,7 +674,7 @@ export default function ManajemenAdmin() {
               <div className="flex flex-col justify-end min-w-[120px]">
                 <button
                   type="submit"
-                  className={`px-4 py-2 font-bold text-sm transition flex items-center gap-2 ${
+                  className={`px-4 py-2 font-bold text-sm transition-colors rounded ${
                     unitForm.id
                       ? "bg-yellow-500 hover:bg-yellow-600 text-white"
                       : "bg-emerald-600 hover:bg-emerald-700 text-white"
@@ -686,7 +697,7 @@ export default function ManajemenAdmin() {
                 <div className="flex flex-col justify-end min-w-[80px]">
                   <button
                     type="button"
-                    className="px-4 py-2 font-bold text-sm bg-gray-300 hover:bg-gray-400 text-gray-700"
+                    className="px-4 py-2 font-bold text-sm bg-gray-300 hover:bg-gray-400 text-gray-700 rounded transition-colors"
                     onClick={() =>
                       setUnitForm({
                         id: null,
@@ -701,7 +712,7 @@ export default function ManajemenAdmin() {
               )}
             </form>
             {unitForm.id && (
-              <div className="mb-2 text-sm text-yellow-700 font-semibold">
+              <div className="mb-4 text-sm text-yellow-700 font-semibold bg-yellow-50 px-3 py-2 rounded">
                 Edit Unit: {unitForm?.name || ""}
               </div>
             )}
@@ -757,27 +768,29 @@ export default function ManajemenAdmin() {
                             </span>
                           )}
                         </td>
-                        <td className="px-4 py-4 text-center align-middle border-b border-gray-100 flex gap-1 justify-center text-base">
-                          <button
-                            className="w-8 h-8 flex items-center justify-center text-yellow-600 hover:text-yellow-800 rounded transition"
-                            onClick={() => handleUnitEdit(row)}
-                            disabled={unitFormLoading}
-                            title="Edit"
-                          >
-                            <span className="material-icons text-base">
-                              edit
-                            </span>
-                          </button>
-                          <button
-                            className="w-8 h-8 flex items-center justify-center text-red-600 hover:text-red-800 rounded transition"
-                            onClick={() => handleUnitDelete(row?.id)}
-                            disabled={unitFormLoading}
-                            title="Hapus"
-                          >
-                            <span className="material-icons text-base">
-                              delete
-                            </span>
-                          </button>
+                        <td className="px-4 py-4 text-center align-middle border-b border-gray-100">
+                          <div className="flex gap-1 justify-center">
+                            <button
+                              className="w-8 h-8 flex items-center justify-center text-yellow-600 hover:text-yellow-800 rounded transition-colors"
+                              onClick={() => handleUnitEdit(row)}
+                              disabled={unitFormLoading}
+                              title="Edit"
+                            >
+                              <span className="material-icons text-base">
+                                edit
+                              </span>
+                            </button>
+                            <button
+                              className="w-8 h-8 flex items-center justify-center text-red-600 hover:text-red-800 rounded transition-colors"
+                              onClick={() => handleUnitDelete(row?.id)}
+                              disabled={unitFormLoading}
+                              title="Hapus"
+                            >
+                              <span className="material-icons text-base">
+                                delete
+                              </span>
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     ))
@@ -785,9 +798,16 @@ export default function ManajemenAdmin() {
                     <tr>
                       <td
                         colSpan={4}
-                        className="text-center text-gray-400 py-4"
+                        className="text-center text-gray-400 py-8"
                       >
-                        Tidak ada data unit.
+                        <div className="flex flex-col items-center gap-2">
+                          <span className="material-icons text-4xl text-gray-300">
+                            business
+                          </span>
+                          <div className="font-semibold text-gray-600">
+                            Tidak ada data unit.
+                          </div>
+                        </div>
                       </td>
                     </tr>
                   )}

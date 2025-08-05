@@ -8,6 +8,8 @@ import pegawaiReducer from "./pegawaiReducer";
 import adminReducer from "./adminReducer";
 import unitReducer from "./unitReducer";
 import hariLiburReducer from "./hariLiburReducer";
+import tambahPegawaiReducer from "./tambahPegawaiReducer";
+import laukPaukReducer from "./laukPaukReducer";
 
 export default combineReducers({
   auth: authReducer,
@@ -19,4 +21,6 @@ export default combineReducers({
   admin: adminReducer,
   unit: unitReducer,
   hariLibur: hariLiburReducer,
+  tambahPegawai: tambahPegawaiReducer,
+  laukPauk: laukPaukReducer,
 });

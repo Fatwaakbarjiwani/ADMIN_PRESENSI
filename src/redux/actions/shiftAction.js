@@ -1,6 +1,13 @@
 import axios from "axios";
 import Swal from "sweetalert2";
-import { setData, setError, setLoading } from "../reducers/shiftReducer";
+import {
+  setData,
+  setError,
+  setLoading,
+  setPegawai,
+  setPengajuan,
+  setPengajuanLoading,
+} from "../reducers/shiftReducer";
 
 export const fetchShifts = () => async (dispatch, getState) => {
   dispatch(setError(null));
@@ -195,50 +202,56 @@ export const updateShiftDetail =
 
 // Tambah: Ambil data pegawai sesuai role
 export const fetchPegawai =
-  (page = 1) =>
+  (page = 1, search) =>
   async (dispatch, getState) => {
     dispatch(setLoading(true));
     const { token, user } = getState().auth;
     let url = "";
     if (user?.role === "super_admin") {
-      url = `${import.meta.env.VITE_API_URL}/api/pegawai?page=${page}`;
+      url = `${
+        import.meta.env.VITE_API_URL
+      }/api/pegawai?page=${page}&&search=${search}`;
     } else {
-      url = `${import.meta.env.VITE_API_URL}/api/pegawai/by-unit-id-presensi`;
+      url = `${
+        import.meta.env.VITE_API_URL
+      }/api/pegawai/by-unit-id-presensi?page=${page}&&search=${search}`;
     }
     try {
       const res = await axios.get(url, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (user?.role === "super_admin") {
-        dispatch({
-          type: "shift/setPegawai",
-          payload: {
+
+        dispatch(
+          setPegawai({
+            data: res?.data?.data,
+            pagination: {
+              last_page: res.data.last_page,
+              current_page: res.data.current_page,
+              links: res.data.links,
+            },
+          })
+        );
+      } else {
+        dispatch(
+          setPegawai({
             data: res.data.data,
             pagination: {
               last_page: res.data.last_page,
               current_page: res.data.current_page,
               links: res.data.links,
             },
-          },
-        });
-      } else {
-        dispatch({
-          type: "shift/setPegawai",
-          payload: {
-            data: res.data,
-            pagination: { last_page: 1, current_page: 1, links: [] },
-          },
-        });
+          })
+        );
       }
       dispatch(setLoading(false));
     } catch {
-      dispatch({
-        type: "shift/setPegawai",
-        payload: {
+      dispatch(
+        setPegawai({
           data: [],
           pagination: { last_page: 1, current_page: 1, links: [] },
-        },
-      });
+        })
+      );
       dispatch(setLoading(false));
     }
   };
@@ -273,34 +286,32 @@ export const assignPegawaiToShift =
 export const fetchPengajuanIzin =
   (type = "izin", page = 1) =>
   async (dispatch, getState) => {
-    dispatch({ type: "shift/setPengajuanLoading", payload: true });
+    dispatch(setPengajuanLoading(true));
     const { token } = getState().auth;
     try {
       const res = await axios.get(
         `${import.meta.env.VITE_API_URL}/api/pengajuan-${type}?page=${page}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      dispatch({
-        type: "shift/setPengajuan",
-        payload: {
+      dispatch(
+        setPengajuan({
           data: res.data.data,
           pagination: {
             last_page: res.data.last_page,
             current_page: res.data.current_page,
             links: res.data.links,
           },
-        },
-      });
+        })
+      );
     } catch {
-      dispatch({
-        type: "shift/setPengajuan",
-        payload: {
+      dispatch(
+        setPengajuan({
           data: [],
           pagination: { last_page: 1, current_page: 1, links: [] },
-        },
-      });
+        })
+      );
     } finally {
-      dispatch({ type: "shift/setPengajuanLoading", payload: false });
+      dispatch(setPengajuanLoading(false));
     }
   };
 

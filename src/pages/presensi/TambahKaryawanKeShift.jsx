@@ -16,10 +16,15 @@ export default function TambahKaryawanKeShift() {
   const [selectedPegawai, setSelectedPegawai] = useState([]);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
+  const [searchValue, setSearchValue] = useState("");
 
   useEffect(() => {
-    dispatch(fetchPegawai(page));
-  }, [dispatch, page]);
+    dispatch(fetchPegawai(page, searchValue));
+  }, [dispatch, page, searchValue]);
+
+  const handleSearch = (e) => {
+    setSearchValue(e.target.value);
+  };
 
   const handleSimpan = () => {
     if (selectedPegawai.length === 0) {
@@ -57,7 +62,7 @@ export default function TambahKaryawanKeShift() {
           </div>
         </div>
       </div>
-      <div className="mx-auto p-4 max-w-4xl flex flex-col gap-8 px-2 md:px-0">
+      <div className="mx-auto p-4 max-w-5xl flex flex-col gap-8 px-2 md:px-0">
         <div className="flex mb-2">
           <button
             className="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded font-bold text-sm mr-auto"
@@ -69,15 +74,31 @@ export default function TambahKaryawanKeShift() {
             >
               arrow_back
             </span>
-            Back
+            Kembali
           </button>
         </div>
         <div className="border border-gray-200 bg-white p-6 shadow flex flex-col gap-4">
-          <div className="font-bold text-emerald-600 mb-2 text-xl flex items-center gap-2">
-            <span className="material-icons text-emerald-600 text-2xl">
-              people
-            </span>
-            Daftar Karyawan
+          <div className="flex items-start justify-between">
+            <div className="font-bold text-emerald-600 mb-2 text-xl flex items-center gap-2">
+              <span className="material-icons text-emerald-600 text-2xl">
+                people
+              </span>
+              Daftar Karyawan
+            </div>
+            <div>
+              <span className="text-gray-400">
+                <span className="text-xs">search :</span>
+              </span>
+              <div className="relative bg-white flex items-center">
+                <input
+                  type="text"
+                  placeholder="Cari Nama/NIK/Unit"
+                  className="p-2 w-full rounded border border-gray-200 outline-none text-sm"
+                  value={searchValue}
+                  onChange={handleSearch}
+                />
+              </div>
+            </div>
           </div>
           <div className="overflow-x-auto">
             <table className="min-w-full text-sm bg-white">
@@ -88,12 +109,21 @@ export default function TambahKaryawanKeShift() {
                   </th>
                   <th className="px-2 py-3 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-56">
                     Nama Lengkap
+                    <div className="text-xs font-normal text-gray-400 normal-case">
+                      (dengan gelar)
+                    </div>
                   </th>
                   <th className="px-2 py-3 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-32">
                     NIP
                   </th>
                   <th className="px-2 py-3 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-40">
                     Jabatan
+                  </th>
+                  <th className="px-2 py-3 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-40">
+                    Unit Detail
+                  </th>
+                  <th className="px-2 py-3 text-center font-extrabold text-emerald-700 tracking-wide text-base uppercase w-40">
+                    Shift
                   </th>
                   <th className="px-2 py-3 text-center font-extrabold text-emerald-700 tracking-wide text-base uppercase w-24">
                     Pilih
@@ -129,6 +159,20 @@ export default function TambahKaryawanKeShift() {
                       </td>
                       <td className="px-2 py-3 align-middle border-b border-gray-100">
                         {row.jabatan}
+                      </td>
+                      <td className="px-2 py-3 align-middle border-b border-gray-100">
+                        {row.unit_detail_name}
+                      </td>
+                      <td className="px-2 py-3 align-middle text-center border-b border-gray-100">
+                        {row.shift_name ? (
+                          <span className="inline-block bg-emerald-100 text-emerald-700 px-2 py-0.5 text-xs font-bold">
+                            {row.shift_name}
+                          </span>
+                        ) : (
+                          <span className="inline-block bg-gray-100 text-gray-400 px-2 py-0.5 text-xs">
+                            -
+                          </span>
+                        )}
                       </td>
                       <td className="px-2 py-3 text-center align-middle border-b border-gray-100">
                         <input

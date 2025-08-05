@@ -1,6 +1,7 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchPegawai } from "../../redux/actions/pegawaiAction";
+import { useNavigate } from "react-router-dom";
 
 export default function Pegawai() {
   const dispatch = useDispatch();
@@ -8,15 +9,22 @@ export default function Pegawai() {
   const user = useSelector((state) => state.auth.user);
   const isSuperAdmin = user?.role === "super_admin";
   const { data, pagination } = useSelector((state) => state.pegawai);
+  const navigate = useNavigate();
+  const [searchValue, setSearchValue] = useState("");
 
   useEffect(() => {
     if (token) {
-      dispatch(fetchPegawai(isSuperAdmin, token, pagination.current_page));
+      dispatch(
+        fetchPegawai(isSuperAdmin, token, pagination.current_page, searchValue)
+      );
     }
-  }, [token, isSuperAdmin, dispatch, pagination.current_page]);
+  }, [token, isSuperAdmin, dispatch, pagination.current_page, searchValue]);
 
   const handlePageChange = (page) => {
     dispatch(fetchPegawai(isSuperAdmin, token, page));
+  };
+  const handleSearch = (e) => {
+    setSearchValue(e.target.value);
   };
 
   return (
@@ -36,11 +44,36 @@ export default function Pegawai() {
       </div>
       <div className="mx-auto p-4 max-w-5xl flex flex-col gap-8 px-2 md:px-0">
         <div className="border border-gray-200 bg-white p-6 shadow flex flex-col gap-4">
-          <div className="font-bold text-emerald-600 text-xl flex items-center gap-2 mb-2">
-            <span className="material-icons text-emerald-600 text-2xl">
-              people
-            </span>
-            DATA PEGAWAI
+          <div className="flex justify-between items-start">
+            <div className="font-bold text-emerald-600 text-xl flex items-center gap-2 mb-2">
+              <span className="material-icons text-emerald-600 text-2xl">
+                people
+              </span>
+              DATA PEGAWAI
+            </div>
+            <div className="flex items-end gap-2">
+              <div>
+                <span className="text-gray-400">
+                  <span className="text-xs">search :</span>
+                </span>
+                <div className="relative bg-white flex items-center">
+                  <input
+                    type="text"
+                    placeholder="Cari Nama/NIK/Unit"
+                    className="p-2 w-full rounded border border-gray-200 outline-none text-sm"
+                    value={searchValue}
+                    onChange={handleSearch}
+                  />
+                </div>
+              </div>
+              <button
+                className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded font-bold text-sm flex items-center gap-2"
+                onClick={() => navigate("/tambah-karyawan-ke-unit-detail")}
+              >
+                <span className="material-icons text-base">person_add</span>{" "}
+                Tambah Pegawai
+              </button>
+            </div>
           </div>
 
           <div className="overflow-x-auto">
@@ -78,11 +111,14 @@ export default function Pegawai() {
                   <th className="px-2 py-3 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-32">
                     Jenis Kelamin
                   </th>
+                  <th className="px-2 py-3 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-32">
+                    Shift
+                  </th>
                 </tr>
               </thead>
               <tbody>
-                {data.length > 0 ? (
-                  data.map((row, idx) => (
+                {data?.length > 0 ? (
+                  data?.map((row, idx) => (
                     <tr
                       key={row.id}
                       className={
@@ -96,7 +132,7 @@ export default function Pegawai() {
                       <td className="px-4 py-3 align-middle border-b border-gray-100">
                         {row.no_ktp}
                       </td>
-                      <td className="px-4 py-3 font-bold align-middle border-b border-gray-100 text-emerald-800">
+                      <td className="px-4 py-3 truncate font-bold align-middle border-b border-gray-100 text-emerald-800">
                         {[
                           row.gelar_depan,
                           row.nama_depan,
@@ -111,9 +147,9 @@ export default function Pegawai() {
                         {row.email}
                       </td>
                       <td className="px-4 py-3 align-middle border-b border-gray-100 font-bold text-emerald-700">
-                        {row.unit_detail?.nama ? (
+                        {row?.unit_detail_name ? (
                           <span className="inline-block bg-emerald-100 text-emerald-700 px-2 py-0.5 text-xs font-bold">
-                            {row.unit_detail.nama}
+                            {row.unit_detail_name}
                           </span>
                         ) : (
                           <span className="inline-block bg-gray-100 text-gray-400 px-2 py-0.5 text-xs">
@@ -121,7 +157,7 @@ export default function Pegawai() {
                           </span>
                         )}
                       </td>
-                      <td className="px-4 py-3 align-middle border-b border-gray-100">
+                      <td className="px-4 py-3 align-middle border-b border-gray-100 whitespace-nowrap">
                         {row.tgl_lahir}
                       </td>
                       <td className="px-4 py-3 align-middle border-b border-gray-100">
@@ -130,6 +166,17 @@ export default function Pegawai() {
                           : row.jenis_kelamin === "p"
                           ? "Perempuan"
                           : "-"}
+                      </td>
+                      <td className="px-4 py-3 align-middle border-b border-gray-100 font-bold text-emerald-700">
+                        {row?.shift_name ? (
+                          <span className="inline-block bg-emerald-100 text-emerald-700 px-2 py-0.5 text-xs font-bold">
+                            {row.shift_name}
+                          </span>
+                        ) : (
+                          <span className="inline-block bg-gray-100 text-gray-400 px-2 py-0.5 text-xs">
+                            -
+                          </span>
+                        )}
                       </td>
                     </tr>
                   ))
@@ -144,7 +191,7 @@ export default function Pegawai() {
             </table>
           </div>
 
-          {isSuperAdmin && pagination.last_page > 1 && (
+          {pagination.last_page > 1 && (
             <div className="flex flex-wrap gap-1 justify-center mt-4">
               {pagination.links.map((link, i) => (
                 <button

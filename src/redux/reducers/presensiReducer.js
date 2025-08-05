@@ -7,6 +7,12 @@ const initialState = {
   rekapData: [],
   rekapLoading: false,
   rekapError: null,
+  detailRekap: [],
+  detailRekapLoading: false,
+  detailRekapError: null,
+  detailHistory: [],
+  detailHistoryLoading: false,
+  detailHistoryError: null,
 };
 
 const presensiSlice = createSlice({
@@ -31,6 +37,24 @@ const presensiSlice = createSlice({
     setRekapData: (state, action) => {
       state.rekapData = action.payload;
     },
+    setDetailRekap: (state, action) => {
+      state.detailRekap = action.payload;
+    },
+    setDetailRekapLoading: (state, action) => {
+      state.detailRekapLoading = action.payload;
+    },
+    setDetailRekapError: (state, action) => {
+      state.detailRekapError = action.payload;
+    },
+    setDetailHistory: (state, action) => {
+      state.detailHistory = action.payload;
+    },
+    setDetailHistoryLoading: (state, action) => {
+      state.detailHistoryLoading = action.payload;
+    },
+    setDetailHistoryError: (state, action) => {
+      state.detailHistoryError = action.payload;
+    },
   },
 });
 
@@ -41,5 +65,11 @@ export const {
   setRekapLoading,
   setRekapError,
   setRekapData,
+  setDetailRekap,
+  setDetailRekapLoading,
+  setDetailRekapError,
+  setDetailHistory,
+  setDetailHistoryLoading,
+  setDetailHistoryError,
 } = presensiSlice.actions;
 export default presensiSlice.reducer;

@@ -193,52 +193,70 @@ export default function DataIzin() {
           </div>
         </div>
         <div className="mx-auto p-4 max-w-5xl flex flex-col gap-8 px-2 md:px-0">
-          {/* Tab menu modern */}
-          <div className="flex gap-2 mb-4 border-b border-gray-200">
+          {/* Tab Navigation - Modern Style */}
+          <div className="flex border-b border-gray-200 bg-white shadow-sm">
             {["izin", "cuti", "sakit"].map((j) => (
               <button
                 key={j}
-                className={`px-6 py-2 rounded-t-lg font-bold text-base border-b-4 transition-all duration-150 focus:outline-none ${
+                className={`px-6 py-3 font-semibold text-sm transition-colors ${
                   pengajuanTab === j
-                    ? "border-emerald-600 text-emerald-600 bg-white shadow-sm"
-                    : "border-transparent text-gray-500 bg-gray-100"
+                    ? "text-emerald-600 border-b-2 border-emerald-600 bg-emerald-50"
+                    : "text-gray-600 hover:text-emerald-600 hover:bg-gray-50"
                 }`}
                 onClick={() => {
                   setPengajuanTab(j);
                   setPengajuanPage(1);
                 }}
               >
+                <span className="material-icons text-lg mr-2">
+                  {j === "izin"
+                    ? "event_note"
+                    : j === "cuti"
+                    ? "event"
+                    : "healing"}
+                </span>
                 {j.charAt(0).toUpperCase() + j.slice(1)}
               </button>
             ))}
           </div>
-          <div className="border border-gray-300 bg-white p-4 rounded shadow">
+
+          <div className="border border-gray-200 bg-white p-6 shadow flex flex-col gap-4">
+            <div className="font-bold text-emerald-600 text-xl flex items-center gap-2 mb-2">
+              <span className="material-icons text-emerald-600 text-2xl">
+                {pengajuanTab === "izin"
+                  ? "event_note"
+                  : pengajuanTab === "cuti"
+                  ? "event"
+                  : "healing"}
+              </span>
+              DATA PENGAJUAN {pengajuanTab.toUpperCase()}
+            </div>
             <div className="overflow-x-auto">
-              <table className="min-w-full text-xs border border-gray-200 rounded-md overflow-hidden shadow-sm">
+              <table className="min-w-full text-sm bg-white">
                 <thead className="sticky top-0 z-10 bg-white border-b-2 border-emerald-100">
                   <tr>
                     <th className="px-4 py-4 text-center font-extrabold text-emerald-700 tracking-wide text-base uppercase w-12">
                       No
                     </th>
-                    <th className="px-2 py-3 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-32">
+                    <th className="px-4 py-4 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-32">
                       Pegawai ID
                     </th>
-                    <th className="px-2 py-3 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-32">
+                    <th className="px-4 py-4 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-32">
                       Tanggal Mulai
                     </th>
-                    <th className="px-2 py-3 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-32">
+                    <th className="px-4 py-4 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-32">
                       Tanggal Selesai
                     </th>
-                    <th className="px-2 py-3 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-40">
+                    <th className="px-4 py-4 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-40">
                       Alasan
                     </th>
-                    <th className="px-2 py-3 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-32">
+                    <th className="px-4 py-4 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-32">
                       Dokumen
                     </th>
-                    <th className="px-2 py-3 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-24">
+                    <th className="px-4 py-4 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-24">
                       Status
                     </th>
-                    <th className="px-2 py-3 text-center font-extrabold text-emerald-700 tracking-wide text-base uppercase w-24">
+                    <th className="px-4 py-4 text-center font-extrabold text-emerald-700 tracking-wide text-base uppercase w-24">
                       Aksi
                     </th>
                   </tr>
@@ -253,24 +271,24 @@ export default function DataIzin() {
                           (idx % 2 === 0 ? "bg-white" : "bg-gray-50")
                         }
                       >
-                        <td className="px-4 py-4 text-center align-middle border-b border-gray-100 text-sm">
+                        <td className="px-4 py-4 text-center align-middle border-b border-gray-100 font-semibold text-sm">
                           {idx +
                             1 +
                             ((pengajuanPagination.current_page - 1) * 10 || 0)}
                         </td>
-                        <td className="px-2 py-3 align-middle border-b border-gray-100 text-sm">
+                        <td className="px-4 py-4 align-middle border-b border-gray-100 text-sm">
                           {row.pegawai_id}
                         </td>
-                        <td className="px-2 py-3 align-middle border-b border-gray-100 text-sm">
+                        <td className="px-4 py-4 align-middle border-b border-gray-100 text-sm">
                           {row.tanggal_mulai}
                         </td>
-                        <td className="px-2 py-3 align-middle border-b border-gray-100 text-sm">
+                        <td className="px-4 py-4 align-middle border-b border-gray-100 text-sm">
                           {row.tanggal_selesai}
                         </td>
-                        <td className="px-2 py-3 align-middle border-b border-gray-100 text-sm">
+                        <td className="px-4 py-4 align-middle border-b border-gray-100 text-sm">
                           {row.alasan}
                         </td>
-                        <td className="px-2 py-3 align-middle border-b border-gray-100">
+                        <td className="px-4 py-4 align-middle border-b border-gray-100">
                           {row.dokumen ? (
                             <a
                               href={`http://103.23.103.43/prototype/tes/storage/${row.dokumen}`}
@@ -284,7 +302,7 @@ export default function DataIzin() {
                             "-"
                           )}
                         </td>
-                        <td className="px-2 py-3 capitalize font-bold align-middle border-b border-gray-100 text-sm">
+                        <td className="px-4 py-4 capitalize font-bold align-middle border-b border-gray-100 text-sm">
                           {row.status === "pending" && (
                             <span className="text-yellow-500">Pending</span>
                           )}
@@ -295,7 +313,7 @@ export default function DataIzin() {
                             <span className="text-red-500">Ditolak</span>
                           )}
                         </td>
-                        <td className="px-2 py-3 text-center align-middle border-b border-gray-100 flex gap-1 justify-center">
+                        <td className="px-4 py-4 text-center align-middle border-b border-gray-100 flex gap-1 justify-center text-sm">
                           {row.status === "pending" && (
                             <>
                               <button
@@ -375,82 +393,124 @@ export default function DataIzin() {
         </div>
       </div>
       <div className="mx-auto p-4 max-w-5xl flex flex-col gap-8 px-2 md:px-0">
-        <div className="border border-gray-300 bg-white p-4 rounded shadow">
-          {/* Tab menu modern untuk superadmin */}
-          <div className="flex gap-2 mb-4 border-b border-gray-200">
-            {jenisList.map((j) => (
-              <button
-                key={j}
-                className={`px-6 py-2 rounded-t-lg font-bold text-base border-b-4 transition-all duration-150 focus:outline-none ${
-                  jenis === j
-                    ? "border-emerald-600 text-emerald-600 bg-white shadow-sm"
-                    : "border-transparent text-gray-500 bg-gray-100"
-                }`}
-                onClick={() => {
-                  setJenis(j);
-                  setForm({ id: null, jenis: "" });
-                  // setError(null);
-                }}
-              >
-                {j.charAt(0).toUpperCase() + j.slice(1)}
-              </button>
-            ))}
-          </div>
-          <form className="flex gap-2 mb-4" onSubmit={handleSubmit}>
-            <input
-              className="border border-gray-300 rounded px-3 py-2 text-sm flex-1"
-              placeholder="Jenis Izin"
-              value={form.jenis}
-              onChange={(e) =>
-                setForm((f) => ({ ...f, jenis: e.target.value }))
-              }
-              disabled={formLoading}
-            />
+        {/* Tab Navigation - Modern Style */}
+        <div className="flex border-b border-gray-200 bg-white shadow-sm">
+          {jenisList.map((j) => (
             <button
-              type="submit"
-              className={`px-4 py-2 rounded font-bold text-sm transition ${
-                form.id
-                  ? "bg-yellow-500 hover:bg-yellow-600 text-white"
-                  : "bg-emerald-600 hover:bg-emerald-700 text-white"
+              key={j}
+              className={`px-6 py-3 font-semibold text-sm transition-colors ${
+                jenis === j
+                  ? "text-emerald-600 border-b-2 border-emerald-600 bg-emerald-50"
+                  : "text-gray-600 hover:text-emerald-600 hover:bg-gray-50"
               }`}
-              disabled={formLoading}
+              onClick={() => {
+                setJenis(j);
+                setForm({ id: null, jenis: "" });
+                // setError(null);
+              }}
             >
-              {form.id
-                ? formLoading
-                  ? "Menyimpan..."
-                  : "Simpan Perubahan"
-                : formLoading
-                ? "Menambah..."
-                : "Tambah"}
+              <span className="material-icons text-lg mr-2">
+                {j === "izin"
+                  ? "event_note"
+                  : j === "cuti"
+                  ? "event"
+                  : "healing"}
+              </span>
+              {j.charAt(0).toUpperCase() + j.slice(1)}
             </button>
-            {form.id && (
+          ))}
+        </div>
+
+        <div className="border border-gray-200 bg-white p-6 shadow flex flex-col gap-4">
+          <div className="font-bold text-emerald-600 text-xl flex items-center gap-2 mb-2">
+            <span className="material-icons text-emerald-600 text-2xl">
+              {jenis === "izin"
+                ? "event_note"
+                : jenis === "cuti"
+                ? "event"
+                : "healing"}
+            </span>
+            DATA JENIS {jenis.toUpperCase()}
+          </div>
+          <form
+            className="flex flex-wrap gap-4 mb-4 items-end"
+            onSubmit={handleSubmit}
+          >
+            <div className="flex flex-col flex-1 min-w-[200px]">
+              <label className="text-xs font-semibold text-gray-600 mb-1">
+                Jenis {jenis.charAt(0).toUpperCase() + jenis.slice(1)}
+              </label>
+              <input
+                className="border border-gray-300 px-3 py-2 text-sm"
+                placeholder={`Jenis ${
+                  jenis.charAt(0).toUpperCase() + jenis.slice(1)
+                }`}
+                value={form.jenis}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, jenis: e.target.value }))
+                }
+                disabled={formLoading}
+                required
+              />
+            </div>
+            <div className="flex flex-col justify-end min-w-[120px]">
               <button
-                type="button"
-                className="px-4 py-2 rounded font-bold text-sm bg-gray-300 hover:bg-gray-400 text-gray-700"
-                onClick={() => setForm({ id: null, jenis: "" })}
+                type="submit"
+                className={`px-4 py-2 font-bold text-sm transition flex items-center gap-2 ${
+                  form.id
+                    ? "bg-yellow-500 hover:bg-yellow-600 text-white"
+                    : "bg-emerald-600 hover:bg-emerald-700 text-white"
+                }`}
                 disabled={formLoading}
               >
-                Batal
+                {formLoading && (
+                  <span className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></span>
+                )}
+                {form.id
+                  ? formLoading
+                    ? "Menyimpan..."
+                    : "Simpan Perubahan"
+                  : formLoading
+                  ? "Menambah..."
+                  : "Tambah"}
               </button>
+            </div>
+            {form.id && (
+              <div className="flex flex-col justify-end min-w-[80px]">
+                <button
+                  type="button"
+                  className="px-4 py-2 font-bold text-sm bg-gray-300 hover:bg-gray-400 text-gray-700"
+                  onClick={() => setForm({ id: null, jenis: "" })}
+                  disabled={formLoading}
+                >
+                  Batal
+                </button>
+              </div>
             )}
           </form>
+          {form.id && (
+            <div className="mb-2 text-sm text-yellow-700 font-semibold">
+              Edit {jenis.charAt(0).toUpperCase() + jenis.slice(1)}:{" "}
+              {form.jenis}
+            </div>
+          )}
           <div className="overflow-x-auto">
-            <table className="min-w-full text-xs border border-gray-200 rounded-md overflow-hidden shadow-sm">
+            <table className="min-w-full text-sm bg-white">
               <thead className="sticky top-0 z-10 bg-white border-b-2 border-emerald-100">
                 <tr>
                   <th className="px-4 py-4 text-center font-extrabold text-emerald-700 tracking-wide text-base uppercase w-12">
                     No
                   </th>
-                  <th className="px-2 py-3 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-40">
-                    Jenis Izin
+                  <th className="px-4 py-4 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-40">
+                    Jenis {jenis.charAt(0).toUpperCase() + jenis.slice(1)}
                   </th>
-                  <th className="px-2 py-3 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-32">
+                  <th className="px-4 py-4 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-32">
                     Created
                   </th>
-                  <th className="px-2 py-3 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-32">
+                  <th className="px-4 py-4 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-32">
                     Updated
                   </th>
-                  <th className="px-2 py-3 text-center font-extrabold text-emerald-700 tracking-wide text-base uppercase w-24">
+                  <th className="px-4 py-4 text-center font-extrabold text-emerald-700 tracking-wide text-base uppercase w-24">
                     Aksi
                   </th>
                 </tr>
@@ -461,23 +521,23 @@ export default function DataIzin() {
                     <tr
                       key={row.id}
                       className={
-                        "transition hover:bg-emerald-50" +
+                        "transition hover:bg-emerald-50 " +
                         (idx % 2 === 0 ? "bg-white" : "bg-gray-50")
                       }
                     >
-                      <td className="px-2 py-3 text-center align-middle border-b border-gray-100 font-semibold text-base">
+                      <td className="px-4 py-4 text-center align-middle border-b border-gray-100 font-semibold text-base">
                         {idx + 1}
                       </td>
-                      <td className="px-2 py-3 font-bold align-middle border-b border-gray-100 text-emerald-800 text-sm">
+                      <td className="px-4 py-4 align-middle border-b border-gray-100 font-bold text-emerald-800 text-base">
                         {row.jenis}
                       </td>
-                      <td className="px-2 py-3 align-middle border-b border-gray-100 text-sm">
+                      <td className="px-4 py-4 align-middle border-b border-gray-100 text-base">
                         {new Date(row.created_at).toLocaleString("id-ID")}
                       </td>
-                      <td className="px-2 py-3 align-middle border-b border-gray-100 text-sm">
+                      <td className="px-4 py-4 align-middle border-b border-gray-100 text-base">
                         {new Date(row.updated_at).toLocaleString("id-ID")}
                       </td>
-                      <td className="px-2 py-3 text-center align-middle border-b border-gray-100 flex gap-1 justify-center text-sm">
+                      <td className="px-4 py-4 text-center align-middle border-b border-gray-100 flex gap-1 justify-center text-base">
                         <button
                           className="w-8 h-8 flex items-center justify-center text-yellow-600 hover:text-yellow-800 rounded transition"
                           onClick={() => handleEdit(row)}

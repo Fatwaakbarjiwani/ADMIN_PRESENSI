@@ -73,6 +73,7 @@ export default function AturShift() {
       })
     );
   };
+  
 
   return (
     <div className="w-full min-h-screen font-sans bg-gray-50">
@@ -129,15 +130,7 @@ export default function AturShift() {
                     <th className="px-2 py-3 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-40">
                       Unit
                     </th>
-                    <th className="px-2 py-3 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-48">
-                      <div className="flex flex-col leading-tight">
-                        <span>Unit Detail</span>
-                        <span className="text-xs font-normal text-gray-400 normal-case">
-                          (Sub Unit/Bagian)
-                        </span>
-                      </div>
-                    </th>
-                    <th className="px-2 py-3 text-center font-extrabold text-emerald-700 tracking-wide text-base uppercase w-32">
+                    <th className="px-2 py-3 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-32">
                       Aksi
                     </th>
                   </tr>
@@ -204,9 +197,6 @@ export default function AturShift() {
                         </td>
                         <td className="px-2 py-3 align-middle border-b border-gray-100 text-emerald-700 font-bold">
                           {shift.unit_name}
-                        </td>
-                        <td className="px-2 py-3 align-middle border-b border-gray-100 font-bold text-emerald-700">
-                          {shift.unit_detail_name}
                         </td>
                         <td className="px-2 py-3 flex items-center justify-start border-b border-gray-100 align-middle text-center gap-1">
                           <ActionButton

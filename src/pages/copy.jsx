@@ -14,7 +14,7 @@ import {
 import PropTypes from "prop-types";
 
 const summaryData = [
-  { label: "Karyawan", value: 32, color: "#059669", icon: "person" },
+  { label: "Dosen Aktif", value: 32, color: "#059669", icon: "person" },
   { label: "Karyawan Aktif", value: 45, color: "#2563eb", icon: "badge" },
   { label: "Tidak Aktif", value: 8, color: "#f59e42", icon: "block" },
 ];
@@ -159,7 +159,7 @@ CollapsibleSection.propTypes = {
   defaultOpen: PropTypes.bool,
 };
 
-export default function Home() {
+export default function Copy() {
   return (
     <div className="w-full min-h-screen font-sans bg-gray-50">
       {/* Header */}
@@ -172,7 +172,7 @@ export default function Home() {
             Dashboard
           </div>
           <div className="text-gray-600 text-base font-medium">
-            Statistik dan rekapitulasi pegawai YBWSA
+            Statistik dan rekapitulasi pegawai/dosen UNISSULA
           </div>
         </div>
       </div>

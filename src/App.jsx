@@ -15,6 +15,9 @@ import MainLayout from "./components/MainLayout";
 import Pegawai from "./pages/data_pegawai/Pegawai";
 import ManajemenAdmin from "./pages/data_pegawai/ManajemenAdmin";
 import TambahKaryawanKeShift from "./pages/presensi/TambahKaryawanKeShift";
+import TambahPegawaiKeUnitDetail from "./pages/data_pegawai/TambahPegawaiKeUnitDetail";
+import DetailRekapBulananPegawai from "./pages/presensi/DetailRekapBulananPegawai";
+import DetailHistoryPresensi from "./pages/presensi/DetailHistoryPresensi";
 
 function App() {
   return (
@@ -144,6 +147,36 @@ function App() {
             <Protected>
               <MainLayout>
                 <TambahKaryawanKeShift />
+              </MainLayout>
+            </Protected>
+          }
+        />
+        <Route
+          path="/tambah-karyawan-ke-unit-detail"
+          element={
+            <Protected>
+              <MainLayout>
+                <TambahPegawaiKeUnitDetail />
+              </MainLayout>
+            </Protected>
+          }
+        />
+        <Route
+          path="/presensi/rekap-bulanan-pegawai/:pegawai_id"
+          element={
+            <Protected>
+              <MainLayout>
+                <DetailRekapBulananPegawai />
+              </MainLayout>
+            </Protected>
+          }
+        />
+        <Route
+          path="/presensi/detail-history-presensi/:pegawai_id"
+          element={
+            <Protected>
+              <MainLayout>
+                <DetailHistoryPresensi />
               </MainLayout>
             </Protected>
           }

@@ -10,27 +10,25 @@ import {
 export default function ShiftDosenKaryawan() {
   const dispatch = useDispatch();
   const token = useSelector((state) => state.auth.token);
-  const user = useSelector((state) => state.auth.user);
-  const isSuperAdmin = user?.role === "super_admin";
   const pegawai = useSelector((state) => state.shift.pegawai);
   const pagination = useSelector((state) => state.shift.pegawaiPagination);
   // const loading = useSelector((state) => state.shift.loading);
 
   const [search, setSearch] = useState("");
-  const [showCount, setShowCount] = useState(10);
   const [page, setPage] = useState(1);
   const [shifts, setShifts] = useState([]);
   const [selectedShift, setSelectedShift] = useState("");
   const [selectedPegawai, setSelectedPegawai] = useState([]);
   const [assignLoading, setAssignLoading] = useState(false);
   const [tab, setTab] = useState("data"); // default: data karyawan
+  const user = useSelector((state) => state.auth.user);
 
   // Fetch karyawan redux
   useEffect(() => {
-    if (assignLoading == false) {
-      dispatch(fetchPegawai(page));
+    if (assignLoading == false || user !== null) {
+      dispatch(fetchPegawai(page, search));
     }
-  }, [dispatch, page, assignLoading]);
+  }, [dispatch, page, assignLoading, search, user]);
 
   // Fetch shift list
   useEffect(() => {
@@ -43,17 +41,6 @@ export default function ShiftDosenKaryawan() {
         .catch(() => setShifts([]));
     }
   }, [token, assignLoading]);
-
-  // Filter
-  const filtered = pegawai.filter(
-    (row) =>
-      (row.nama_depan + " " + (row.nama_belakang || ""))
-        .toLowerCase()
-        .includes(search.toLowerCase()) ||
-      (row.nipy || "").toLowerCase().includes(search.toLowerCase()) ||
-      (row.jabatan || "").toLowerCase().includes(search.toLowerCase())
-  );
-  const paginated = isSuperAdmin ? filtered : filtered.slice(0, showCount);
 
   // Assign shift
   const handleAssignShift = () => {
@@ -77,7 +64,7 @@ export default function ShiftDosenKaryawan() {
         </span>
         <div>
           <div className="text-2xl font-extrabold text-emerald-700 tracking-tight drop-shadow-sm uppercase">
-            Shift Dosen/Karyawan
+            Shift Karyawan
           </div>
           <div className="text-gray-600 text-base font-medium">
             Manajemen karyawan & pembagian shift
@@ -111,51 +98,26 @@ export default function ShiftDosenKaryawan() {
         {/* Tab content */}
         {tab === "data" && (
           <div className="border border-gray-200 bg-white p-6 shadow flex flex-col gap-4">
-            <div className="font-bold text-emerald-600 mb-2 text-xl flex items-center gap-2">
-              <span className="material-icons text-emerald-600 text-2xl">
-                people
-              </span>
-              Data Karyawan
-            </div>
-            <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-2">
-              <div className="flex items-center gap-2">
-                <label
-                  htmlFor="show-entries-data"
-                  className="text-xs text-gray-600 font-semibold"
-                >
-                  Show
-                </label>
-                <select
-                  id="show-entries-data"
-                  className="border border-gray-300 rounded px-2 py-1 text-xs"
-                  value={showCount}
-                  onChange={(e) => setShowCount(Number(e.target.value))}
-                >
-                  {[5, 10, 25, 50, 100].map((opt) => (
-                    <option key={opt} value={opt}>
-                      {opt}
-                    </option>
-                  ))}
-                </select>
-                <span className="text-xs text-gray-600 font-semibold">
-                  entries
+            <div className="flex items-start justify-between gap-2 mb-2">
+              <div className="font-bold text-emerald-600 mb-2 text-xl flex items-center gap-2">
+                <span className="material-icons text-emerald-600 text-2xl">
+                  people
                 </span>
+                Data Karyawan
               </div>
-              <div className="flex items-center gap-2 ml-auto">
-                <label
-                  htmlFor="search-data"
-                  className="text-xs text-gray-600 font-semibold"
-                >
-                  Search:
-                </label>
-                <input
-                  id="search-data"
-                  type="text"
-                  className="border border-gray-300 rounded px-2 py-1 text-xs"
-                  placeholder="Cari nama/NIP/jabatan"
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                />
+              <div>
+                <span className="text-gray-400">
+                  <span className="text-xs">search :</span>
+                </span>
+                <div className="relative bg-white flex items-center">
+                  <input
+                    type="text"
+                    placeholder="Cari Nama/NIK/Unit"
+                    className="p-2 w-full rounded border border-gray-200 outline-none text-sm"
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                  />
+                </div>
               </div>
             </div>
             <div className="overflow-x-auto">
@@ -172,10 +134,18 @@ export default function ShiftDosenKaryawan() {
                       </div>
                     </th>
                     <th className="px-2 py-3 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-32">
-                      NIP
+                      NIK
                     </th>
                     <th className="px-2 py-3 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-40">
                       Jabatan
+                    </th>
+                    <th className="px-2 py-3 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-40">
+                      <div className="flex flex-col leading-tight">
+                        <span>Unit</span>
+                        <span className="text-xs font-normal text-gray-400 normal-case">
+                          Detail Unit
+                        </span>
+                      </div>
                     </th>
                     <th className="px-2 py-3 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-40">
                       Shift
@@ -183,8 +153,8 @@ export default function ShiftDosenKaryawan() {
                   </tr>
                 </thead>
                 <tbody>
-                  {paginated.length > 0 ? (
-                    paginated.map((row, idx) => (
+                  {pegawai.length > 0 ? (
+                    pegawai.map((row, idx) => (
                       <tr
                         key={row.id}
                         className={
@@ -213,12 +183,12 @@ export default function ShiftDosenKaryawan() {
                           {row.jabatan}
                         </td>
                         <td className="px-2 py-3 align-middle border-b border-gray-100">
-                          {row.shift_detail_id ? (
+                          {row.unit_detail_name}
+                        </td>
+                        <td className="px-2 py-3 align-middle border-b border-gray-100">
+                          {row.shift_name ? (
                             <span className="inline-block bg-emerald-100 text-emerald-700 px-2 py-0.5 text-xs font-bold">
-                              {shifts.find(
-                                (s) =>
-                                  s.shift_detail?.id === row.shift_detail_id
-                              )?.name || "-"}
+                              {row.shift_name}
                             </span>
                           ) : (
                             <span className="inline-block bg-gray-100 text-gray-400 px-2 py-0.5 text-xs">
@@ -267,47 +237,63 @@ export default function ShiftDosenKaryawan() {
           </div>
         )}
         {tab === "atur" && (
-          <div className="border border-gray-200 bg-white p-6 shadow flex flex-col gap-4">
-            <div className="font-bold text-emerald-600 mb-2 text-xl flex items-center gap-2">
+          <div className="border border-gray-200 bg-white p-6 shadow flex flex-col gap-2">
+            <div className="font-bold text-emerald-600 text-xl flex items-center gap-2">
               <span className="material-icons text-emerald-600 text-2xl">
                 tune
               </span>
               Atur Shift
             </div>
-            <div className="flex flex-col md:flex-row md:items-center gap-2 mb-4">
-              <select
-                className="border border-emerald-400 rounded px-2 py-1 text-xs"
-                value={selectedShift}
-                onChange={(e) => setSelectedShift(e.target.value)}
-              >
-                <option value="">Pilih Shift</option>
-                {shifts.map((s) => (
-                  <option
-                    key={s.shift_detail?.id || s.id}
-                    value={s.shift_detail?.id || s.id}
-                  >
-                    {s.name}
-                  </option>
-                ))}
-              </select>
-              <button
-                className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded disabled:opacity-60"
-                onClick={handleAssignShift}
-                disabled={
-                  assignLoading ||
-                  !selectedShift ||
-                  selectedPegawai.length === 0
-                }
-              >
-                {assignLoading ? (
-                  <span className="flex items-center gap-2">
-                    <span className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></span>{" "}
-                    Menyimpan...
-                  </span>
-                ) : (
-                  "Atur Shift"
-                )}
-              </button>
+            <div className="flex flex-col md:flex-row md:items-end gap-2 mb-4 justify-between">
+              <div className="flex items-center gap-2">
+                <select
+                  className="border border-emerald-400 rounded px-2 py-1 text-xs"
+                  value={selectedShift}
+                  onChange={(e) => setSelectedShift(e.target.value)}
+                >
+                  <option value="">Pilih Shift</option>
+                  {shifts.map((s) => (
+                    <option
+                      key={s.shift_detail?.id || s.id}
+                      value={s.shift_detail?.id || s.id}
+                    >
+                      {s.name}
+                    </option>
+                  ))}
+                </select>
+                <button
+                  className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded disabled:opacity-60"
+                  onClick={handleAssignShift}
+                  disabled={
+                    assignLoading ||
+                    !selectedShift ||
+                    selectedPegawai.length === 0
+                  }
+                >
+                  {assignLoading ? (
+                    <span className="flex items-center gap-2">
+                      <span className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></span>{" "}
+                      Menyimpan...
+                    </span>
+                  ) : (
+                    "Atur Shift"
+                  )}
+                </button>
+              </div>
+              <div>
+                <span className="text-gray-400">
+                  <span className="text-xs">search :</span>
+                </span>
+                <div className="relative bg-white flex items-center">
+                  <input
+                    type="text"
+                    placeholder="Cari Nama/NIK/Unit"
+                    className="p-2 w-full rounded border border-gray-200 outline-none text-sm"
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                  />
+                </div>
+              </div>
             </div>
             <div className="overflow-x-auto max-h-[420px] md:max-h-[520px]">
               <table className="min-w-full text-sm bg-white">
@@ -331,8 +317,8 @@ export default function ShiftDosenKaryawan() {
                   </tr>
                 </thead>
                 <tbody>
-                  {paginated.length > 0 ? (
-                    paginated.map((row, idx) => (
+                  {pegawai.length > 0 ? (
+                    pegawai.map((row, idx) => (
                       <tr
                         key={row.id}
                         className={
@@ -355,12 +341,9 @@ export default function ShiftDosenKaryawan() {
                             .join(" ")}
                         </td>
                         <td className="px-2 py-3 align-middle border-b border-gray-100">
-                          {row.shift_detail_id ? (
+                          {row.shift_name ? (
                             <span className="inline-block bg-emerald-100 text-emerald-700 px-2 py-0.5 text-xs font-bold">
-                              {shifts.find(
-                                (s) =>
-                                  s.shift_detail?.id === row.shift_detail_id
-                              )?.name || "-"}
+                              {row.shift_name}
                             </span>
                           ) : (
                             <span className="inline-block bg-gray-100 text-gray-400 px-2 py-0.5 text-xs">

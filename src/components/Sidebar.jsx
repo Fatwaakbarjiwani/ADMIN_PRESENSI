@@ -43,10 +43,46 @@ export default function Sidebar() {
         { icon: "event", label: "Shift", link: "/atur_shift" },
         {
           icon: "tune",
-          label: "Atur Shift",
+          label: "Shift Pegawai",
           link: "/shift_dosen_karyawan",
         },
-        { icon: "holiday_village", label: "Daftar Libur", link: "/daftar_libur" },
+        ...(!isSuperAdmin
+          ? [
+              {
+                icon: "calendar_month",
+                label: "Daftar Libur",
+                link: "/daftar_libur",
+              },
+            ]
+          : []),
+        ...(isSuperAdmin
+          ? [
+              {
+                icon: "settings_input_component",
+                label: "Setting Izin",
+                link: "/rekap_izin",
+              },
+            ]
+          : []),
+        // { icon: "upload_file", label: "Import Data CSV", link: "/import_csv" },
+      ],
+    },
+    {
+      ...(!isSuperAdmin
+        ? {
+            section: "REPORT",
+          }
+        : {}),
+      items: [
+        ...(!isSuperAdmin
+          ? [
+              {
+                icon: "insert_chart",
+                label: "Rekap Izin",
+                link: "/rekap_izin",
+              },
+            ]
+          : []),
         // Rekap Presensi hanya untuk non-superadmin
         ...(!isSuperAdmin
           ? [
@@ -57,13 +93,8 @@ export default function Sidebar() {
               },
             ]
           : []),
-        { icon: "insert_chart", label: "Rekap Izin", link: "/rekap_izin" },
-        { icon: "upload_file", label: "Import Data CSV", link: "/import_csv" },
+        // { icon: "pie_chart", label: "Sistem Presensi", link: "/report" },
       ],
-    },
-    {
-      section: "REPORT",
-      items: [{ icon: "pie_chart", label: "Sistem Presensi", link: "/report" }],
     },
   ];
 
