@@ -43,7 +43,7 @@ export default function Sidebar() {
         { icon: "event", label: "Shift", link: "/atur_shift" },
         {
           icon: "tune",
-          label: "Shift Pegawai",
+          label: "Shift Karyawan",
           link: "/shift_dosen_karyawan",
         },
         ...(!isSuperAdmin
@@ -158,7 +158,27 @@ export default function Sidebar() {
                   <SidebarItem
                     icon={item.icon}
                     label={item.label}
-                    active={location.pathname === item.link}
+                    active={
+                      item.label === "Pegawai"
+                        ? location.pathname === "/management_pegawai" ||
+                          location.pathname ===
+                            "/tambah-karyawan-ke-unit-detail"
+                        : item.label === "Shift"
+                        ? location.pathname === "/atur_shift" ||
+                          location.pathname.startsWith("/shift-detail/") ||
+                          location.pathname.startsWith(
+                            "/tambah-karyawan-ke-shift/"
+                          )
+                        : item.label === "Rekap Presensi"
+                        ? location.pathname === "/rekap_presensi" ||
+                          location.pathname.startsWith(
+                            "/presensi/rekap-bulanan-pegawai/"
+                          ) ||
+                          location.pathname.startsWith(
+                            "/presensi/detail-history-presensi/"
+                          )
+                        : location.pathname === item.link
+                    }
                     hasSub={item.label === "Listing Report List"}
                     openSub={openSub[item.label]}
                     toggleSub={() =>

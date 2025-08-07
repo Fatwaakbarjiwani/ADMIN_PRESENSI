@@ -26,7 +26,11 @@ export default function RekapPresensiBulanan() {
   const pegawaiLoading = useSelector((state) => state.pegawai.loading);
   const pegawaiPagination = useSelector((state) => state.pegawai.pagination);
   const token = useSelector((state) => state.auth.token);
-  const [tab, setTab] = useState("history");
+  const [tab, setTab] = useState(() => {
+    // Load tab dari localStorage saat komponen mount
+    const savedTab = localStorage.getItem("rekapPresensiTab");
+    return savedTab || "history";
+  });
   const [tahun, setTahun] = useState(new Date().getFullYear());
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -43,17 +47,31 @@ export default function RekapPresensiBulanan() {
   const [editingId, setEditingId] = useState(null);
   const [formData, setFormData] = useState({
     nominal: "",
+    pot_izin_pribadi: "",
+    pot_tanpa_izin: "",
+    pot_sakit: "",
+    pot_pulang_awal_beralasan: "",
+    pot_pulang_awal_tanpa_beralasan: "",
+    pot_terlambat_0806_0900: "",
+    pot_terlambat_0901_1000: "",
+    pot_terlambat_setelah_1000: "",
   });
   const [searchValue, setSearchValue] = useState("");
 
+  // Effect untuk menyimpan tab ke localStorage saat berubah
   useEffect(() => {
-    if (user !== null) {
+    localStorage.setItem("rekapPresensiTab", tab);
+  }, [tab]);
+
+  // Effect untuk load data berdasarkan tab yang aktif
+  useEffect(() => {
+    if (user !== null && tab === "history") {
       dispatch(fetchPresensiHistoryByUnit());
     }
-  }, [dispatch, user]);
+  }, [dispatch, user, tab]);
 
   useEffect(() => {
-    if (token) {
+    if (token && tab === "rekap") {
       dispatch(
         fetchPegawai(
           user?.role === "super_admin",
@@ -63,7 +81,7 @@ export default function RekapPresensiBulanan() {
         )
       );
     }
-  }, [token, user, currentPage, searchValue]);
+  }, [token, user, currentPage, searchValue, tab]);
 
   useEffect(() => {
     if (token && tab === "laukPauk") {
@@ -78,6 +96,7 @@ export default function RekapPresensiBulanan() {
 
   const handleSearch = (e) => {
     setSearchValue(e.target.value);
+    setCurrentPage(1);
   };
 
   // Fungsi untuk render pagination buttons
@@ -106,19 +125,56 @@ export default function RekapPresensiBulanan() {
   // Fungsi untuk handle form lauk pauk
   const handleLaukPaukSubmit = (e) => {
     e.preventDefault();
+    const submitData = {
+      nominal: parseInt(formData.nominal),
+      pot_izin_pribadi: parseInt(formData.pot_izin_pribadi),
+      pot_tanpa_izin: parseInt(formData.pot_tanpa_izin),
+      pot_sakit: parseInt(formData.pot_sakit),
+      pot_pulang_awal_beralasan: parseInt(formData.pot_pulang_awal_beralasan),
+      pot_pulang_awal_tanpa_beralasan: parseInt(
+        formData.pot_pulang_awal_tanpa_beralasan
+      ),
+      pot_terlambat_0806_0900: parseInt(formData.pot_terlambat_0806_0900),
+      pot_terlambat_0901_1000: parseInt(formData.pot_terlambat_0901_1000),
+      pot_terlambat_setelah_1000: parseInt(formData.pot_terlambat_setelah_1000),
+    };
+
     if (editingId) {
-      dispatch(updateLaukPauk(editingId, parseInt(formData.nominal)));
+      dispatch(updateLaukPauk(editingId, submitData));
     } else {
-      dispatch(createLaukPauk(parseInt(formData.nominal)));
+      dispatch(createLaukPauk(submitData));
     }
     setShowForm(false);
     setEditingId(null);
-    setFormData({ nominal: "" });
+    setFormData({
+      nominal: "",
+      pot_izin_pribadi: "",
+      pot_tanpa_izin: "",
+      pot_sakit: "",
+      pot_pulang_awal_beralasan: "",
+      pot_pulang_awal_tanpa_beralasan: "",
+      pot_terlambat_0806_0900: "",
+      pot_terlambat_0901_1000: "",
+      pot_terlambat_setelah_1000: "",
+    });
   };
 
   const handleEditLaukPauk = (data) => {
     setEditingId(data.id);
-    setFormData({ nominal: data.nominal.toString() });
+    setFormData({
+      nominal: data.nominal?.toString() || "",
+      pot_izin_pribadi: data.pot_izin_pribadi?.toString() || "",
+      pot_tanpa_izin: data.pot_tanpa_izin?.toString() || "",
+      pot_sakit: data.pot_sakit?.toString() || "",
+      pot_pulang_awal_beralasan:
+        data.pot_pulang_awal_beralasan?.toString() || "",
+      pot_pulang_awal_tanpa_beralasan:
+        data.pot_pulang_awal_tanpa_beralasan?.toString() || "",
+      pot_terlambat_0806_0900: data.pot_terlambat_0806_0900?.toString() || "",
+      pot_terlambat_0901_1000: data.pot_terlambat_0901_1000?.toString() || "",
+      pot_terlambat_setelah_1000:
+        data.pot_terlambat_setelah_1000?.toString() || "",
+    });
     setShowForm(true);
   };
 
@@ -175,14 +231,35 @@ export default function RekapPresensiBulanan() {
     // Tabel
     autoTable(doc, {
       startY: 50,
-      head: [["No", "No KTP", "Nama", "Status", "Waktu", "Keterangan"]],
+      head: [
+        [
+          "No",
+          "No KTP",
+          "Nama",
+          "Status Masuk",
+          "Status Pulang",
+          "Status Presensi",
+          "Waktu Masuk",
+          "Waktu Pulang",
+          "Keterangan Masuk",
+          "Keterangan Pulang",
+        ],
+      ],
       body: data.map((row, idx) => [
         idx + 1,
         row.no_ktp,
         row.nama,
-        row.status,
-        new Date(row.waktu).toLocaleString("id-ID"),
-        row.keterangan || "-",
+        row.status_masuk,
+        row.status_pulang,
+        row.status_presensi,
+        row.waktu_masuk
+          ? new Date(row.waktu_masuk).toLocaleString("id-ID")
+          : "-",
+        row.waktu_pulang
+          ? new Date(row.waktu_pulang).toLocaleString("id-ID")
+          : "-",
+        row.keterangan_masuk || "-",
+        row.keterangan_pulang || "-",
       ]),
       headStyles: {
         fillColor: [22, 160, 133],
@@ -429,13 +506,25 @@ export default function RekapPresensiBulanan() {
                           Nama
                         </th>
                         <th className="px-4 py-4 text-left font-extrabold text-emerald-700 tracking-wide uppercase w-32 text-base">
-                          Status
+                          Status Masuk
+                        </th>
+                        <th className="px-4 py-4 text-left font-extrabold text-emerald-700 tracking-wide uppercase w-32 text-base">
+                          Status Pulang
+                        </th>
+                        <th className="px-4 py-4 text-left font-extrabold text-emerald-700 tracking-wide uppercase w-32 text-base">
+                          Status Presensi
                         </th>
                         <th className="px-4 py-4 text-left font-extrabold text-emerald-700 tracking-wide uppercase w-40 text-base">
-                          Waktu
+                          Waktu Masuk
                         </th>
                         <th className="px-4 py-4 text-left font-extrabold text-emerald-700 tracking-wide uppercase w-40 text-base">
-                          Keterangan
+                          Waktu Pulang
+                        </th>
+                        <th className="px-4 py-4 text-left font-extrabold text-emerald-700 tracking-wide uppercase w-40 text-base">
+                          Keterangan Masuk
+                        </th>
+                        <th className="px-4 py-4 text-left font-extrabold text-emerald-700 tracking-wide uppercase w-40 text-base">
+                          Keterangan Pulang
                         </th>
                       </tr>
                     </thead>
@@ -459,13 +548,33 @@ export default function RekapPresensiBulanan() {
                               {row.nama}
                             </td>
                             <td className="px-4 py-4 align-middle border-b border-gray-100 font-bold text-emerald-800 text-sm">
-                              {row.status}
+                              {row.status_masuk}
+                            </td>
+                            <td className="px-4 py-4 align-middle border-b border-gray-100 font-bold text-emerald-800 text-sm">
+                              {row.status_pulang}
+                            </td>
+                            <td className="px-4 py-4 align-middle border-b border-gray-100 font-bold text-emerald-800 text-sm">
+                              {row.status_presensi}
                             </td>
                             <td className="px-4 py-4 align-middle border-b border-gray-100 text-sm">
-                              {new Date(row.waktu).toLocaleString("id-ID")}
+                              {row.waktu_masuk
+                                ? new Date(row.waktu_masuk).toLocaleString(
+                                    "id-ID"
+                                  )
+                                : "-"}
                             </td>
                             <td className="px-4 py-4 align-middle border-b border-gray-100 text-sm">
-                              {row.keterangan || "-"}
+                              {row.waktu_pulang
+                                ? new Date(row.waktu_pulang).toLocaleString(
+                                    "id-ID"
+                                  )
+                                : "-"}
+                            </td>
+                            <td className="px-4 py-4 align-middle border-b border-gray-100 text-sm">
+                              {row.keterangan_masuk || "-"}
+                            </td>
+                            <td className="px-4 py-4 align-middle border-b border-gray-100 text-sm">
+                              {row.keterangan_pulang || "-"}
                             </td>
                           </tr>
                         ))
@@ -599,13 +708,7 @@ export default function RekapPresensiBulanan() {
                               {row.no_ktp}
                             </td>
                             <td className="px-4 py-4 align-middle border-b border-gray-100 font-bold text-emerald-800 text-sm">
-                              {[
-                                row.gelar_depan,
-                                row.nama_depan,
-                                row.nama_tengah,
-                                row.nama_belakang,
-                                row.gelar_belakang,
-                              ]
+                              {[row.gelar_depan, row.nama, row.gelar_belakang]
                                 .filter(Boolean)
                                 .join(" ")}
                             </td>
@@ -694,10 +797,20 @@ export default function RekapPresensiBulanan() {
                     </h2>
                   </div>
                   <button
-                    className="px-4 py-2 bg-emerald-600 text-white font-bold text-sm hover:bg-emerald-700 transition flex items-center gap-2"
+                    className="px-4 py-2 bg-emerald-600 text-white font-bold text-sm hover:bg-emerald-700 transition flex items-center gap-2 "
                     onClick={() => {
                       setEditingId(null);
-                      setFormData({ nominal: "" });
+                      setFormData({
+                        nominal: "",
+                        pot_izin_pribadi: "",
+                        pot_tanpa_izin: "",
+                        pot_sakit: "",
+                        pot_pulang_awal_beralasan: "",
+                        pot_pulang_awal_tanpa_beralasan: "",
+                        pot_terlambat_0806_0900: "",
+                        pot_terlambat_0901_1000: "",
+                        pot_terlambat_setelah_1000: "",
+                      });
                       setShowForm(true);
                     }}
                   >
@@ -713,127 +826,408 @@ export default function RekapPresensiBulanan() {
                   </div>
                 ) : (
                   <div className="overflow-x-auto">
-                    <table className="min-w-full text-xs border border-gray-200 overflow-hidden shadow-sm">
-                      <thead className="sticky top-0 z-10 bg-white border-b-2 border-emerald-100">
-                        <tr>
-                          <th className="px-4 py-4 text-center font-extrabold text-emerald-700 tracking-wide uppercase w-12 text-base">
-                            <span className="material-icons text-base">
-                              format_list_numbered
-                            </span>
-                          </th>
-                          <th className="px-4 py-4 text-left font-extrabold text-emerald-700 tracking-wide uppercase w-32 text-base">
-                            Nominal
-                          </th>
-                          <th className="px-4 py-4 text-center font-extrabold text-emerald-700 tracking-wide uppercase w-16 text-base">
-                            <span className="material-icons text-base">
-                              build
-                            </span>
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {laukPaukData ? (
-                          <tr className="transition hover:bg-emerald-50 bg-white">
-                            <td className="px-4 py-4 text-center align-middle border-b border-gray-100 font-semibold text-sm">
-                              1
-                            </td>
-                            <td className="px-4 py-4 align-middle border-b border-gray-100 text-sm">
-                              <span className="font-bold text-green-600">
-                                Rp{" "}
-                                {laukPaukData.nominal?.toLocaleString("id-ID")}
-                              </span>
-                            </td>
-                            <td className="px-4 py-4 text-center align-middle border-b border-gray-100">
-                              <div className="flex justify-center gap-1">
-                                <button
-                                  className="p-2 hover:bg-emerald-100 transition"
-                                  title="Edit Lauk Pauk"
-                                  onClick={() =>
-                                    handleEditLaukPauk(laukPaukData)
-                                  }
-                                >
-                                  <span className="material-icons text-emerald-600">
-                                    edit
-                                  </span>
-                                </button>
-                                <button
-                                  className="p-2 hover:bg-red-100 transition"
-                                  title="Hapus Lauk Pauk"
-                                  onClick={() =>
-                                    handleDeleteLaukPauk(laukPaukData.id)
-                                  }
-                                >
-                                  <span className="material-icons text-red-600">
-                                    delete
-                                  </span>
-                                </button>
-                              </div>
-                            </td>
-                          </tr>
-                        ) : (
-                          <tr>
-                            <td
-                              colSpan={3}
-                              className="text-center text-gray-400 py-8"
-                            >
-                              <div className="flex flex-col items-center gap-2">
-                                <span className="material-icons text-4xl text-gray-300">
-                                  attach_money
-                                </span>
-                                <span className="font-semibold">
-                                  Tidak ada data lauk pauk
-                                </span>
-                                <span className="text-sm">
-                                  Belum ada setting nominal lauk pauk
-                                </span>
-                              </div>
-                            </td>
-                          </tr>
-                        )}
-                      </tbody>
-                    </table>
+                    {/* Data Lauk Pauk Card Grid Layout */}
+                    <div className="mb-6">
+                      {laukPaukData ? (
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                          <div className="bg-white border border-gray-200 p-4">
+                            <div className="text-sm text-gray-500 mb-1">
+                              Nominal
+                            </div>
+                            <div className="text-xl font-bold text-emerald-700">
+                              Rp {laukPaukData.nominal?.toLocaleString("id-ID")}
+                            </div>
+                          </div>
+                          <div className="bg-white border border-gray-200 p-4">
+                            <div className="text-sm text-gray-500 mb-1">
+                              Potongan Izin Pribadi
+                            </div>
+                            <div className="text-lg font-semibold text-gray-800">
+                              Rp{" "}
+                              {laukPaukData.pot_izin_pribadi?.toLocaleString(
+                                "id-ID"
+                              )}
+                            </div>
+                          </div>
+                          <div className="bg-white border border-gray-200 p-4">
+                            <div className="text-sm text-gray-500 mb-1">
+                              Potongan Tanpa Izin
+                            </div>
+                            <div className="text-lg font-semibold text-gray-800">
+                              Rp{" "}
+                              {laukPaukData.pot_tanpa_izin?.toLocaleString(
+                                "id-ID"
+                              )}
+                            </div>
+                          </div>
+                          <div className="bg-white border border-gray-200 p-4">
+                            <div className="text-sm text-gray-500 mb-1">
+                              Potongan Sakit
+                            </div>
+                            <div className="text-lg font-semibold text-gray-800">
+                              Rp{" "}
+                              {laukPaukData.pot_sakit?.toLocaleString("id-ID")}
+                            </div>
+                          </div>
+                          <div className="bg-white border border-gray-200 p-4">
+                            <div className="text-sm text-gray-500 mb-1">
+                              Potongan Pulang Awal Beralasan
+                            </div>
+                            <div className="text-lg font-semibold text-gray-800">
+                              Rp{" "}
+                              {laukPaukData.pot_pulang_awal_beralasan?.toLocaleString(
+                                "id-ID"
+                              )}
+                            </div>
+                          </div>
+                          <div className="bg-white border border-gray-200 p-4">
+                            <div className="text-sm text-gray-500 mb-1">
+                              Potongan Pulang Awal Tanpa Beralasan
+                            </div>
+                            <div className="text-lg font-semibold text-gray-800">
+                              Rp{" "}
+                              {laukPaukData.pot_pulang_awal_tanpa_beralasan?.toLocaleString(
+                                "id-ID"
+                              )}
+                            </div>
+                          </div>
+                          <div className="bg-white border border-gray-200 p-4">
+                            <div className="text-sm text-gray-500 mb-1">
+                              Potongan Terlambat 08:06-09:00
+                            </div>
+                            <div className="text-lg font-semibold text-gray-800">
+                              Rp{" "}
+                              {laukPaukData.pot_terlambat_0806_0900?.toLocaleString(
+                                "id-ID"
+                              )}
+                            </div>
+                          </div>
+                          <div className="bg-white border border-gray-200 p-4">
+                            <div className="text-sm text-gray-500 mb-1">
+                              Potongan Terlambat 09:01-10:00
+                            </div>
+                            <div className="text-lg font-semibold text-gray-800">
+                              Rp{" "}
+                              {laukPaukData.pot_terlambat_0901_1000?.toLocaleString(
+                                "id-ID"
+                              )}
+                            </div>
+                          </div>
+                          <div className="bg-white border border-gray-200 p-4">
+                            <div className="text-sm text-gray-500 mb-1">
+                              Potongan Terlambat Setelah 10:00
+                            </div>
+                            <div className="text-lg font-semibold text-gray-800">
+                              Rp{" "}
+                              {laukPaukData.pot_terlambat_setelah_1000?.toLocaleString(
+                                "id-ID"
+                              )}
+                            </div>
+                          </div>
+                          <div className="bg-white border border-gray-200 p-4 flex items-center justify-center">
+                            <div className="flex gap-2">
+                              <button
+                                className="px-4 py-2 border border-emerald-600 text-emerald-700 font-semibold hover:bg-emerald-50 transition"
+                                title="Edit Lauk Pauk"
+                                onClick={() => handleEditLaukPauk(laukPaukData)}
+                              >
+                                Edit
+                              </button>
+                              <button
+                                className="px-4 py-2 border border-red-600 text-red-700 font-semibold hover:bg-red-50 transition"
+                                title="Hapus Lauk Pauk"
+                                onClick={() =>
+                                  handleDeleteLaukPauk(laukPaukData.id)
+                                }
+                              >
+                                Hapus
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="text-center text-gray-500 py-12">
+                          <div className="text-lg font-semibold mb-2">
+                            Tidak ada data
+                          </div>
+                          <div className="text-sm">
+                            Belum ada setting nominal lauk pauk
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 )}
 
                 {showForm && (
                   <div className="mt-6 p-6 bg-gray-50 border border-gray-200">
-                    <div className="flex items-center gap-2 mb-4">
+                    <div className="flex items-center gap-2 mb-6">
                       <span className="material-icons text-emerald-600">
-                        edit
+                        {editingId ? "edit" : "add"}
                       </span>
                       <h3 className="text-lg font-bold text-emerald-700">
                         {editingId ? "Edit Lauk Pauk" : "Tambah Lauk Pauk"}
                       </h3>
                     </div>
-                    <form onSubmit={handleLaukPaukSubmit} className="space-y-4">
-                      <div>
-                        <label
-                          htmlFor="nominal"
-                          className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2"
-                        >
-                          <span className="material-icons text-base">
-                            attach_money
-                          </span>
-                          Nominal (Rp)
-                        </label>
-                        <input
-                          type="number"
-                          id="nominal"
-                          className="w-full px-3 py-2 border border-gray-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-                          value={formData.nominal}
-                          onChange={(e) =>
-                            setFormData({
-                              ...formData,
-                              nominal: e.target.value,
-                            })
-                          }
-                          required
-                        />
+                    <form onSubmit={handleLaukPaukSubmit} className="space-y-6">
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div className="p-0 border-b border-gray-200">
+                          <label
+                            htmlFor="nominal"
+                            className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2"
+                          >
+                            <span className="material-icons text-base text-emerald-600">
+                              attach_money
+                            </span>
+                            Nominal (Rp)
+                          </label>
+                          <input
+                            type="number"
+                            id="nominal"
+                            className="w-full px-3 py-2 border border-gray-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                            value={formData.nominal}
+                            onChange={(e) =>
+                              setFormData({
+                                ...formData,
+                                nominal: e.target.value,
+                              })
+                            }
+                            required
+                            placeholder="500000"
+                          />
+                          <p className="text-xs text-gray-500 mt-1">
+                            Nominal Lauk Pauk
+                          </p>
+                        </div>
+                        <div className="p-0 border-b border-gray-200">
+                          <label
+                            htmlFor="pot_izin_pribadi"
+                            className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2"
+                          >
+                            <span className="material-icons text-base text-red-600">
+                              money_off
+                            </span>
+                            Potongan Izin Pribadi (Rp)
+                          </label>
+                          <input
+                            type="number"
+                            id="pot_izin_pribadi"
+                            className="w-full px-3 py-2 border border-gray-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                            value={formData.pot_izin_pribadi}
+                            onChange={(e) =>
+                              setFormData({
+                                ...formData,
+                                pot_izin_pribadi: e.target.value,
+                              })
+                            }
+                            required
+                            placeholder="20000"
+                          />
+                          <p className="text-xs text-gray-500 mt-1">
+                            Potongan izin pribadi
+                          </p>
+                        </div>
+                        <div className="p-0 border-b border-gray-200">
+                          <label
+                            htmlFor="pot_tanpa_izin"
+                            className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2"
+                          >
+                            <span className="material-icons text-base text-red-600">
+                              money_off
+                            </span>
+                            Potongan Tanpa Izin (Rp)
+                          </label>
+                          <input
+                            type="number"
+                            id="pot_tanpa_izin"
+                            className="w-full px-3 py-2 border border-gray-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                            value={formData.pot_tanpa_izin}
+                            onChange={(e) =>
+                              setFormData({
+                                ...formData,
+                                pot_tanpa_izin: e.target.value,
+                              })
+                            }
+                            required
+                            placeholder="25000"
+                          />
+                          <p className="text-xs text-gray-500 mt-1">
+                            Potongan tanpa izin
+                          </p>
+                        </div>
+                        <div className="p-0 border-b border-gray-200">
+                          <label
+                            htmlFor="pot_sakit"
+                            className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2"
+                          >
+                            <span className="material-icons text-base text-red-600">
+                              money_off
+                            </span>
+                            Potongan Sakit (Rp)
+                          </label>
+                          <input
+                            type="number"
+                            id="pot_sakit"
+                            className="w-full px-3 py-2 border border-gray-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                            value={formData.pot_sakit}
+                            onChange={(e) =>
+                              setFormData({
+                                ...formData,
+                                pot_sakit: e.target.value,
+                              })
+                            }
+                            required
+                            placeholder="15000"
+                          />
+                          <p className="text-xs text-gray-500 mt-1">
+                            Potongan sakit
+                          </p>
+                        </div>
+                        <div className="p-0 border-b border-gray-200">
+                          <label
+                            htmlFor="pot_pulang_awal_beralasan"
+                            className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2"
+                          >
+                            <span className="material-icons text-base text-red-600">
+                              money_off
+                            </span>
+                            Potongan Pulang Awal Beralasan (Rp)
+                          </label>
+                          <input
+                            type="number"
+                            id="pot_pulang_awal_beralasan"
+                            className="w-full px-3 py-2 border border-gray-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                            value={formData.pot_pulang_awal_beralasan}
+                            onChange={(e) =>
+                              setFormData({
+                                ...formData,
+                                pot_pulang_awal_beralasan: e.target.value,
+                              })
+                            }
+                            required
+                            placeholder="10000"
+                          />
+                          <p className="text-xs text-gray-500 mt-1">
+                            Potongan pulang awal dengan alasan
+                          </p>
+                        </div>
+                        <div className="p-0 border-b border-gray-200">
+                          <label
+                            htmlFor="pot_pulang_awal_tanpa_beralasan"
+                            className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2"
+                          >
+                            <span className="material-icons text-base text-red-600">
+                              money_off
+                            </span>
+                            Potongan Pulang Awal Tanpa Beralasan (Rp)
+                          </label>
+                          <input
+                            type="number"
+                            id="pot_pulang_awal_tanpa_beralasan"
+                            className="w-full px-3 py-2 border border-gray-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                            value={formData.pot_pulang_awal_tanpa_beralasan}
+                            onChange={(e) =>
+                              setFormData({
+                                ...formData,
+                                pot_pulang_awal_tanpa_beralasan: e.target.value,
+                              })
+                            }
+                            required
+                            placeholder="15000"
+                          />
+                          <p className="text-xs text-gray-500 mt-1">
+                            Potongan pulang awal tanpa alasan
+                          </p>
+                        </div>
+                        <div className="p-0 border-b border-gray-200">
+                          <label
+                            htmlFor="pot_terlambat_0806_0900"
+                            className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2"
+                          >
+                            <span className="material-icons text-base text-red-600">
+                              money_off
+                            </span>
+                            Potongan Terlambat 08:06-09:00 (Rp)
+                          </label>
+                          <input
+                            type="number"
+                            id="pot_terlambat_0806_0900"
+                            className="w-full px-3 py-2 border border-gray-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                            value={formData.pot_terlambat_0806_0900}
+                            onChange={(e) =>
+                              setFormData({
+                                ...formData,
+                                pot_terlambat_0806_0900: e.target.value,
+                              })
+                            }
+                            required
+                            placeholder="3000"
+                          />
+                          <p className="text-xs text-gray-500 mt-1">
+                            Potongan terlambat pukul 08.06 - 09.00
+                          </p>
+                        </div>
+                        <div className="p-0 border-b border-gray-200">
+                          <label
+                            htmlFor="pot_terlambat_0901_1000"
+                            className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2"
+                          >
+                            <span className="material-icons text-base text-red-600">
+                              money_off
+                            </span>
+                            Potongan Terlambat 09:01-10:00 (Rp)
+                          </label>
+                          <input
+                            type="number"
+                            id="pot_terlambat_0901_1000"
+                            className="w-full px-3 py-2 border border-gray-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                            value={formData.pot_terlambat_0901_1000}
+                            onChange={(e) =>
+                              setFormData({
+                                ...formData,
+                                pot_terlambat_0901_1000: e.target.value,
+                              })
+                            }
+                            required
+                            placeholder="2000"
+                          />
+                          <p className="text-xs text-gray-500 mt-1">
+                            Potongan terlambat 09.01 - 10.00
+                          </p>
+                        </div>
+                        <div className="p-0 border-b border-gray-200">
+                          <label
+                            htmlFor="pot_terlambat_setelah_1000"
+                            className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2"
+                          >
+                            <span className="material-icons text-base text-red-600">
+                              money_off
+                            </span>
+                            Potongan Terlambat Setelah 10:00 (Rp)
+                          </label>
+                          <input
+                            type="number"
+                            id="pot_terlambat_setelah_1000"
+                            className="w-full px-3 py-2 border border-gray-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                            value={formData.pot_terlambat_setelah_1000}
+                            onChange={(e) =>
+                              setFormData({
+                                ...formData,
+                                pot_terlambat_setelah_1000: e.target.value,
+                              })
+                            }
+                            required
+                            placeholder="1000"
+                          />
+                          <p className="text-xs text-gray-500 mt-1">
+                            Potongan terlambat setelah pukul 10.00
+                          </p>
+                        </div>
                       </div>
-                      <div className="flex justify-end gap-2">
+                      <div className="flex justify-end gap-3 pt-4 border-t border-gray-200">
                         <button
                           type="button"
-                          className="px-4 py-2 bg-gray-300 text-gray-800 font-bold text-sm hover:bg-gray-400 transition flex items-center gap-2"
+                          className="px-6 py-2 bg-gray-300 text-gray-700 font-semibold hover:bg-gray-400 transition flex items-center gap-2"
                           onClick={() => setShowForm(false)}
                         >
                           <span className="material-icons text-base">
@@ -843,10 +1237,10 @@ export default function RekapPresensiBulanan() {
                         </button>
                         <button
                           type="submit"
-                          className="px-4 py-2 bg-emerald-600 text-white font-bold text-sm hover:bg-emerald-700 transition flex items-center gap-2"
+                          className="px-6 py-2 bg-emerald-600 text-white font-semibold hover:bg-emerald-700 transition flex items-center gap-2"
                         >
                           <span className="material-icons text-base">save</span>
-                          Simpan
+                          {editingId ? "Update" : "Simpan"}
                         </button>
                       </div>
                     </form>

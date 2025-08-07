@@ -19,11 +19,12 @@ export default function TambahKaryawanKeShift() {
   const [searchValue, setSearchValue] = useState("");
 
   useEffect(() => {
-    dispatch(fetchPegawai(page, searchValue));
-  }, [dispatch, page, searchValue]);
+    dispatch(fetchPegawai(page));
+  }, [dispatch, page]);
 
   const handleSearch = (e) => {
     setSearchValue(e.target.value);
+    dispatch(fetchPegawai(1, e.target.value));
   };
 
   const handleSimpan = () => {
@@ -144,13 +145,7 @@ export default function TambahKaryawanKeShift() {
                         {idx + 1 + ((pagination?.current_page - 1) * 20 || 0)}
                       </td>
                       <td className="px-2 py-3 font-bold align-middle border-b border-gray-100 text-emerald-800">
-                        {[
-                          row.gelar_depan,
-                          row.nama_depan,
-                          row.nama_tengah,
-                          row.nama_belakang,
-                          row.gelar_belakang,
-                        ]
+                        {[row.gelar_depan, row.nama, row.gelar_belakang]
                           .filter(Boolean)
                           .join(" ")}
                       </td>
@@ -233,13 +228,7 @@ export default function TambahKaryawanKeShift() {
                   .filter((row) => selectedPegawai.includes(row.id))
                   .map((row) => (
                     <li key={row.id}>
-                      {[
-                        row.gelar_depan,
-                        row.nama_depan,
-                        row.nama_tengah,
-                        row.nama_belakang,
-                        row.gelar_belakang,
-                      ]
+                      {[row.gelar_depan, row.nama, row.gelar_belakang]
                         .filter(Boolean)
                         .join(" ")}{" "}
                       ({row.nipy || row.no_ktp})

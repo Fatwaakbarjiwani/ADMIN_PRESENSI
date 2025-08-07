@@ -26,9 +26,9 @@ export default function ShiftDosenKaryawan() {
   // Fetch karyawan redux
   useEffect(() => {
     if (assignLoading == false || user !== null) {
-      dispatch(fetchPegawai(page, search));
+      dispatch(fetchPegawai(page));
     }
-  }, [dispatch, page, assignLoading, search, user]);
+  }, [dispatch, page, assignLoading, user]);
 
   // Fetch shift list
   useEffect(() => {
@@ -115,7 +115,10 @@ export default function ShiftDosenKaryawan() {
                     placeholder="Cari Nama/NIK/Unit"
                     className="p-2 w-full rounded border border-gray-200 outline-none text-sm"
                     value={search}
-                    onChange={(e) => setSearch(e.target.value)}
+                    onChange={(e) => {
+                      setSearch(e.target.value);
+                      dispatch(fetchPegawai(1, e.target.value));
+                    }}
                   />
                 </div>
               </div>
@@ -166,13 +169,7 @@ export default function ShiftDosenKaryawan() {
                           {idx + 1 + ((pagination.current_page - 1) * 20 || 0)}
                         </td>
                         <td className="px-2 py-3 font-bold align-middle border-b border-gray-100 text-emerald-800">
-                          {[
-                            row.gelar_depan,
-                            row.nama_depan,
-                            row.nama_tengah,
-                            row.nama_belakang,
-                            row.gelar_belakang,
-                          ]
+                          {[row.gelar_depan, row.nama, row.gelar_belakang]
                             .filter(Boolean)
                             .join(" ")}
                         </td>
@@ -290,7 +287,10 @@ export default function ShiftDosenKaryawan() {
                     placeholder="Cari Nama/NIK/Unit"
                     className="p-2 w-full rounded border border-gray-200 outline-none text-sm"
                     value={search}
-                    onChange={(e) => setSearch(e.target.value)}
+                    onChange={(e) => {
+                      setSearch(e.target.value);
+                      dispatch(fetchPegawai(1, e.target.value));
+                    }}
                   />
                 </div>
               </div>
@@ -330,13 +330,7 @@ export default function ShiftDosenKaryawan() {
                           {idx + 1 + ((pagination.current_page - 1) * 20 || 0)}
                         </td>
                         <td className="px-2 py-3 font-bold align-middle border-b border-gray-100 text-emerald-800">
-                          {[
-                            row.gelar_depan,
-                            row.nama_depan,
-                            row.nama_tengah,
-                            row.nama_belakang,
-                            row.gelar_belakang,
-                          ]
+                          {[row.gelar_depan, row.nama, row.gelar_belakang]
                             .filter(Boolean)
                             .join(" ")}
                         </td>

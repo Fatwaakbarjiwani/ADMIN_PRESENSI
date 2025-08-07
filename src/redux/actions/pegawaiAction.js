@@ -14,6 +14,7 @@ export const fetchPegawai =
   async (dispatch) => {
     dispatch({ type: FETCH_PEGAWAI_REQUEST });
     let url = "";
+
     if (isSuperAdmin) {
       url = `${
         import.meta.env.VITE_API_URL
@@ -62,7 +63,7 @@ export const fetchPegawai =
 
 // Fetch pegawai untuk kebutuhan tambah pegawai ke unit detail
 export const fetchTambahPegawaiList =
-  (page = 1, searchValue = "") =>
+  (page = 1, searchValue) =>
   async (dispatch, getState) => {
     dispatch(setTambahPegawaiLoading(true));
     const { token } = getState().auth;

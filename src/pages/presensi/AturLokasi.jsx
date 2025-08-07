@@ -330,7 +330,7 @@ export default function AturLokasi() {
                         <span className="material-icons text-emerald-400 text-2xl">
                           apartment
                         </span>
-                        <span className="font-bold text-lg text-emerald-700">
+                        <span className="font-bold text-lg text-emerald-700 text-sm">
                           {u.unit}
                         </span>
                       </div>
@@ -338,7 +338,7 @@ export default function AturLokasi() {
                         <span className="material-icons text-emerald-400 text-base">
                           location_on
                         </span>
-                        <span>{u.name}</span>
+                        <span className="text-xs">{u.name}</span>
                       </div>
                     </div>
                     <div>

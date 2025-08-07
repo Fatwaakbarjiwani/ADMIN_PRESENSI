@@ -96,15 +96,20 @@ export default function ShiftDetail() {
           </div>
         </div>
       </div>
+      <button
+        className="px-4 py-2 mx-10 my-4 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded font-bold text-sm mr-auto"
+        onClick={() => navigate(-1)}
+      >
+        <span
+          className="material-icons align-middle mr-1"
+          style={{ fontSize: "18px", verticalAlign: "middle" }}
+        >
+          arrow_back
+        </span>
+        Kembali
+      </button>
       <div className="max-w-5xl mx-auto p-6 bg-white border border-gray-100 shadow mt-4 mb-12">
         <div className="flex items-center gap-3 mb-6">
-          <button
-            className="text-emerald-600 hover:underline flex items-center"
-            onClick={() => navigate(-1)}
-          >
-            <span className="material-icons align-middle mr-1">arrow_back</span>
-            Kembali
-          </button>
           <h2 className="text-xl font-bold text-emerald-700 flex-1 flex items-center gap-2">
             <span className="material-icons text-emerald-500">schedule</span>
             Atur Detail Shift

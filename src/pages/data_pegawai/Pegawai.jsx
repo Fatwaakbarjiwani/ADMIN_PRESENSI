@@ -15,16 +15,19 @@ export default function Pegawai() {
   useEffect(() => {
     if (token) {
       dispatch(
-        fetchPegawai(isSuperAdmin, token, pagination.current_page, searchValue)
+        fetchPegawai(isSuperAdmin, token)
       );
     }
-  }, [token, isSuperAdmin, dispatch, pagination.current_page, searchValue]);
+  }, [token, isSuperAdmin, dispatch, ]);
 
   const handlePageChange = (page) => {
     dispatch(fetchPegawai(isSuperAdmin, token, page));
   };
+
   const handleSearch = (e) => {
-    setSearchValue(e.target.value);
+    const newSearchValue = e.target.value;
+    setSearchValue(newSearchValue);
+    dispatch(fetchPegawai(isSuperAdmin, token, 1, newSearchValue));
   };
 
   return (
@@ -135,9 +138,7 @@ export default function Pegawai() {
                       <td className="px-4 py-3 truncate font-bold align-middle border-b border-gray-100 text-emerald-800">
                         {[
                           row.gelar_depan,
-                          row.nama_depan,
-                          row.nama_tengah,
-                          row.nama_belakang,
+                          row.nama,
                           row.gelar_belakang,
                         ]
                           .filter(Boolean)

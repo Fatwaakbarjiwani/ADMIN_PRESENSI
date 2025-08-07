@@ -178,45 +178,53 @@ export default function Home() {
       </div>
       <div className="mx-auto p-4 max-w-5xl flex flex-col gap-8 px-2 md:px-0">
         {/* Summary */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
           {summaryData.map((item) => (
             <div
               key={item.label}
-              className="relative bg-white border border-gray-200 flex flex-col items-start p-4 pl-5"
-              style={{ borderLeft: `6px solid ${item.color}` }}
+              className="relative bg-white rounded-lg shadow-md p-5 flex flex-col items-start transition-all duration-300 hover:shadow-lg"
             >
-              <span
-                className="absolute top-2 right-3 material-icons text-xl select-none pointer-events-none"
-                style={{ color: item.color }}
-              >
-                {item.icon}
-              </span>
-              <span className="text-3xl font-extrabold text-gray-800 leading-none mb-1 mt-2">
-                {item.value}
-              </span>
-              <span className="text-xs font-semibold text-gray-500 mb-0.5">
+              <div
+                className="absolute top-0 left-0 bottom-0 w-2 rounded-l-lg"
+                style={{ backgroundColor: item.color }}
+              ></div>
+              <div className="flex items-center justify-between w-full mb-2">
+                <span className="text-4xl font-extrabold text-gray-800 leading-none">
+                  {item.value}
+                </span>
+                <span
+                  className="material-icons text-3xl opacity-70"
+                  style={{ color: item.color }}
+                >
+                  {item.icon}
+                </span>
+              </div>
+              <span className="text-sm font-semibold text-gray-600 mb-1">
                 {item.label}
               </span>
               <span className="text-xs font-bold text-emerald-700">
-                {((item.value / total) * 100).toFixed(1)}%
+                {((item.value / total) * 100).toFixed(1)}% dari Total
               </span>
             </div>
           ))}
-          <div
-            className="relative bg-white border border-gray-200 flex flex-col items-start p-4 pl-5"
-            style={{ borderLeft: `6px solid #fbbf24` }}
-          >
-            <span
-              className="absolute top-2 right-3 material-icons text-xl select-none pointer-events-none"
-              style={{ color: "#fbbf24" }}
-            >
-              equalizer
-            </span>
-            <span className="text-3xl font-extrabold text-gray-800 leading-none mb-1 mt-2">
-              {total}
-            </span>
-            <span className="text-xs font-semibold text-gray-500 mb-0.5">
-              Total
+          <div className="relative bg-white rounded-lg shadow-md p-5 flex flex-col items-start transition-all duration-300 hover:shadow-lg">
+            <div
+              className="absolute top-0 left-0 bottom-0 w-2 rounded-l-lg"
+              style={{ backgroundColor: "#fbbf24" }}
+            ></div>
+            <div className="flex items-center justify-between w-full mb-2">
+              <span className="text-4xl font-extrabold text-gray-800 leading-none">
+                {total}
+              </span>
+              <span
+                className="material-icons text-3xl opacity-70"
+                style={{ color: "#fbbf24" }}
+              >
+                equalizer
+              </span>
+            </div>
+            <span className="text-sm font-semibold text-gray-600 mb-1">
+              Total Karyawan
             </span>
             <span className="text-xs font-bold text-emerald-700">100%</span>
           </div>

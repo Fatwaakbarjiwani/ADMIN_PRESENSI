@@ -49,6 +49,25 @@ export default function TambahPegawaiKeUnitDetail() {
     );
   };
 
+  const handleSelectAll = () => {
+    if (selectedPegawai.length === pegawaiData?.data?.length) {
+      // Jika semua sudah dipilih, hapus semua
+      setSelectedPegawai([]);
+    } else {
+      // Jika belum semua dipilih, pilih semua
+      const allIds = pegawaiData?.data?.map((row) => row.id) || [];
+      setSelectedPegawai(allIds);
+    }
+  };
+
+  const isAllSelected =
+    pegawaiData?.data?.length > 0 &&
+    selectedPegawai.length === pegawaiData.data.length;
+
+  const isIndeterminate =
+    selectedPegawai.length > 0 &&
+    selectedPegawai.length < (pegawaiData?.data?.length || 0);
+
   const handleTambah = () => {
     if (!unitDetailId || selectedPegawai?.length === 0) {
       Swal.fire({ icon: "warning", title: "Pilih unit detail dan pegawai!" });
@@ -64,7 +83,9 @@ export default function TambahPegawaiKeUnitDetail() {
   };
 
   const handleSearch = (e) => {
-    setSearchValue(e.target.value);
+    const newSearchValue = e.target.value;
+    setSearchValue(newSearchValue);
+    setPage(1);
   };
 
   return (
@@ -156,7 +177,23 @@ export default function TambahPegawaiKeUnitDetail() {
                     Unit Detail
                   </th>
                   <th className="px-2 py-3 text-center font-extrabold text-emerald-700 tracking-wide text-base uppercase w-16">
-                    Pilih
+                    <div className="flex flex-col items-center gap-1">
+                      <span className="text-xs">Pilih</span>
+                      <div className="flex items-center gap-1">
+                        <input
+                          type="checkbox"
+                          checked={isAllSelected}
+                          ref={(input) => {
+                            if (input) {
+                              input.indeterminate = isIndeterminate;
+                            }
+                          }}
+                          onChange={handleSelectAll}
+                          className="w-4 h-4 text-emerald-600 bg-gray-100 border-gray-300 rounded focus:ring-emerald-500 focus:ring-2"
+                        />
+                        <span className="text-xs text-gray-500">Semua</span>
+                      </div>
+                    </div>
                   </th>
                 </tr>
               </thead>
@@ -183,13 +220,7 @@ export default function TambahPegawaiKeUnitDetail() {
                           1}
                       </td>
                       <td className="px-2 py-3 align-middle border-b border-gray-100 font-bold text-emerald-800">
-                        {[
-                          row.gelar_depan,
-                          row.nama_depan,
-                          row.nama_tengah,
-                          row.nama_belakang,
-                          row.gelar_belakang,
-                        ]
+                        {[row.gelar_depan, row.nama, row.gelar_belakang]
                           .filter(Boolean)
                           .join(" ")}
                       </td>
@@ -215,6 +246,7 @@ export default function TambahPegawaiKeUnitDetail() {
                           type="checkbox"
                           checked={selectedPegawai.includes(row.id)}
                           onChange={() => handleTogglePegawai(row.id)}
+                          className="w-4 h-4 text-emerald-600 bg-gray-100 border-gray-300 rounded focus:ring-emerald-500 focus:ring-2"
                         />
                       </td>
                     </tr>
@@ -243,13 +275,7 @@ export default function TambahPegawaiKeUnitDetail() {
                       key={row.id}
                       className="inline-block bg-emerald-100 text-emerald-700 px-2 py-1 rounded text-xs font-bold"
                     >
-                      {[
-                        row.gelar_depan,
-                        row.nama_depan,
-                        row.nama_tengah,
-                        row.nama_belakang,
-                        row.gelar_belakang,
-                      ]
+                      {[row.gelar_depan, row.nama, row.gelar_belakang]
                         .filter(Boolean)
                         .join(" ")}
                     </span>

@@ -202,7 +202,7 @@ export const updateShiftDetail =
 
 // Tambah: Ambil data pegawai sesuai role
 export const fetchPegawai =
-  (page = 1, search) =>
+  (page = 1, search = "") =>
   async (dispatch, getState) => {
     dispatch(setLoading(true));
     const { token, user } = getState().auth;
@@ -221,7 +221,6 @@ export const fetchPegawai =
         headers: { Authorization: `Bearer ${token}` },
       });
       if (user?.role === "super_admin") {
-
         dispatch(
           setPegawai({
             data: res?.data?.data,

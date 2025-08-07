@@ -76,13 +76,7 @@ export default function DetailRekapBulananPegawai() {
 
   const getNamaLengkap = (pegawai) => {
     if (!pegawai) return "Loading...";
-    return [
-      pegawai.gelar_depan,
-      pegawai.nama_depan,
-      pegawai.nama_tengah,
-      pegawai.nama_belakang,
-      pegawai.gelar_belakang,
-    ]
+    return [pegawai.gelar_depan, pegawai.nama, pegawai.gelar_belakang]
       .filter(Boolean)
       .join(" ");
   };
@@ -124,51 +118,39 @@ export default function DetailRekapBulananPegawai() {
         {/* Summary Cards */}
         {totalStats && (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
-            <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-              <div className="text-sm font-semibold text-gray-600 mb-1">
-                Total Hadir
-              </div>
-              <div className="text-2xl font-bold text-emerald-600">
+            <div className="bg-white p-4 rounded-lg border border-gray-100">
+              <div className="text-xs text-gray-500 mb-1">Hadir</div>
+              <div className="text-xl font-bold text-emerald-700">
                 {totalStats.hadir}
               </div>
             </div>
-            <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-              <div className="text-sm font-semibold text-gray-600 mb-1">
-                Total Izin
-              </div>
-              <div className="text-2xl font-bold text-sky-600">
+            <div className="bg-white p-4 rounded-lg border border-gray-100">
+              <div className="text-xs text-gray-500 mb-1">Izin</div>
+              <div className="text-xl font-bold text-emerald-600">
                 {totalStats.izin}
               </div>
             </div>
-            <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-              <div className="text-sm font-semibold text-gray-600 mb-1">
-                Total Sakit
-              </div>
-              <div className="text-2xl font-bold text-red-600">
+            <div className="bg-white p-4 rounded-lg border border-gray-100">
+              <div className="text-xs text-gray-500 mb-1">Sakit</div>
+              <div className="text-xl font-bold text-emerald-500">
                 {totalStats.sakit}
               </div>
             </div>
-            <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-              <div className="text-sm font-semibold text-gray-600 mb-1">
-                Total Cuti
-              </div>
-              <div className="text-2xl font-bold text-yellow-600">
+            <div className="bg-white p-4 rounded-lg border border-gray-100">
+              <div className="text-xs text-gray-500 mb-1">Cuti</div>
+              <div className="text-xl font-bold text-emerald-400">
                 {totalStats.cuti}
               </div>
             </div>
-            <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-              <div className="text-sm font-semibold text-gray-600 mb-1">
-                Tidak Hadir
-              </div>
-              <div className="text-2xl font-bold text-gray-600">
+            <div className="bg-white p-4 rounded-lg border border-gray-100">
+              <div className="text-xs text-gray-500 mb-1">Tidak Hadir</div>
+              <div className="text-xl font-bold text-gray-500">
                 {totalStats.tidak_hadir}
               </div>
             </div>
-            <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-              <div className="text-sm font-semibold text-gray-600 mb-1">
-                Belum Presensi
-              </div>
-              <div className="text-2xl font-bold text-orange-600">
+            <div className="bg-white p-4 rounded-lg border border-gray-100">
+              <div className="text-xs text-gray-500 mb-1">Belum Presensi</div>
+              <div className="text-xl font-bold text-gray-400">
                 {totalStats.belum_presensi}
               </div>
             </div>
@@ -228,36 +210,36 @@ export default function DetailRekapBulananPegawai() {
                         key={idx}
                         className="hover:bg-gray-50 transition-colors"
                       >
-                        <td className="px-6 py-4 font-semibold text-gray-900">
+                        <td className="px-6 py-4 font-medium text-gray-800">
                           {bulanLabels[row.bulan] || row.bulan}
                         </td>
                         <td className="px-6 py-4 text-center">
-                          <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-emerald-100 text-emerald-800">
+                          <span className="font-bold text-emerald-700">
                             {row.hadir}
                           </span>
                         </td>
                         <td className="px-6 py-4 text-center">
-                          <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-sky-100 text-sky-800">
+                          <span className="font-bold text-emerald-600">
                             {row.izin}
                           </span>
                         </td>
                         <td className="px-6 py-4 text-center">
-                          <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-red-100 text-red-800">
+                          <span className="font-bold text-emerald-500">
                             {row.sakit}
                           </span>
                         </td>
                         <td className="px-6 py-4 text-center">
-                          <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-yellow-100 text-yellow-800">
+                          <span className="font-bold text-emerald-400">
                             {row.cuti}
                           </span>
                         </td>
                         <td className="px-6 py-4 text-center">
-                          <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-gray-100 text-gray-800">
+                          <span className="font-bold text-gray-500">
                             {row.tidak_hadir}
                           </span>
                         </td>
                         <td className="px-6 py-4 text-center">
-                          <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-orange-100 text-orange-800">
+                          <span className="font-bold text-gray-400">
                             {row.belum_presensi}
                           </span>
                         </td>

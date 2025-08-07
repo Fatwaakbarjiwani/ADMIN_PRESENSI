@@ -80,15 +80,21 @@ export const fetchPresensiRekapBulananPegawai =
   };
 
 export const fetchPresensiDetailHistoryByUnit =
-  (pegawai_id) => async (dispatch, getState) => {
+  (pegawai_id, from, to) => async (dispatch, getState) => {
     dispatch(setDetailHistoryLoading(true));
     dispatch(setDetailHistoryError(null));
     const { token } = getState().auth;
     try {
+      // Default: from hari ini, to satu tahun setelahnya jika tidak diisi
+      const today = new Date();
+      const defaultFrom = from || today.toISOString().slice(0, 10);
+      const nextYear = new Date(today);
+      nextYear.setFullYear(today.getFullYear() + 1);
+      const defaultTo = to || nextYear.toISOString().slice(0, 10);
       const response = await axios.get(
         `${
           import.meta.env.VITE_API_URL
-        }/api/presensi/detail-history-by-unit?pegawai_id=${pegawai_id}&from=2024-07-01&to=2025-07-31`,
+        }/api/presensi/detail-history-by-unit?pegawai_id=${pegawai_id}&from=${defaultFrom}&to=${defaultTo}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }

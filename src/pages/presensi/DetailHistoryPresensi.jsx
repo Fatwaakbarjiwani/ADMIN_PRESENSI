@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useParams, useNavigate } from "react-router-dom";
 import { fetchPresensiDetailHistoryByUnit } from "../../redux/actions/presensiAction";
@@ -17,10 +17,117 @@ export default function DetailHistoryPresensi() {
   const token = useSelector((state) => state.auth.token);
   const user = useSelector((state) => state.auth.user);
 
+  // Tambahkan state untuk filter tanggal
+  const today = new Date();
+  const defaultFrom = today.toISOString().slice(0, 10);
+  const nextYear = new Date(today);
+  nextYear.setFullYear(today.getFullYear() + 1);
+  const defaultTo = nextYear.toISOString().slice(0, 10);
+
+  const [fromDate, setFromDate] = useState(defaultFrom);
+  const [toDate, setToDate] = useState(defaultTo);
+
+  // Tambahkan state untuk modal edit, data edit, dan fungsi open/close modal
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editData, setEditData] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
+
+  // Fungsi untuk handle filter
+  const handleFilter = () => {
+    if (token && pegawai_id) {
+      dispatch(fetchPresensiDetailHistoryByUnit(pegawai_id, fromDate, toDate));
+    }
+  };
+
+  // Helper untuk format waktu ke input datetime-local
+  function toDatetimeLocal(val) {
+    if (!val) return "";
+    // val: '2025-08-05 08:00:00' => '2025-08-05T08:00'
+    const [date, time] = val.split(" ");
+    if (!date || !time) return "";
+    return `${date}T${time.slice(0, 5)}`;
+  }
+  const handleEditPresensi = (row) => {
+    setEditData({
+      waktu_masuk: row.masuk?.waktu
+        ? toDatetimeLocal(row.tanggal + " " + row.masuk.waktu)
+        : "",
+      waktu_pulang: row.pulang?.waktu
+        ? toDatetimeLocal(row.tanggal + " " + row.pulang.waktu)
+        : "",
+      status_masuk: row.masuk?.status || "",
+      status_pulang: row.pulang?.status || "",
+      keterangan_masuk: row.masuk?.keterangan || "",
+      keterangan_pulang: row.pulang?.keterangan || "",
+      status_presensi: row.status_presensi || "",
+      tanggal: row.tanggal,
+      id: row.id,
+    });
+    setShowEditModal(true);
+  };
+
+  const closeEditModal = () => {
+    setShowEditModal(false);
+    setEditData(null);
+    setErrorMsg("");
+  };
+
+  const handleEditInputChange = (e) => {
+    const { name, value } = e.target;
+    setEditData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleEditSubmit = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setErrorMsg("");
+    try {
+      // Siapkan endpoint dan body
+      const base_url = import.meta.env.VITE_API_URL || "";
+      const url = `${base_url}/api/presensi/update-by-admin-unit/${pegawai_id}/${editData.tanggal}`;
+      const body = {
+        updates: [
+          {
+            waktu_masuk: editData.waktu_masuk.replace("T", " ") + ":00",
+            waktu_pulang: editData.waktu_pulang.replace("T", " ") + ":00",
+            status_masuk: editData.status_masuk,
+            status_pulang: editData.status_pulang,
+            keterangan_masuk: editData.keterangan_masuk,
+            keterangan_pulang: editData.keterangan_pulang,
+            status_presensi: editData.status_presensi,
+          },
+        ],
+      };
+      const res = await fetch(url, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(body),
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.message || "Gagal update presensi");
+      }
+      // Sukses, refresh data
+      setShowEditModal(false);
+      setEditData(null);
+      dispatch(fetchPresensiDetailHistoryByUnit(pegawai_id, fromDate, toDate));
+    } catch (err) {
+      setErrorMsg(err.message || "Gagal update presensi");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // Fetch data saat mount dan saat filter berubah
   useEffect(() => {
     if (token && pegawai_id) {
-      dispatch(fetchPresensiDetailHistoryByUnit(pegawai_id));
+      dispatch(fetchPresensiDetailHistoryByUnit(pegawai_id, fromDate, toDate));
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, token, pegawai_id]);
 
   useEffect(() => {
@@ -41,18 +148,12 @@ export default function DetailHistoryPresensi() {
   // Ambil data presensi dari response baru
   const presensiList = useMemo(() => {
     if (!detailHistory?.length) return [];
-    return detailHistory[0]?.presensi_list || [];
+    return detailHistory[0]?.presensi || [];
   }, [detailHistory]);
 
   const getNamaLengkap = (pegawai) => {
     if (!pegawai) return "Loading...";
-    return [
-      pegawai.gelar_depan,
-      pegawai.nama_depan,
-      pegawai.nama_tengah,
-      pegawai.nama_belakang,
-      pegawai.gelar_belakang,
-    ]
+    return [pegawai.gelar_depan, pegawai.nama, pegawai.gelar_belakang]
       .filter(Boolean)
       .join(" ");
   };
@@ -207,6 +308,32 @@ export default function DetailHistoryPresensi() {
           </div>
         )}
 
+        {/* Filter tanggal */}
+        <div className="flex gap-2 items-center mb-2">
+          <label className="font-semibold">Dari:</label>
+          <input
+            type="date"
+            value={fromDate}
+            max={toDate}
+            onChange={(e) => setFromDate(e.target.value)}
+            className="border px-2 py-1 rounded"
+          />
+          <label className="font-semibold">Sampai:</label>
+          <input
+            type="date"
+            value={toDate}
+            min={fromDate}
+            onChange={(e) => setToDate(e.target.value)}
+            className="border px-2 py-1 rounded"
+          />
+          <button
+            onClick={handleFilter}
+            className="ml-2 px-3 py-1 bg-emerald-600 text-white rounded hover:bg-emerald-700 font-semibold"
+          >
+            Terapkan
+          </button>
+        </div>
+
         {/* Main Table */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
           <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
@@ -214,10 +341,9 @@ export default function DetailHistoryPresensi() {
               Detail History Presensi
             </h3>
             <p className="text-sm text-gray-600 mt-1">
-              Rincian history presensi pegawai dari 2024-07-01 hingga 2025-07-31
+              Rincian history presensi pegawai dari {fromDate} hingga {toDate}
             </p>
           </div>
-
           {detailHistoryLoading ? (
             <div className="text-center py-12">
               <div className="inline-flex items-center gap-2 text-emerald-600 font-bold">
@@ -253,6 +379,9 @@ export default function DetailHistoryPresensi() {
                     </th>
                     <th className="px-4 py-3 text-left font-bold text-emerald-800 text-sm uppercase tracking-wide w-48">
                       Lokasi
+                    </th>
+                    <th className="px-4 py-3 text-center font-bold text-emerald-800 text-sm uppercase tracking-wide w-20">
+                      Aksi
                     </th>
                   </tr>
                 </thead>
@@ -296,13 +425,12 @@ export default function DetailHistoryPresensi() {
                             )}
                           </div>
                         </td>
+                        {/* Status Presensi per hari dari row.masuk.status_presensi */}
                         <td className="px-4 py-3 text-center">
                           <div className="space-y-1">
-                            {pegawaiFromResponse?.status_presensi && (
+                            {row?.status_presensi && (
                               <div className="text-xs">
-                                {getStatusPresensiBadge(
-                                  pegawaiFromResponse.status_presensi
-                                )}
+                                {getStatusPresensiBadge(row.status_presensi)}
                               </div>
                             )}
                           </div>
@@ -362,6 +490,29 @@ export default function DetailHistoryPresensi() {
                             )}
                           </div>
                         </td>
+                        <td className="px-4 py-3 text-center">
+                          <button
+                            onClick={() => handleEditPresensi(row)}
+                            className="inline-flex items-center justify-center p-2 rounded hover:bg-emerald-100 text-emerald-600"
+                            title="Edit Pemutihan"
+                          >
+                            {/* Simple pencil/edit SVG icon */}
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              strokeWidth={1.5}
+                              stroke="currentColor"
+                              className="w-5 h-5"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M16.862 4.487a2.1 2.1 0 1 1 2.97 2.97L7.5 19.79l-4 1 1-4 14.362-14.303z"
+                              />
+                            </svg>
+                          </button>
+                        </td>
                       </tr>
                     ))
                   ) : (
@@ -384,6 +535,172 @@ export default function DetailHistoryPresensi() {
           )}
         </div>
       </div>
+
+      {/* Modal Edit Presensi */}
+      {showEditModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-lg relative">
+            <button
+              className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
+              onClick={closeEditModal}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={2}
+                stroke="currentColor"
+                className="w-6 h-6"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+            <h3 className="text-lg font-bold mb-4">
+              Edit Presensi (Pemutihan)
+            </h3>
+            <form onSubmit={handleEditSubmit} className="space-y-3">
+              <div>
+                <label className="block text-sm font-semibold">
+                  Waktu Masuk
+                </label>
+                <input
+                  type="datetime-local"
+                  name="waktu_masuk"
+                  value={editData?.waktu_masuk || ""}
+                  onChange={handleEditInputChange}
+                  className="border px-2 py-1 rounded w-full"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold">
+                  Waktu Pulang
+                </label>
+                <input
+                  type="datetime-local"
+                  name="waktu_pulang"
+                  value={editData?.waktu_pulang || ""}
+                  onChange={handleEditInputChange}
+                  className="border px-2 py-1 rounded w-full"
+                  required
+                />
+              </div>
+              <div className="flex gap-2">
+                <div className="flex-1">
+                  <label className="block text-sm font-semibold">
+                    Status Masuk
+                  </label>
+                  <select
+                    name="status_masuk"
+                    value={editData?.status_masuk || ""}
+                    onChange={handleEditInputChange}
+                    className="border px-2 py-1 rounded w-full"
+                    required
+                  >
+                    <option value="">Pilih</option>
+                    <option value="absen_masuk">Absen Masuk</option>
+                    <option value="terlambat">Terlambat</option>
+                    <option value="tidak_absen_masuk">Tidak Absen Masuk</option>
+                    <option value="tidak_masuk">Tidak Masuk</option>
+                    <option value="izin">Izin</option>
+                    <option value="sakit_cuti">Sakit/Cuti</option>
+                  </select>
+                </div>
+                <div className="flex-1">
+                  <label className="block text-sm font-semibold">
+                    Status Pulang
+                  </label>
+                  <select
+                    name="status_pulang"
+                    value={editData?.status_pulang || ""}
+                    onChange={handleEditInputChange}
+                    className="border px-2 py-1 rounded w-full"
+                    required
+                  >
+                    <option value="">Pilih</option>
+                    <option value="absen_pulang">Absen Pulang</option>
+                    <option value="pulang_awal">Pulang Awal</option>
+                    <option value="tidak_absen_pulang">
+                      Tidak Absen Pulang
+                    </option>
+                    <option value="tidak_masuk">Tidak Masuk</option>
+                    <option value="izin">Izin</option>
+                    <option value="sakit_cuti">Sakit/Cuti</option>
+                  </select>
+                </div>
+              </div>
+              <div className="flex gap-2">
+                <div className="flex-1">
+                  <label className="block text-sm font-semibold">
+                    Keterangan Masuk
+                  </label>
+                  <input
+                    type="text"
+                    name="keterangan_masuk"
+                    value={editData?.keterangan_masuk || ""}
+                    onChange={handleEditInputChange}
+                    className="border px-2 py-1 rounded w-full"
+                  />
+                </div>
+                <div className="flex-1">
+                  <label className="block text-sm font-semibold">
+                    Keterangan Pulang
+                  </label>
+                  <input
+                    type="text"
+                    name="keterangan_pulang"
+                    value={editData?.keterangan_pulang || ""}
+                    onChange={handleEditInputChange}
+                    className="border px-2 py-1 rounded w-full"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-semibold">
+                  Status Presensi
+                </label>
+                <select
+                  name="status_presensi"
+                  value={editData?.status_presensi || ""}
+                  onChange={handleEditInputChange}
+                  className="border px-2 py-1 rounded w-full"
+                  required
+                >
+                  <option value="">Pilih</option>
+                  <option value="hadir">Hadir</option>
+                  <option value="tidak_masuk">Tidak Masuk</option>
+                  <option value="izin">Izin</option>
+                  <option value="sakit">Sakit</option>
+                  <option value="cuti">Cuti</option>
+                </select>
+              </div>
+              {errorMsg && (
+                <div className="text-red-600 text-sm">{errorMsg}</div>
+              )}
+              <div className="flex justify-end gap-2 mt-4">
+                <button
+                  type="button"
+                  onClick={closeEditModal}
+                  className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300"
+                >
+                  Batal
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="px-4 py-2 rounded bg-emerald-600 text-white hover:bg-emerald-700 font-semibold"
+                >
+                  {isSubmitting ? "Menyimpan..." : "Simpan"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

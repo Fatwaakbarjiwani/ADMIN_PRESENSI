@@ -43,14 +43,14 @@ export const fetchLaukPauk = () => async (dispatch, getState) => {
 };
 
 // Create lauk pauk
-export const createLaukPauk = (nominal) => async (dispatch, getState) => {
+export const createLaukPauk = (data) => async (dispatch, getState) => {
   dispatch({ type: CREATE_LAUK_PAUK_REQUEST });
   const { token } = getState().auth;
 
   try {
     const response = await axios.post(
       `${import.meta.env.VITE_API_URL}/api/lauk-pauk/create`,
-      { nominal },
+      data,
       {
         headers: { Authorization: `Bearer ${token}` },
       }
@@ -83,14 +83,14 @@ export const createLaukPauk = (nominal) => async (dispatch, getState) => {
 };
 
 // Update lauk pauk
-export const updateLaukPauk = (id, nominal) => async (dispatch, getState) => {
+export const updateLaukPauk = (id, data) => async (dispatch, getState) => {
   dispatch({ type: UPDATE_LAUK_PAUK_REQUEST });
   const { token } = getState().auth;
 
   try {
     const response = await axios.put(
       `${import.meta.env.VITE_API_URL}/api/lauk-pauk/update/${id}`,
-      { nominal },
+      data,
       {
         headers: { Authorization: `Bearer ${token}` },
       }
