@@ -84,6 +84,12 @@ export default function ShiftDetail() {
   return (
     <div>
       <div className="px-4 sticky z-50 top-0 py-4 border-b border-gray-200 bg-white flex items-center gap-4">
+        <button
+          onClick={() => navigate(-1)}
+          className="p-2 hover:bg-gray-100 rounded-lg transition flex items-center"
+        >
+          <span className="material-icons text-gray-600">arrow_back</span>
+        </button>
         <span className="material-icons text-lg text-green-200 bg-primary p-2 rounded opacity-80">
           {"dashboard"}
         </span>
@@ -96,18 +102,6 @@ export default function ShiftDetail() {
           </div>
         </div>
       </div>
-      <button
-        className="px-4 py-2 mx-10 my-4 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded font-bold text-sm mr-auto"
-        onClick={() => navigate(-1)}
-      >
-        <span
-          className="material-icons align-middle mr-1"
-          style={{ fontSize: "18px", verticalAlign: "middle" }}
-        >
-          arrow_back
-        </span>
-        Kembali
-      </button>
       <div className="max-w-5xl mx-auto p-6 bg-white border border-gray-100 shadow mt-4 mb-12">
         <div className="flex items-center gap-3 mb-6">
           <h2 className="text-xl font-bold text-emerald-700 flex-1 flex items-center gap-2">

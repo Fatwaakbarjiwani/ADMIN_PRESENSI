@@ -91,6 +91,12 @@ export default function TambahPegawaiKeUnitDetail() {
   return (
     <div className="w-full min-h-screen font-sans bg-gray-50">
       <div className="px-4 sticky z-40 top-0 py-4 border-b border-gray-200 bg-white flex items-center gap-4">
+        <button
+          onClick={() => navigate(-1)}
+          className="p-2 hover:bg-gray-100 rounded-lg transition flex items-center"
+        >
+          <span className="material-icons text-gray-600">arrow_back</span>
+        </button>
         <span className="material-icons text-lg text-green-200 bg-primary p-2 rounded opacity-80">
           person_add
         </span>
@@ -104,20 +110,6 @@ export default function TambahPegawaiKeUnitDetail() {
         </div>
       </div>
       <div className="mx-auto p-4 max-w-5xl flex flex-col gap-8 px-2 md:px-0">
-        <div>
-          <button
-            className="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded font-bold text-sm"
-            onClick={() => navigate("/management_pegawai")}
-          >
-            <span
-              className="material-icons align-middle mr-1"
-              style={{ fontSize: "18px", verticalAlign: "middle" }}
-            >
-              arrow_back
-            </span>
-            Kembali
-          </button>
-        </div>
         <div className="border border-gray-200 bg-white p-6 shadow flex flex-col gap-4 mb-4 rounded-xl">
           <div className="flex flex-col md:flex-row gap-4 items-end mb-2">
             <div className="flex-1 min-w-[220px]">
@@ -171,10 +163,19 @@ export default function TambahPegawaiKeUnitDetail() {
                     NIK
                   </th>
                   <th className="px-2 py-3 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-32">
-                    Email
+                    No. HP  
+                  </th>
+                  <th className="px-2 py-3 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-32">
+                    Tempat Lahir
+                  </th>
+                  <th className="px-2 py-3 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-32">
+                    Tanggal Lahir
                   </th>
                   <th className="px-2 py-3 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-40">
-                    Unit Detail
+                    Unit
+                  </th>
+                  <th className="px-2 py-3 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-40">
+                    Shift
                   </th>
                   <th className="px-2 py-3 text-center font-extrabold text-emerald-700 tracking-wide text-base uppercase w-16">
                     <div className="flex flex-col items-center gap-1">
@@ -220,20 +221,35 @@ export default function TambahPegawaiKeUnitDetail() {
                           1}
                       </td>
                       <td className="px-2 py-3 align-middle border-b border-gray-100 font-bold text-emerald-800">
-                        {[row.gelar_depan, row.nama, row.gelar_belakang]
-                          .filter(Boolean)
-                          .join(" ")}
+                        {row.nama}
                       </td>
                       <td className="px-2 py-3 align-middle border-b border-gray-100">
                         {row.no_ktp}
                       </td>
                       <td className="px-2 py-3 align-middle border-b border-gray-100">
-                        {row.email}
+                        {row.no_hp}
+                      </td>
+                      <td className="px-2 py-3 align-middle border-b border-gray-100">
+                        {row.tmpt_lahir}
+                      </td>
+                      <td className="px-2 py-3 align-middle border-b border-gray-100">
+                        {row.tgl_lahir}
                       </td>
                       <td className="px-2 py-3 align-middle border-b border-gray-100 font-bold text-emerald-700">
-                        {row?.unit_detail_name ? (
+                        {row?.nama_unit ? (
                           <span className="inline-block bg-emerald-100 text-emerald-700 px-2 py-0.5 text-xs font-bold">
-                            {row?.unit_detail_name}
+                            {row?.nama_unit}
+                          </span>
+                        ) : (
+                          <span className="inline-block bg-gray-100 text-gray-400 px-2 py-0.5 text-xs">
+                            -
+                          </span>
+                        )}
+                      </td>
+                      <td className="px-2 py-3 align-middle border-b border-gray-100 font-bold text-emerald-700">
+                        {row?.nama_shift ? (
+                          <span className="inline-block bg-emerald-100 text-emerald-700 px-2 py-0.5 text-xs font-bold">
+                            {row.nama_shift}
                           </span>
                         ) : (
                           <span className="inline-block bg-gray-100 text-gray-400 px-2 py-0.5 text-xs">

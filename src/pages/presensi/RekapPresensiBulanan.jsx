@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { fetchPresensiHistoryByUnit } from "../../redux/actions/presensiAction";
+import {
+  fetchLembur,
+  fetchPresensiHistoryByUnit,
+} from "../../redux/actions/presensiAction";
 import { fetchPegawai } from "../../redux/actions/pegawaiAction";
 import {
   fetchLaukPauk,
@@ -12,20 +15,27 @@ import { useNavigate } from "react-router-dom";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import Swal from "sweetalert2";
+import { fetchAllUnit } from "../../redux/actions/unitDetailAction";
 
-// Logo Unissula base64 PNG (dummy, ganti dengan logo asli jika ada)
+// Logo ybwsa base64 PNG (dummy, ganti dengan logo asli jika ada)
 const logoBase64 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQC..."; // Potong, ganti dengan base64 logo asli jika ada
 
 export default function RekapPresensiBulanan() {
   const dispatch = useDispatch();
   const data = useSelector((state) => state.presensi.data);
   const loading = useSelector((state) => state.presensi.loading);
+  const { lemburData } = useSelector((state) => state.presensi);
   const user = useSelector((state) => state.auth.user);
   const navigate = useNavigate();
   const pegawai = useSelector((state) => state.pegawai.data);
   const pegawaiLoading = useSelector((state) => state.pegawai.loading);
   const pegawaiPagination = useSelector((state) => state.pegawai.pagination);
+  const isSuperAdmin = user?.role === "super_admin";
+  const units = useSelector((state) => state.unitDetail.units);
   const token = useSelector((state) => state.auth.token);
+  const today = new Date();
+  const defaultFrom = today.toISOString().slice(0, 10);
+  const [fromDate, setFromDate] = useState(defaultFrom);
   const [tab, setTab] = useState(() => {
     // Load tab dari localStorage saat komponen mount
     const savedTab = localStorage.getItem("rekapPresensiTab");
@@ -33,13 +43,15 @@ export default function RekapPresensiBulanan() {
   });
   const [tahun, setTahun] = useState(new Date().getFullYear());
   const [currentPage, setCurrentPage] = useState(1);
+  const [filterUnit, setFilterUnit] = useState("");
 
   // State untuk rekap lauk pauk
   const [bulan, setBulan] = useState(new Date().getMonth() + 1);
   const [tahunLaukPauk, setTahunLaukPauk] = useState(new Date().getFullYear());
   const [rekapLaukPauk, setRekapLaukPauk] = useState([]);
   const [loadingLaukPauk, setLoadingLaukPauk] = useState(false);
-
+  // lembur
+  const [loadingLembur, setLoadingLembur] = useState(false);
   // State untuk setting lauk pauk
   const laukPaukData = useSelector((state) => state.laukPauk.data);
   const laukPaukLoading = useSelector((state) => state.laukPauk.loading);
@@ -66,9 +78,9 @@ export default function RekapPresensiBulanan() {
   // Effect untuk load data berdasarkan tab yang aktif
   useEffect(() => {
     if (user !== null && tab === "history") {
-      dispatch(fetchPresensiHistoryByUnit());
+      dispatch(fetchPresensiHistoryByUnit(fromDate));
     }
-  }, [dispatch, user, tab]);
+  }, [dispatch, user, tab, fromDate]);
 
   useEffect(() => {
     if (token && tab === "rekap") {
@@ -85,9 +97,18 @@ export default function RekapPresensiBulanan() {
 
   useEffect(() => {
     if (token && tab === "laukPauk") {
-      dispatch(fetchLaukPauk());
+      // dispatch(fetchLaukPauk(filterUnit, isSuperAdmin, user?.unit_id));
+      dispatch(fetchLaukPauk(filterUnit, isSuperAdmin));
+      dispatch(fetchAllUnit());
     }
-  }, [token, tab, dispatch]);
+  }, [token, tab, dispatch, filterUnit, isSuperAdmin]);
+
+  useEffect(() => {
+    if (token && tab === "lembur") {
+      dispatch(fetchLembur(bulan, tahun, filterUnit, isSuperAdmin));
+      dispatch(fetchAllUnit());
+    }
+  }, [token, tab, dispatch, bulan, tahun, filterUnit, isSuperAdmin]);
 
   // Fungsi untuk handle pagination
   const handlePageChange = (page) => {
@@ -120,6 +141,14 @@ export default function RekapPresensiBulanan() {
         dangerouslySetInnerHTML={{ __html: link.label }}
       />
     ));
+  };
+
+  // fetch Lembur
+  const fetchLaporanLembur = async (bulan, tahun) => {
+    setLoadingLembur(true);
+    dispatch(fetchLembur(bulan, tahun, filterUnit, isSuperAdmin)).finally(() =>
+      setLoadingLembur(false)
+    );
   };
 
   // Fungsi untuk handle form lauk pauk
@@ -206,7 +235,7 @@ export default function RekapPresensiBulanan() {
     }
     // Judul dan alamat
     doc.setFontSize(16);
-    doc.text("UNIVERSITAS ISLAM SULTAN AGUNG SEMARANG", 148, 20, {
+    doc.text("YAYASAN BADAN WAKAF SULTAN AGUNG", 148, 20, {
       align: "center",
     });
     doc.setFontSize(10);
@@ -220,7 +249,7 @@ export default function RekapPresensiBulanan() {
       align: "center",
     });
     doc.text(
-      "Email : informasi@unissula.ac.id Homepage : http://unissula.ac.id",
+      "Email : informasi@ybwsa.ac.id Homepage : http://ybwsa.ac.id",
       148,
       40,
       { align: "center" }
@@ -272,7 +301,109 @@ export default function RekapPresensiBulanan() {
       margin: { left: 10, right: 10 },
       tableWidth: "auto",
     });
-    doc.save("history-presensi-unissula.pdf");
+    doc.save("history-presensi-ybwsa.pdf");
+  };
+  const handleDownloadPDFLembur = () => {
+    if (!lemburData || lemburData.length === 0) return;
+
+    const doc = new jsPDF("l", "mm", "a4"); // landscape A4
+
+    // Logo (opsional)
+    try {
+      doc.addImage(logoBase64, "PNG", 10, 10, 25, 25);
+    } catch {
+      // kalau logo gagal dimuat, lanjutkan
+    }
+
+    // Header
+    doc.setFontSize(16);
+    doc.text("YAYASAN BADAN WAKAF SULTAN AGUNG", 148, 20, {
+      align: "center",
+    });
+    doc.setFontSize(10);
+    doc.text(
+      "Jl.Raya Kaligawe Km.4 Semarang 50112; PO Box 1054/SM Indonesia",
+      148,
+      28,
+      { align: "center" }
+    );
+    doc.text("Telp (024) 6583584 Fax. (024) 6582455", 148, 34, {
+      align: "center",
+    });
+    doc.text(
+      "Email : informasi@ybwsa.ac.id Homepage : http://ybwsa.ac.id",
+      148,
+      40,
+      { align: "center" }
+    );
+
+    // Garis bawah
+    doc.setLineWidth(0.5);
+    doc.line(10, 44, 287, 44);
+
+    // Judul laporan
+    doc.setFontSize(12);
+    doc.text("LAPORAN REKAP LEMBUR PEGAWAI", 148, 55, { align: "center" });
+    doc.setFontSize(10);
+    doc.text(
+      `Periode: ${bulanOptions.find((b) => b.value === bulan)?.label} ${tahun}`,
+      20,
+      65
+    );
+
+    // Tabel lembur -> style samakan dengan history
+    autoTable(doc, {
+      startY: 75,
+      head: [
+        [
+          "NO",
+          "NIK",
+          "Nama",
+          "Unit",
+          "Tanggal",
+          "Waktu Masuk",
+          "Waktu Pulang",
+          "Lembur",
+        ],
+      ],
+      body: lemburData.map((row, idx) => [
+        idx + 1,
+        row.no_ktp,
+        [row.gelar_depan, row.nama, row.gelar_belakang]
+          .filter(Boolean)
+          .join(" "),
+        row?.nama_unit || "-",
+        formatTanggal(row?.tanggal),
+        row?.waktu_masuk || "-",
+        row?.waktu_pulang || "-",
+        formatOvertime(row?.menit_overtime),
+      ]),
+      theme: "grid", // samakan seperti history
+      headStyles: {
+        fillColor: [22, 160, 133], // hijau emerald (history)
+        halign: "center",
+        fontStyle: "bold",
+        fontSize: 10,
+        textColor: [255, 255, 255],
+      },
+      bodyStyles: {
+        fontSize: 9,
+        textColor: [0, 0, 0],
+      },
+      styles: {
+        cellPadding: 2,
+        font: "helvetica",
+      },
+      margin: { left: 10, right: 10 },
+      tableWidth: "auto",
+    });
+
+    // Simpan PDF
+    doc.save(
+      `laporan-lembur-${
+        bulanOptions.find((b) => b.value === bulan)?.label
+      }-${tahun}.pdf`
+    );
   };
 
   const bulanOptions = [
@@ -297,7 +428,9 @@ export default function RekapPresensiBulanan() {
       const response = await fetch(
         `${
           import.meta.env.VITE_API_URL
-        }/api/presensi/rekap-bulanan-semua-pegawai?bulan=${bulan}&tahun=${tahunLaukPauk}`,
+        }/api/presensi/rekap-bulanan-semua-pegawai?${
+          isSuperAdmin ? `unit_id=${filterUnit}&` : ""
+        }bulan=${bulan}&tahun=${tahunLaukPauk}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -326,7 +459,7 @@ export default function RekapPresensiBulanan() {
 
     // Judul dan alamat
     doc.setFontSize(16);
-    doc.text("UNIVERSITAS ISLAM SULTAN AGUNG SEMARANG", 148, 20, {
+    doc.text("YAYASAN BADAN WAKAF SULTAN AGUNG", 148, 20, {
       align: "center",
     });
     doc.setFontSize(10);
@@ -340,7 +473,7 @@ export default function RekapPresensiBulanan() {
       align: "center",
     });
     doc.text(
-      "Email : informasi@unissula.ac.id Homepage : http://unissula.ac.id",
+      "Email : informasi@nama.ac.id Homepage : http://ybwsa.ac.id",
       148,
       40,
       { align: "center" }
@@ -414,6 +547,22 @@ export default function RekapPresensiBulanan() {
     );
   };
 
+  // konversi menit
+  const formatOvertime = (minutes) => {
+    if (!minutes) return "-";
+    const jam = Math.floor(minutes / 60);
+    const menit = minutes % 60;
+    return `${jam} jam ${menit} menit`;
+  };
+  const formatTanggal = (tanggal) => {
+    if (!tanggal) return "-";
+    return new Date(tanggal).toLocaleDateString("id-ID", {
+      day: "2-digit",
+      month: "long",
+      year: "numeric",
+    });
+  };
+
   return (
     <div className="w-full min-h-screen font-sans bg-gray-50">
       {/* Header */}
@@ -433,17 +582,19 @@ export default function RekapPresensiBulanan() {
       <div className="mx-auto p-4 max-w-5xl flex flex-col gap-8 px-2 md:px-0">
         <div className="border border-gray-300 bg-white p-4">
           <div className="flex gap-2 mb-6">
-            <button
-              className={`px-6 py-3 font-bold text-sm transition border-2 flex items-center gap-2 ${
-                tab === "history"
-                  ? "bg-emerald-600 text-white border-emerald-600"
-                  : "bg-white text-emerald-700 border-gray-300 hover:bg-gray-50"
-              }`}
-              onClick={() => setTab("history")}
-            >
-              <span className="material-icons text-base">history</span>
-              History Presensi
-            </button>
+            {!isSuperAdmin ? (
+              <button
+                className={`px-6 py-3 font-bold text-sm transition border-2 flex items-center gap-2 ${
+                  tab === "history"
+                    ? "bg-emerald-600 text-white border-emerald-600"
+                    : "bg-white text-emerald-700 border-gray-300 hover:bg-gray-50"
+                }`}
+                onClick={() => setTab("history")}
+              >
+                <span className="material-icons text-base">history</span>
+                History Presensi
+              </button>
+            ) : null}
             <button
               className={`px-6 py-3 font-bold text-sm transition border-2 flex items-center gap-2 ${
                 tab === "rekap"
@@ -455,6 +606,19 @@ export default function RekapPresensiBulanan() {
               <span className="material-icons text-base">people</span>
               Rekap Presensi Pegawai
             </button>
+            {!isSuperAdmin && (
+              <button
+                className={`px-6 py-3 font-bold text-sm transition border-2 flex items-center gap-2 ${
+                  tab === "lembur"
+                    ? "bg-emerald-600 text-white border-emerald-600"
+                    : "bg-white text-emerald-700 border-gray-300 hover:bg-gray-50"
+                }`}
+                onClick={() => setTab("lembur")}
+              >
+                <span className="material-icons text-base">watch</span>
+                Rekap Lembur Pegawai
+              </button>
+            )}
             <button
               className={`px-6 py-3 font-bold text-sm transition border-2 flex items-center gap-2 ${
                 tab === "laukPauk"
@@ -476,11 +640,22 @@ export default function RekapPresensiBulanan() {
             ) : (
               <>
                 <div className="mb-4 flex justify-between items-center">
-                  <div className="flex items-center gap-2 text-emerald-700">
-                    <span className="material-icons">description</span>
-                    <span className="font-semibold">
-                      Total Data: {data.length} records
-                    </span>
+                  <div>
+                    <div className="flex items-center gap-2 text-emerald-700">
+                      <span className="material-icons">description</span>
+                      <span className="font-semibold">
+                        Total Data: {data.length} records
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2 text-emerald-700">
+                      <label className="font-semibold">Dari:</label>
+                      <input
+                        type="date"
+                        value={fromDate}
+                        onChange={(e) => setFromDate(e.target.value)}
+                        className="border px-2 py-1 rounded"
+                      />
+                    </div>
                   </div>
                   <button
                     className="px-4 py-2 bg-emerald-600 text-white font-bold text-sm hover:bg-emerald-700 transition flex items-center gap-2"
@@ -491,7 +666,7 @@ export default function RekapPresensiBulanan() {
                   </button>
                 </div>
                 <div className="overflow-x-auto">
-                  <table className="min-w-full text-xs border border-gray-200 overflow-hidden shadow-sm">
+                  <table className="min-w-[200%] text-xs border border-gray-200 overflow-hidden shadow-sm">
                     <thead className="sticky top-0 z-10 bg-white border-b-2 border-emerald-100">
                       <tr>
                         <th className="px-4 py-4 text-center font-extrabold text-emerald-700 tracking-wide uppercase w-12 text-base">
@@ -652,7 +827,7 @@ export default function RekapPresensiBulanan() {
                 </div>
               ) : (
                 <div className="overflow-x-auto">
-                  <table className="min-w-full text-xs border border-gray-200 overflow-hidden shadow-sm">
+                  <table className="min-w-[120%] text-xs border border-gray-200 overflow-hidden shadow-sm">
                     <thead className="sticky top-0 z-10 bg-white border-b-2 border-emerald-100">
                       <tr>
                         <th className="px-4 py-4 text-center font-extrabold text-emerald-700 tracking-wide uppercase w-12 text-base">
@@ -667,7 +842,7 @@ export default function RekapPresensiBulanan() {
                           Nama
                         </th>
                         <th className="px-4 py-4 text-left font-extrabold text-emerald-700 tracking-wide uppercase w-40 text-base">
-                          Unit Detail
+                          Unit
                         </th>
                         <th className="px-4 py-4 text-left font-extrabold text-emerald-700 tracking-wide uppercase w-40 text-base">
                           Shift
@@ -685,6 +860,14 @@ export default function RekapPresensiBulanan() {
                             <span>PRESENSI</span>
                             <span className="text-xs font-normal text-gray-400 normal-case">
                               History Presensi Pegawai
+                            </span>
+                          </div>
+                        </th>
+                        <th className="px-2 py-3 text-center font-extrabold text-emerald-700 tracking-wide text-base uppercase w-40">
+                          <div className="flex flex-col leading-tight">
+                            <span>KEHADIRAN</span>
+                            <span className="text-xs font-normal text-gray-400 normal-case">
+                              Laporan Kehadiran Pegawai
                             </span>
                           </div>
                         </th>
@@ -708,15 +891,13 @@ export default function RekapPresensiBulanan() {
                               {row.no_ktp}
                             </td>
                             <td className="px-4 py-4 align-middle border-b border-gray-100 font-bold text-emerald-800 text-sm">
-                              {[row.gelar_depan, row.nama, row.gelar_belakang]
-                                .filter(Boolean)
-                                .join(" ")}
+                              {row.nama}
                             </td>
                             <td className="px-4 py-4 align-middle border-b border-gray-100 font-bold text-emerald-700 text-sm">
-                              {row?.unit_detail_name || "-"}
+                              {row?.nama_unit || "-"}
                             </td>
                             <td className="px-4 py-4 align-middle border-b border-gray-100 font-bold text-emerald-700 text-sm">
-                              {row?.shift_name || "-"}
+                              {row?.nama_shift || "-"}
                             </td>
                             <td className="px-4 py-4 text-center align-middle border-b border-gray-100">
                               <button
@@ -739,12 +920,27 @@ export default function RekapPresensiBulanan() {
                                 title="Lihat Rekap Presensi"
                                 onClick={() =>
                                   navigate(
-                                    `/presensi/detail-history-presensi/${row.id}`
+                                    `/presensi/detail-history-presensi/${row.id}/${row.unit_id_presensi}`
                                   )
                                 }
                               >
                                 <span className="material-icons text-blue-600">
                                   history
+                                </span>
+                              </button>
+                            </td>
+                            <td className="px-4 py-4 text-center align-middle border-b border-gray-100">
+                              <button
+                                className="p-2 hover:bg-orange-100 transition"
+                                title="Lihat Laporan Kehadiran"
+                                onClick={() =>
+                                  navigate(
+                                    `/presensi/laporan-kehadiran/${row.id}`
+                                  )
+                                }
+                              >
+                                <span className="material-icons text-orange-600">
+                                  assessment
                                 </span>
                               </button>
                             </td>
@@ -783,8 +979,199 @@ export default function RekapPresensiBulanan() {
               )}
             </>
           )}
+          {tab === "lembur" && (
+            <div className="space-y-6">
+              <div className="flex flex-col md:flex-row gap-4 items-end mb-6">
+                <div className="flex-1">
+                  <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                    <span className="material-icons text-base">
+                      calendar_month
+                    </span>
+                    Bulan
+                  </label>
+                  <select
+                    className="w-full px-3 py-2 border border-gray-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                    value={bulan}
+                    onChange={(e) => setBulan(Number(e.target.value))}
+                  >
+                    {bulanOptions.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="flex-1">
+                  <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                    <span className="material-icons text-base">event</span>
+                    Tahun
+                  </label>
+                  <input
+                    type="number"
+                    className="w-full px-3 py-2 border border-gray-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                    value={tahun}
+                    onChange={(e) => setTahun(Number(e.target.value))}
+                    min="2000"
+                    max={new Date().getFullYear() + 1}
+                  />
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    className="px-6 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm transition flex items-center gap-2"
+                    onClick={() => fetchLaporanLembur(bulan, tahun)}
+                    disabled={loading}
+                  >
+                    {loading ? (
+                      <>
+                        <span className="material-icons animate-spin">
+                          refresh
+                        </span>
+                        Loading...
+                      </>
+                    ) : (
+                      <>
+                        <span className="material-icons text-base">search</span>
+                        Cari Data
+                      </>
+                    )}
+                  </button>
+                  {lemburData.length > 0 && (
+                    <button
+                      className="px-6 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm transition flex items-center gap-2"
+                      onClick={handleDownloadPDFLembur}
+                    >
+                      <span className="material-icons text-base">download</span>
+                      Download PDF
+                    </button>
+                  )}
+                </div>
+              </div>
+              {loadingLembur ? (
+                <div className="text-center py-12 text-emerald-600 font-bold flex items-center justify-center gap-2">
+                  <span className="material-icons animate-spin">refresh</span>
+                  Memuat data rekap lembur...
+                </div>
+              ) : (
+                <div>
+                  <div className="overflow-x-auto">
+                    <table className="min-w-[130%] text-xs border border-gray-200 overflow-hidden shadow-sm">
+                      <thead className="sticky top-0 z-10 bg-white border-b-2 border-emerald-100">
+                        <tr>
+                          <th className="px-4 py-4 text-center font-extrabold text-emerald-700 tracking-wide uppercase w-12 text-base">
+                            <span className="material-icons text-base">
+                              format_list_numbered
+                            </span>
+                          </th>
+                          <th className="px-4 py-4 text-left font-extrabold text-emerald-700 tracking-wide uppercase w-32 text-base">
+                            NIK
+                          </th>
+                          <th className="px-4 py-4 text-left font-extrabold text-emerald-700 tracking-wide uppercase w-56 text-base">
+                            Nama
+                          </th>
+                          <th className="px-4 py-4 text-left font-extrabold text-emerald-700 tracking-wide uppercase w-40 text-base">
+                            Unit
+                          </th>
+                          <th className="px-4 py-4 text-left font-extrabold text-emerald-700 tracking-wide uppercase w-40 text-base">
+                            Tanggal
+                          </th>
+                          <th className="px-2 py-3 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-40">
+                            Waktu Masuk
+                          </th>
+                          <th className="px-2 py-3 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-40">
+                            Waktu Pulang
+                          </th>
+                          <th className="px-2 py-3 text-center font-extrabold text-emerald-700 tracking-wide text-base uppercase w-40">
+                            Lembur
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {lemburData?.length > 0 ? (
+                          lemburData?.map((row, idx) => (
+                            <tr
+                              key={row.id}
+                              className={
+                                idx % 2 === 0 ? "bg-white" : "bg-gray-50"
+                              }
+                            >
+                              <td className="px-4 py-4 text-center align-middle border-b border-gray-100 font-semibold text-sm">
+                                {idx + 1}
+                              </td>
+                              <td className="px-4 py-4 align-middle border-b border-gray-100 text-sm">
+                                {row.no_ktp}
+                              </td>
+                              <td className="px-4 py-4 align-middle border-b border-gray-100 font-bold text-emerald-800 text-sm">
+                                {[row.gelar_depan, row.nama, row.gelar_belakang]
+                                  .filter(Boolean)
+                                  .join(" ")}
+                              </td>
+                              <td className="px-4 py-4 align-middle border-b border-gray-100 font-bold text-emerald-700 text-sm">
+                                {row?.nama_unit || "-"}
+                              </td>
+                              <td className="px-4 py-4 align-middle border-b border-gray-100 font-bold text-emerald-700 text-sm">
+                                {formatTanggal(row?.tanggal)}
+                              </td>
+                              <td className="px-4 py-4 align-middle border-b border-gray-100 font-bold text-emerald-700 text-sm">
+                                {row?.waktu_masuk || "-"}
+                              </td>
+                              <td className="px-4 py-4 align-middle border-b border-gray-100 font-bold text-emerald-700 text-sm">
+                                {row?.waktu_pulang || "-"}
+                              </td>
+                              <td className="px-4 py-4 align-middle border-b border-gray-100 font-bold text-emerald-700 text-sm">
+                                {formatOvertime(row?.menit_overtime)}
+                              </td>
+                            </tr>
+                          ))
+                        ) : (
+                          <tr>
+                            <td
+                              colSpan={6}
+                              className="text-center text-gray-400 py-8"
+                            >
+                              <div className="flex flex-col items-center gap-2">
+                                <span className="material-icons text-4xl text-gray-300">
+                                  watch
+                                </span>
+                                <span className="font-semibold">
+                                  Tidak ada data lembur pegawai
+                                </span>
+                                <span className="text-sm">
+                                  Data lembur pegawai kosong
+                                </span>
+                              </div>
+                            </td>
+                          </tr>
+                        )}
+                      </tbody>
+                    </table>
+
+                    {/* Pagination
+                    {pegawaiPagination && pegawaiPagination.last_page > 1 && (
+                      <div className="flex flex-wrap gap-1 justify-center mt-6">
+                        {renderPaginationButtons()}
+                      </div>
+                    )} */}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
           {tab === "laukPauk" && (
             <div className="space-y-6">
+              {isSuperAdmin && (
+                <select
+                  className="border border-gray-300 px-3 py-2 text-sm min-w-[160px] rounded"
+                  value={filterUnit}
+                  onChange={(e) => setFilterUnit(e.target.value)}
+                >
+                  <option value="">Semua Unit</option>
+                  {units.map((u) => (
+                    <option key={u.id} value={u.id}>
+                      {u.name}
+                    </option>
+                  ))}
+                </select>
+              )}
               {/* Setting Lauk Pauk Section */}
               <div className="border border-gray-300 bg-white p-6">
                 <div className="flex justify-between items-center mb-6">
@@ -1329,164 +1716,170 @@ export default function RekapPresensiBulanan() {
                 </div>
 
                 {rekapLaukPauk.length > 0 && (
-                  <div className="overflow-x-auto">
-                    <div className="flex items-center gap-2 mb-4 text-emerald-700">
-                      <span className="material-icons">table_chart</span>
-                      <span className="font-semibold">
-                        Total Data: {rekapLaukPauk.length} records
-                      </span>
+                  <>
+                    <div className="mb-4 flex justify-between items-center">
+                      <div className="flex items-center gap-2 text-emerald-700">
+                        <span className="material-icons">description</span>
+                        <span className="font-semibold">
+                          Total Data: {rekapLaukPauk.length} records
+                        </span>
+                      </div>
                     </div>
-                    <table className="min-w-full text-sm border border-gray-200">
-                      <thead className="bg-emerald-50 border-b border-emerald-200">
-                        <tr>
-                          <th className="px-4 py-3 text-left font-bold text-emerald-800">
-                            No
-                          </th>
-                          <th className="px-4 py-3 text-left font-bold text-emerald-800">
-                            NIK
-                          </th>
-                          <th className="px-4 py-3 text-left font-bold text-emerald-800">
-                            Nama Pegawai
-                          </th>
-                          <th className="px-4 py-3 text-left font-bold text-emerald-800">
-                            Unit Kerja
-                          </th>
-                          <th className="px-4 py-3 text-center font-bold text-emerald-800">
-                            Hari Efektif
-                          </th>
-                          <th className="px-4 py-3 text-center font-bold text-emerald-800">
-                            Hadir
-                          </th>
-                          <th className="px-4 py-3 text-center font-bold text-emerald-800">
-                            Izin
-                          </th>
-                          <th className="px-4 py-3 text-center font-bold text-emerald-800">
-                            Sakit
-                          </th>
-                          <th className="px-4 py-3 text-center font-bold text-emerald-800">
-                            Cuti
-                          </th>
-                          <th className="px-4 py-3 text-center font-bold text-emerald-800">
-                            Tidak Masuk
-                          </th>
-                          <th className="px-4 py-3 text-center font-bold text-emerald-800">
-                            Dinas
-                          </th>
-                          <th className="px-4 py-3 text-center font-bold text-emerald-800">
-                            Terlambat
-                          </th>
-                          <th className="px-4 py-3 text-center font-bold text-emerald-800">
-                            Pulang Awal
-                          </th>
-                          <th className="px-4 py-3 text-center font-bold text-emerald-800">
-                            Jam Datang Kosong
-                          </th>
-                          <th className="px-4 py-3 text-center font-bold text-emerald-800">
-                            Jam Pulang Kosong
-                          </th>
-                          <th className="px-4 py-3 text-center font-bold text-emerald-800">
-                            Lembur
-                          </th>
-                          <th className="px-4 py-3 text-center font-bold text-emerald-800">
-                            Libur
-                          </th>
-                          <th className="px-4 py-3 text-center font-bold text-emerald-800">
-                            Nominal Lauk Pauk
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-gray-200">
-                        {rekapLaukPauk.map((row, idx) => (
-                          <tr
-                            key={idx}
-                            className="hover:bg-gray-50 transition-colors"
-                          >
-                            <td className="px-4 py-3 text-gray-900">
-                              {row.no}
-                            </td>
-                            <td className="px-4 py-3 text-gray-900">
-                              {row.nik}
-                            </td>
-                            <td className="px-4 py-3 font-semibold text-gray-900">
-                              {row.nama_pegawai}
-                            </td>
-                            <td className="px-4 py-3 text-gray-900">
-                              {row.unit_kerja}
-                            </td>
-                            <td className="px-4 py-3 text-center">
-                              {row.hari_efektif}
-                            </td>
-                            <td className="px-4 py-3 text-center">
-                              <span className="inline-flex items-center px-2 py-1 text-xs font-semibold bg-emerald-100 text-emerald-800">
-                                {row.jumlah_hadir}
-                              </span>
-                            </td>
-                            <td className="px-4 py-3 text-center">
-                              <span className="inline-flex items-center px-2 py-1 text-xs font-semibold bg-sky-100 text-sky-800">
-                                {row.jumlah_izin}
-                              </span>
-                            </td>
-                            <td className="px-4 py-3 text-center">
-                              <span className="inline-flex items-center px-2 py-1 text-xs font-semibold bg-red-100 text-red-800">
-                                {row.jumlah_sakit}
-                              </span>
-                            </td>
-                            <td className="px-4 py-3 text-center">
-                              <span className="inline-flex items-center px-2 py-1 text-xs font-semibold bg-yellow-100 text-yellow-800">
-                                {row.jumlah_cuti}
-                              </span>
-                            </td>
-                            <td className="px-4 py-3 text-center">
-                              <span className="inline-flex items-center px-2 py-1 text-xs font-semibold bg-gray-100 text-gray-800">
-                                {row.jumlah_tidak_masuk}
-                              </span>
-                            </td>
-                            <td className="px-4 py-3 text-center">
-                              <span className="inline-flex items-center px-2 py-1 text-xs font-semibold bg-purple-100 text-purple-800">
-                                {row.jumlah_dinas}
-                              </span>
-                            </td>
-                            <td className="px-4 py-3 text-center">
-                              <span className="inline-flex items-center px-2 py-1 text-xs font-semibold bg-orange-100 text-orange-800">
-                                {row.jumlah_terlambat}
-                              </span>
-                            </td>
-                            <td className="px-4 py-3 text-center">
-                              <span className="inline-flex items-center px-2 py-1 text-xs font-semibold bg-pink-100 text-pink-800">
-                                {row.jumlah_pulang_awal}
-                              </span>
-                            </td>
-                            <td className="px-4 py-3 text-center">
-                              <span className="inline-flex items-center px-2 py-1 text-xs font-semibold bg-indigo-100 text-indigo-800">
-                                {row.jumlah_jam_datang_kosong}
-                              </span>
-                            </td>
-                            <td className="px-4 py-3 text-center">
-                              <span className="inline-flex items-center px-2 py-1 text-xs font-semibold bg-teal-100 text-teal-800">
-                                {row.jumlah_jam_pulang_kosong}
-                              </span>
-                            </td>
-                            <td className="px-4 py-3 text-center">
-                              <span className="inline-flex items-center px-2 py-1 text-xs font-semibold bg-amber-100 text-amber-800">
-                                {row.lembur}
-                              </span>
-                            </td>
-                            <td className="px-4 py-3 text-center">
-                              <span className="inline-flex items-center px-2 py-1 text-xs font-semibold bg-lime-100 text-lime-800">
-                                {row.jumlah_libur}
-                              </span>
-                            </td>
-                            <td className="px-4 py-3 text-center font-bold text-green-600">
-                              Rp{" "}
-                              {(row.nominal_lauk_pauk || 0).toLocaleString(
-                                "id-ID"
-                              )}
-                            </td>
+                    <div className="overflow-x-auto border border-gray-200 rounded-lg shadow-sm">
+                      <table className="min-w-full text-xs">
+                        <thead className="bg-emerald-600 text-white">
+                          <tr>
+                            <th className="px-3 py-3 text-center font-bold text-sm border-r border-emerald-500 w-16">
+                              NO
+                            </th>
+                            <th className="px-3 py-3 text-center font-bold text-sm border-r border-emerald-500 w-24">
+                              NIK
+                            </th>
+                            <th className="px-3 py-3 text-center font-bold text-sm border-r border-emerald-500 w-40">
+                              NAMA PEGAWAI
+                            </th>
+                            <th className="px-3 py-3 text-center font-bold text-sm border-r border-emerald-500 w-32">
+                              UNIT KERJA
+                            </th>
+                            <th className="px-3 py-3 text-center font-bold text-sm border-r border-emerald-500 w-24">
+                              HARI EFEKTIF
+                            </th>
+                            <th className="px-3 py-3 text-center font-bold text-sm border-r border-emerald-500 w-20">
+                              HADIR
+                            </th>
+                            <th className="px-3 py-3 text-center font-bold text-sm border-r border-emerald-500 w-20">
+                              IZIN
+                            </th>
+                            <th className="px-3 py-3 text-center font-bold text-sm border-r border-emerald-500 w-20">
+                              SAKIT
+                            </th>
+                            <th className="px-3 py-3 text-center font-bold text-sm border-r border-emerald-500 w-20">
+                              CUTI
+                            </th>
+                            <th className="px-3 py-3 text-center font-bold text-sm border-r border-emerald-500 w-28">
+                              TIDAK MASUK
+                            </th>
+                            <th className="px-3 py-3 text-center font-bold text-sm border-r border-emerald-500 w-20">
+                              DINAS
+                            </th>
+                            <th className="px-3 py-3 text-center font-bold text-sm border-r border-emerald-500 w-24">
+                              TERLAMBAT
+                            </th>
+                            <th className="px-3 py-3 text-center font-bold text-sm border-r border-emerald-500 w-24">
+                              PULANG AWAL
+                            </th>
+                            <th className="px-3 py-3 text-center font-bold text-sm border-r border-emerald-500 w-32">
+                              JAM DATANG KOSONG
+                            </th>
+                            <th className="px-3 py-3 text-center font-bold text-sm border-r border-emerald-500 w-32">
+                              JAM PULANG KOSONG
+                            </th>
+                            <th className="px-3 py-3 text-center font-bold text-sm border-r border-emerald-500 w-20">
+                              LEMBUR
+                            </th>
+                            <th className="px-3 py-3 text-center font-bold text-sm border-r border-emerald-500 w-20">
+                              LIBUR
+                            </th>
+                            <th className="px-3 py-3 text-center font-bold text-sm w-32">
+                              NOMINAL LAUK PAUK
+                            </th>
                           </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
+                        </thead>
+                        <tbody>
+                          {rekapLaukPauk.map((row, idx) => (
+                            <tr
+                              key={idx}
+                              className={`transition hover:bg-emerald-50 border-b border-gray-100 ${
+                                idx % 2 === 0 ? "bg-white" : "bg-gray-50"
+                              }`}
+                            >
+                              <td className="px-3 py-3 text-center align-middle text-sm border-r border-gray-200 font-semibold">
+                                {row.no}
+                              </td>
+                              <td className="px-3 py-3 text-center align-middle text-sm border-r border-gray-200">
+                                {row.nik}
+                              </td>
+                              <td className="px-3 py-3 text-center align-middle text-sm border-r border-gray-200 font-semibold">
+                                {row.nama_pegawai}
+                              </td>
+                              <td className="px-3 py-3 text-center align-middle text-sm border-r border-gray-200">
+                                {row.unit_kerja}
+                              </td>
+                              <td className="px-3 py-3 text-center align-middle text-sm border-r border-gray-200 font-semibold">
+                                {row.hari_efektif}
+                              </td>
+                              <td className="px-3 py-3 text-center align-middle text-sm border-r border-gray-200">
+                                <span className="inline-flex items-center px-2 py-1 text-xs font-semibold bg-emerald-100 text-emerald-800 rounded">
+                                  {row.jumlah_hadir}
+                                </span>
+                              </td>
+                              <td className="px-3 py-3 text-center align-middle text-sm border-r border-gray-200">
+                                <span className="inline-flex items-center px-2 py-1 text-xs font-semibold bg-sky-100 text-sky-800 rounded">
+                                  {row.jumlah_izin}
+                                </span>
+                              </td>
+                              <td className="px-3 py-3 text-center align-middle text-sm border-r border-gray-200">
+                                <span className="inline-flex items-center px-2 py-1 text-xs font-semibold bg-red-100 text-red-800 rounded">
+                                  {row.jumlah_sakit}
+                                </span>
+                              </td>
+                              <td className="px-3 py-3 text-center align-middle text-sm border-r border-gray-200">
+                                <span className="inline-flex items-center px-2 py-1 text-xs font-semibold bg-yellow-100 text-yellow-800 rounded">
+                                  {row.jumlah_cuti}
+                                </span>
+                              </td>
+                              <td className="px-3 py-3 text-center align-middle text-sm border-r border-gray-200">
+                                <span className="inline-flex items-center px-2 py-1 text-xs font-semibold bg-gray-100 text-gray-800 rounded">
+                                  {row.jumlah_tidak_masuk}
+                                </span>
+                              </td>
+                              <td className="px-3 py-3 text-center align-middle text-sm border-r border-gray-200">
+                                <span className="inline-flex items-center px-2 py-1 text-xs font-semibold bg-purple-100 text-purple-800 rounded">
+                                  {row.jumlah_dinas}
+                                </span>
+                              </td>
+                              <td className="px-3 py-3 text-center align-middle text-sm border-r border-gray-200">
+                                <span className="inline-flex items-center px-2 py-1 text-xs font-semibold bg-orange-100 text-orange-800 rounded">
+                                  {row.jumlah_terlambat}
+                                </span>
+                              </td>
+                              <td className="px-3 py-3 text-center align-middle text-sm border-r border-gray-200">
+                                <span className="inline-flex items-center px-2 py-1 text-xs font-semibold bg-pink-100 text-pink-800 rounded">
+                                  {row.jumlah_pulang_awal}
+                                </span>
+                              </td>
+                              <td className="px-3 py-3 text-center align-middle text-sm border-r border-gray-200">
+                                <span className="inline-flex items-center px-2 py-1 text-xs font-semibold bg-indigo-100 text-indigo-800 rounded">
+                                  {row.jumlah_jam_datang_kosong}
+                                </span>
+                              </td>
+                              <td className="px-3 py-3 text-center align-middle text-sm border-r border-gray-200">
+                                <span className="inline-flex items-center px-2 py-1 text-xs font-semibold bg-teal-100 text-teal-800 rounded">
+                                  {row.jumlah_jam_pulang_kosong}
+                                </span>
+                              </td>
+                              <td className="px-3 py-3 text-center align-middle text-sm border-r border-gray-200">
+                                <span className="inline-flex items-center px-2 py-1 text-xs font-semibold bg-amber-100 text-amber-800 rounded">
+                                  {row.lembur}
+                                </span>
+                              </td>
+                              <td className="px-3 py-3 text-center align-middle text-sm border-r border-gray-200">
+                                <span className="inline-flex items-center px-2 py-1 text-xs font-semibold bg-lime-100 text-lime-800 rounded">
+                                  {row.jumlah_libur}
+                                </span>
+                              </td>
+                              <td className="px-3 py-3 text-center align-middle text-sm font-bold text-green-600">
+                                Rp{" "}
+                                {(row.nominal_lauk_pauk || 0).toLocaleString(
+                                  "id-ID"
+                                )}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </>
                 )}
               </div>
             </div>

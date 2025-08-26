@@ -10,6 +10,7 @@ import unitReducer from "./unitReducer";
 import hariLiburReducer from "./hariLiburReducer";
 import tambahPegawaiReducer from "./tambahPegawaiReducer";
 import laukPaukReducer from "./laukPaukReducer";
+import dashboardReducer from "./dashboardReducer";
 
 export default combineReducers({
   auth: authReducer,
@@ -23,4 +24,5 @@ export default combineReducers({
   hariLibur: hariLiburReducer,
   tambahPegawai: tambahPegawaiReducer,
   laukPauk: laukPaukReducer,
+  dashboard: dashboardReducer,
 });

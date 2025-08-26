@@ -54,10 +54,12 @@ export const fetchPegawai =
         });
       }
     } catch (err) {
-      dispatch({
-        type: FETCH_PEGAWAI_FAILURE,
-        error: "Gagal mengambil data pegawai",
-      });
+      if (err) {
+        dispatch({
+          type: FETCH_PEGAWAI_FAILURE,
+          error: "Gagal mengambil data pegawai",
+        });
+      }
     }
   };
 

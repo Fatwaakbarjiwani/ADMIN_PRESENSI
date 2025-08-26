@@ -140,7 +140,13 @@ export default function ShiftDosenKaryawan() {
                       NIK
                     </th>
                     <th className="px-2 py-3 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-40">
-                      Jabatan
+                      No. HP
+                    </th>
+                    <th className="px-2 py-3 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-40">
+                      Tempat Lahir
+                    </th>
+                    <th className="px-2 py-3 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-40">
+                      Tanggal Lahir
                     </th>
                     <th className="px-2 py-3 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-40">
                       <div className="flex flex-col leading-tight">
@@ -174,18 +180,32 @@ export default function ShiftDosenKaryawan() {
                             .join(" ")}
                         </td>
                         <td className="px-2 py-3 align-middle border-b border-gray-100">
-                          {row.nipy || row.no_ktp}
+                          {row.no_ktp}
                         </td>
                         <td className="px-2 py-3 align-middle border-b border-gray-100">
-                          {row.jabatan}
+                          {row.no_hp}
                         </td>
                         <td className="px-2 py-3 align-middle border-b border-gray-100">
-                          {row.unit_detail_name}
+                          {row.tmpt_lahir}
                         </td>
                         <td className="px-2 py-3 align-middle border-b border-gray-100">
-                          {row.shift_name ? (
+                          {row.tgl_lahir}
+                        </td>
+                        <td className="px-2 py-3 align-middle border-b border-gray-100">
+                          {row.nama_unit ? (
                             <span className="inline-block bg-emerald-100 text-emerald-700 px-2 py-0.5 text-xs font-bold">
-                              {row.shift_name}
+                              {row.nama_unit}
+                            </span>
+                          ) : (
+                            <span className="inline-block bg-gray-100 text-gray-400 px-2 py-0.5 text-xs">
+                              -
+                            </span>
+                          )}
+                        </td>
+                        <td className="px-2 py-3 align-middle border-b border-gray-100">
+                          {row.nama_shift ? (
+                            <span className="inline-block bg-emerald-100 text-emerald-700 px-2 py-0.5 text-xs font-bold">
+                              {row.nama_shift}
                             </span>
                           ) : (
                             <span className="inline-block bg-gray-100 text-gray-400 px-2 py-0.5 text-xs">
@@ -330,14 +350,12 @@ export default function ShiftDosenKaryawan() {
                           {idx + 1 + ((pagination.current_page - 1) * 20 || 0)}
                         </td>
                         <td className="px-2 py-3 font-bold align-middle border-b border-gray-100 text-emerald-800">
-                          {[row.gelar_depan, row.nama, row.gelar_belakang]
-                            .filter(Boolean)
-                            .join(" ")}
+                          {row.nama}
                         </td>
                         <td className="px-2 py-3 align-middle border-b border-gray-100">
-                          {row.shift_name ? (
+                          {row.nama_shift ? (
                             <span className="inline-block bg-emerald-100 text-emerald-700 px-2 py-0.5 text-xs font-bold">
-                              {row.shift_name}
+                              {row.nama_shift}
                             </span>
                           ) : (
                             <span className="inline-block bg-gray-100 text-gray-400 px-2 py-0.5 text-xs">

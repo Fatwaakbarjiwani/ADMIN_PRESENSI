@@ -1,0 +1,499 @@
+import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
+import { useParams, useNavigate } from "react-router-dom";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
+import Swal from "sweetalert2";
+
+// Logo ybwsa base64 PNG (dummy, ganti dengan logo asli jika ada)
+const logoBase64 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQC..."; // Potong, ganti dengan base64 logo asli jika ada
+
+export default function LaporanKehadiranPegawai() {
+  const { pegawai_id } = useParams();
+  const navigate = useNavigate();
+  const token = useSelector((state) => state.auth.token);
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [bulan, setBulan] = useState(new Date().getMonth() + 1);
+  const [tahun, setTahun] = useState(new Date().getFullYear());
+
+  const bulanOptions = [
+    { value: 1, label: "Januari" },
+    { value: 2, label: "Februari" },
+    { value: 3, label: "Maret" },
+    { value: 4, label: "April" },
+    { value: 5, label: "Mei" },
+    { value: 6, label: "Juni" },
+    { value: 7, label: "Juli" },
+    { value: 8, label: "Agustus" },
+    { value: 9, label: "September" },
+    { value: 10, label: "Oktober" },
+    { value: 11, label: "November" },
+    { value: 12, label: "Desember" },
+  ];
+
+  const fetchLaporanKehadiran = async (bulan, tahun) => {
+    setLoading(true);
+    try {
+      const response = await fetch(
+        `${
+          import.meta.env.VITE_API_URL
+        }/api/presensi/laporan-kehadiran-karyawan/${pegawai_id}?bulan=${bulan}&tahun=${tahun}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Gagal mengambil data laporan kehadiran");
+      }
+
+      const result = await response.json();
+      setData(result);
+    } catch (error) {
+      console.error("Error fetching laporan kehadiran:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Gagal mengambil data laporan kehadiran",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (token && pegawai_id) {
+      fetchLaporanKehadiran(bulan, tahun);
+    }
+  }, [token, pegawai_id, bulan, tahun]);
+
+  const handleDownloadPDF = () => {
+    if (!data) return;
+
+    const doc = new jsPDF("l", "mm", "a4"); // landscape, mm, A4
+
+    // Logo kiri atas
+    try {
+      doc.addImage(logoBase64, "PNG", 10, 10, 25, 25);
+    } catch {
+      // logo gagal dimuat, lanjutkan tanpa logo
+    }
+
+    // Judul dan alamat
+    doc.setFontSize(16);
+    doc.text("YAYASAN BADAN WAKAF SULTAN AGUNG", 148, 20, {
+      align: "center",
+    });
+    doc.setFontSize(10);
+    doc.text(
+      "Jl.Raya Kaligawe Km.4 Semarang 50112; PO Box 1054/SM Indonesia",
+      148,
+      28,
+      { align: "center" }
+    );
+    doc.text("Telp (024) 6583584 Fax. (024) 6582455", 148, 34, {
+      align: "center",
+    });
+    doc.text(
+      "Email : informasi@ybwsa.ac.id Homepage : http://ybwsa.ac.id",
+      148,
+      40,
+      { align: "center" }
+    );
+
+    // Garis bawah
+    doc.setLineWidth(0.5);
+    doc.line(10, 44, 287, 44);
+
+    // Informasi pegawai
+    doc.setFontSize(12);
+    doc.text("LAPORAN KEHADIRAN PEGAWAI", 148, 55, { align: "center" });
+    doc.setFontSize(10);
+    doc.text(`Nama: ${data.pegawai.nama}`, 20, 65);
+    doc.text(`NIK: ${data.pegawai.no_ktp}`, 20, 72);
+    doc.text(`Unit Kerja: ${data.pegawai.unit_kerja || "-"}`, 20, 79);
+    doc.text(`Jabatan: ${data.pegawai.jabatan || "-"}`, 20, 86);
+    doc.text(
+      `Periode: ${
+        bulanOptions.find((b) => b.value === parseInt(data.periode.bulan))
+          ?.label
+      } ${data.periode.tahun}`,
+      20,
+      93
+    );
+
+    // Tabel dengan format yang lebih rapi
+    autoTable(doc, {
+      startY: 100,
+      head: [
+        [
+          "TGL. ABSENSI",
+          "JAM KERJA (MASUK)",
+          "JAM KERJA (PULANG)",
+          "JAM MASUK",
+          "JAM KELUAR",
+          "JML MENIT DATANG (CEPAT)",
+          "JML MENIT DATANG (TELAT)",
+          "JML MENIT PULANG (CEPAT)",
+          "JML MENIT PULANG (LEMBUR)",
+          "JML JAM KERJA",
+          "ALASAN",
+        ],
+      ],
+      body: data.data.map((row) => [
+        row.tgl_absensi,
+        row.jam_kerja.masuk,
+        row.jam_kerja.pulang,
+        row.jam_masuk,
+        row.jam_keluar,
+        row.jumlah_menit_datang.menit_datang_cepat > 0
+          ? `${row.jumlah_menit_datang.menit_datang_cepat}`
+          : "-",
+        row.jumlah_menit_datang.menit_telat > 0
+          ? `${row.jumlah_menit_datang.menit_telat}`
+          : "-",
+        row.jumlah_menit_pulang.menit_pulang_cepat > 0
+          ? `${row.jumlah_menit_pulang.menit_pulang_cepat}`
+          : "-",
+        row.jumlah_menit_pulang.menit_lembur > 0
+          ? `${row.jumlah_menit_pulang.menit_lembur}`
+          : "-",
+        row.jam_kerja_total,
+        row.alasan || "-",
+      ]),
+      headStyles: {
+        fillColor: [64, 64, 64], // Dark grey header like in the image
+        halign: "center",
+        fontStyle: "bold",
+        fontSize: 8,
+        textColor: [255, 255, 255],
+      },
+      bodyStyles: {
+        fontSize: 7,
+        halign: "center",
+        textColor: [0, 0, 0],
+      },
+      styles: {
+        cellPadding: 2,
+        font: "helvetica",
+        lineWidth: 0.1,
+      },
+      margin: { left: 10, right: 10 },
+      tableWidth: "auto",
+      columnStyles: {
+        0: { cellWidth: 30, halign: "center" }, // TGL. ABSENSI
+        1: { cellWidth: 20, halign: "center" }, // JAM KERJA (MASUK)
+        2: { cellWidth: 20, halign: "center" }, // JAM KERJA (PULANG)
+        3: { cellWidth: 25, halign: "center" }, // JAM MASUK
+        4: { cellWidth: 25, halign: "center" }, // JAM KELUAR
+        5: { cellWidth: 22, halign: "center" }, // JML MENIT DATANG (CEPAT)
+        6: { cellWidth: 22, halign: "center" }, // JML MENIT DATANG (TELAT)
+        7: { cellWidth: 22, halign: "center" }, // JML MENIT PULANG (CEPAT)
+        8: { cellWidth: 22, halign: "center" }, // JML MENIT PULANG (LEMBUR)
+        9: { cellWidth: 25, halign: "center" }, // JML JAM KERJA
+        10: { cellWidth: 35, halign: "left" }, // ALASAN
+      },
+      alternateRowStyles: {
+        fillColor: [245, 245, 245],
+      },
+      didDrawPage: function (data) {
+        // Add page number
+        doc.setFontSize(8);
+        doc.text(
+          `Halaman ${doc.internal.getNumberOfPages()}`,
+          data.settings.margin.left,
+          doc.internal.pageSize.height - 10
+        );
+      },
+    });
+
+    doc.save(
+      `laporan-kehadiran-${data.pegawai.nama}-${
+        bulanOptions.find((b) => b.value === bulan)?.label
+      }-${tahun}.pdf`
+    );
+  };
+
+  return (
+    <div className="w-full min-h-screen font-sans bg-gray-50">
+      {/* Header */}
+      <div className="px-4 sticky z-40 top-0 py-4 border-b border-gray-200 bg-white flex items-center gap-4">
+        <button
+          onClick={() => navigate(-1)}
+          className="p-2 hover:bg-gray-100 rounded-lg transition flex items-center"
+        >
+          <span className="material-icons text-gray-600">arrow_back</span>
+        </button>
+        <span className="material-icons text-green-200 bg-primary p-2 opacity-80">
+          assessment
+        </span>
+        <div>
+          <div className="text-2xl font-extrabold text-emerald-700 tracking-tight drop-shadow-sm uppercase">
+            Laporan Kehadiran Pegawai
+          </div>
+          <div className="text-gray-600 text-base font-medium">
+            Detail laporan kehadiran pegawai per periode
+          </div>
+        </div>
+      </div>
+
+      <div className="mx-auto p-4 max-w-5xl flex flex-col gap-8 px-2 md:px-0">
+        <div className="border border-gray-300 bg-white p-6">
+          {/* Filter Section */}
+          <div className="flex flex-col md:flex-row gap-4 items-end mb-6">
+            <div className="flex-1">
+              <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                <span className="material-icons text-base">calendar_month</span>
+                Bulan
+              </label>
+              <select
+                className="w-full px-3 py-2 border border-gray-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                value={bulan}
+                onChange={(e) => setBulan(Number(e.target.value))}
+              >
+                {bulanOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="flex-1">
+              <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                <span className="material-icons text-base">event</span>
+                Tahun
+              </label>
+              <input
+                type="number"
+                className="w-full px-3 py-2 border border-gray-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                value={tahun}
+                onChange={(e) => setTahun(Number(e.target.value))}
+                min="2000"
+                max={new Date().getFullYear() + 1}
+              />
+            </div>
+            <div className="flex gap-2">
+              <button
+                className="px-6 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm transition flex items-center gap-2"
+                onClick={() => fetchLaporanKehadiran(bulan, tahun)}
+                disabled={loading}
+              >
+                {loading ? (
+                  <>
+                    <span className="material-icons animate-spin">refresh</span>
+                    Loading...
+                  </>
+                ) : (
+                  <>
+                    <span className="material-icons text-base">search</span>
+                    Cari Data
+                  </>
+                )}
+              </button>
+              {data && data.data.length > 0 && (
+                <button
+                  className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm transition flex items-center gap-2"
+                  onClick={handleDownloadPDF}
+                >
+                  <span className="material-icons text-base">download</span>
+                  Download PDF
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Informasi Pegawai */}
+          {data && (
+            <div className="bg-emerald-50 border border-emerald-200 p-4 mb-6 rounded-lg">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div>
+                  <div className="text-sm text-gray-600 mb-1">Nama Pegawai</div>
+                  <div className="font-bold text-emerald-800">
+                    {data.pegawai.nama}
+                  </div>
+                </div>
+                <div>
+                  <div className="text-sm text-gray-600 mb-1">NIK</div>
+                  <div className="font-semibold text-gray-800">
+                    {data.pegawai.no_ktp}
+                  </div>
+                </div>
+                <div>
+                  <div className="text-sm text-gray-600 mb-1">Unit Kerja</div>
+                  <div className="font-semibold text-gray-800">
+                    {data.pegawai.unit_kerja || "-"}
+                  </div>
+                </div>
+                <div>
+                  <div className="text-sm text-gray-600 mb-1">Jabatan</div>
+                  <div className="font-semibold text-gray-800">
+                    {data.pegawai.jabatan || "-"}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Tabel Data */}
+          {loading ? (
+            <div className="text-center py-12 text-emerald-600 font-bold flex items-center justify-center gap-2">
+              <span className="material-icons animate-spin">refresh</span>
+              Memuat data laporan kehadiran...
+            </div>
+          ) : !data ? (
+            <div className="text-center text-gray-400 py-8">
+              <div className="flex flex-col items-center gap-2">
+                <span className="material-icons text-4xl text-gray-300">
+                  search
+                </span>
+                <span className="font-semibold">
+                  Pilih periode untuk melihat data
+                </span>
+                <span className="text-sm">
+                  Klik tombol &quot;Cari Data&quot; untuk menampilkan laporan
+                  kehadiran
+                </span>
+              </div>
+            </div>
+          ) : data && data.data.length > 0 ? (
+            <>
+              <div className="mb-4 flex justify-between items-center">
+                <div className="flex items-center gap-2 text-emerald-700">
+                  <span className="material-icons">description</span>
+                  <span className="font-semibold">
+                    Total Data: {data.data.length} records
+                  </span>
+                </div>
+              </div>
+              <div className="overflow-x-auto border border-gray-200 rounded-lg shadow-sm">
+                <table className="min-w-[150%] text-xs">
+                  <thead className="bg-emerald-600 text-white">
+                    <tr>
+                      <th className="px-3 py-3 text-center font-bold text-sm border-r border-emerald-500 w-32">
+                        TGL. ABSENSI
+                      </th>
+                      <th className="px-3 py-3 text-center font-bold text-sm border-r border-emerald-500 w-20">
+                        JAM KERJA (MASUK)
+                      </th>
+                      <th className="px-3 py-3 text-center font-bold text-sm border-r border-emerald-500 w-20">
+                        JAM KERJA (PULANG)
+                      </th>
+                      <th className="px-3 py-3 text-center font-bold text-sm border-r border-emerald-500 w-24">
+                        JAM MASUK
+                      </th>
+                      <th className="px-3 py-3 text-center font-bold text-sm border-r border-emerald-500 w-24">
+                        JAM KELUAR
+                      </th>
+                      <th className="px-3 py-3 text-center font-bold text-sm border-r border-emerald-500 w-24">
+                        JML MENIT DATANG (CEPAT)
+                      </th>
+                      <th className="px-3 py-3 text-center font-bold text-sm border-r border-emerald-500 w-24">
+                        JML MENIT DATANG (TELAT)
+                      </th>
+                      <th className="px-3 py-3 text-center font-bold text-sm border-r border-emerald-500 w-24">
+                        JML MENIT PULANG (CEPAT)
+                      </th>
+                      <th className="px-3 py-3 text-center font-bold text-sm border-r border-emerald-500 w-24">
+                        JML MENIT PULANG (LEMBUR)
+                      </th>
+                      <th className="px-3 py-3 text-center font-bold text-sm border-r border-emerald-500 w-28">
+                        JML JAM KERJA
+                      </th>
+                      <th className="px-3 py-3 text-center font-bold text-sm w-32">
+                        ALASAN
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {data.data.map((row, idx) => (
+                      <tr
+                        key={idx}
+                        className={
+                          "transition hover:bg-emerald-50 border-b border-gray-100 " +
+                          (idx % 2 === 0 ? "bg-white" : "bg-gray-50")
+                        }
+                      >
+                        <td className="px-3 py-3 text-center align-middle text-sm border-r border-gray-200">
+                          {row.tgl_absensi}
+                        </td>
+                        <td className="px-3 py-3 text-center align-middle text-sm border-r border-gray-200">
+                          {row.jam_kerja.masuk}
+                        </td>
+                        <td className="px-3 py-3 text-center align-middle text-sm border-r border-gray-200">
+                          {row.jam_kerja.pulang}
+                        </td>
+                        <td className="px-3 py-3 text-center align-middle text-sm border-r border-gray-200">
+                          {row.jam_masuk}
+                        </td>
+                        <td className="px-3 py-3 text-center align-middle text-sm border-r border-gray-200">
+                          {row.jam_keluar}
+                        </td>
+                        <td className="px-3 py-3 text-center align-middle text-sm border-r border-gray-200">
+                          {row.jumlah_menit_datang.menit_datang_cepat > 0 ? (
+                            <span className="text-emerald-600 font-semibold">
+                              {row.jumlah_menit_datang.menit_datang_cepat}
+                            </span>
+                          ) : (
+                            <span className="text-gray-500">-</span>
+                          )}
+                        </td>
+                        <td className="px-3 py-3 text-center align-middle text-sm border-r border-gray-200">
+                          {row.jumlah_menit_datang.menit_telat > 0 ? (
+                            <span className="text-red-600 font-semibold">
+                              {row.jumlah_menit_datang.menit_telat}
+                            </span>
+                          ) : (
+                            <span className="text-gray-500">-</span>
+                          )}
+                        </td>
+                        <td className="px-3 py-3 text-center align-middle text-sm border-r border-gray-200">
+                          {row.jumlah_menit_pulang.menit_pulang_cepat > 0 ? (
+                            <span className="text-orange-600 font-semibold">
+                              {row.jumlah_menit_pulang.menit_pulang_cepat}
+                            </span>
+                          ) : (
+                            <span className="text-gray-500">-</span>
+                          )}
+                        </td>
+                        <td className="px-3 py-3 text-center align-middle text-sm border-r border-gray-200">
+                          {row.jumlah_menit_pulang.menit_lembur > 0 ? (
+                            <span className="text-green-600 font-semibold">
+                              {row.jumlah_menit_pulang.menit_lembur}
+                            </span>
+                          ) : (
+                            <span className="text-gray-500">-</span>
+                          )}
+                        </td>
+                        <td className="px-3 py-3 text-center align-middle font-bold text-emerald-800 text-sm border-r border-gray-200">
+                          {row.jam_kerja_total}
+                        </td>
+                        <td className="px-3 py-3 text-center align-middle text-sm">
+                          {row.alasan || "-"}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </>
+          ) : data && data.data.length === 0 ? (
+            <div className="text-center text-gray-400 py-8">
+              <div className="flex flex-col items-center gap-2">
+                <span className="material-icons text-4xl text-gray-300">
+                  inbox
+                </span>
+                <span className="font-semibold">Tidak ada data ditemukan</span>
+                <span className="text-sm">
+                  Data laporan kehadiran kosong untuk periode ini
+                </span>
+              </div>
+            </div>
+          ) : null}
+        </div>
+      </div>
+    </div>
+  );
+}

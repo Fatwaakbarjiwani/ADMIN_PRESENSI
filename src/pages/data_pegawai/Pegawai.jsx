@@ -14,11 +14,9 @@ export default function Pegawai() {
 
   useEffect(() => {
     if (token) {
-      dispatch(
-        fetchPegawai(isSuperAdmin, token)
-      );
+      dispatch(fetchPegawai(isSuperAdmin, token));
     }
-  }, [token, isSuperAdmin, dispatch, ]);
+  }, [token, isSuperAdmin, dispatch]);
 
   const handlePageChange = (page) => {
     dispatch(fetchPegawai(isSuperAdmin, token, page));
@@ -98,7 +96,7 @@ export default function Pegawai() {
                     </div>
                   </th>
                   <th className="px-2 py-3 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-48">
-                    Email
+                    No. HP
                   </th>
                   <th className="px-2 py-3 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-40">
                     <div className="flex flex-col leading-tight">
@@ -107,6 +105,9 @@ export default function Pegawai() {
                         Detail Unit
                       </span>
                     </div>
+                  </th>
+                  <th className="px-2 py-3 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-32">
+                    Tempat Lahir
                   </th>
                   <th className="px-2 py-3 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-32">
                     Tanggal Lahir
@@ -136,27 +137,24 @@ export default function Pegawai() {
                         {row.no_ktp}
                       </td>
                       <td className="px-4 py-3 truncate font-bold align-middle border-b border-gray-100 text-emerald-800">
-                        {[
-                          row.gelar_depan,
-                          row.nama,
-                          row.gelar_belakang,
-                        ]
-                          .filter(Boolean)
-                          .join(" ")}
+                        {row.nama}
                       </td>
                       <td className="px-4 py-3 align-middle border-b border-gray-100">
-                        {row.email}
+                        {row.no_hp}
                       </td>
                       <td className="px-4 py-3 align-middle border-b border-gray-100 font-bold text-emerald-700">
-                        {row?.unit_detail_name ? (
+                        {row?.nama_unit ? (
                           <span className="inline-block bg-emerald-100 text-emerald-700 px-2 py-0.5 text-xs font-bold">
-                            {row.unit_detail_name}
+                            {row.nama_unit}
                           </span>
                         ) : (
                           <span className="inline-block bg-gray-100 text-gray-400 px-2 py-0.5 text-xs">
                             -
                           </span>
                         )}
+                      </td>
+                      <td className="px-4 py-3 align-middle border-b border-gray-100 whitespace-nowrap">
+                        {row.tmpt_lahir}
                       </td>
                       <td className="px-4 py-3 align-middle border-b border-gray-100 whitespace-nowrap">
                         {row.tgl_lahir}
@@ -169,9 +167,9 @@ export default function Pegawai() {
                           : "-"}
                       </td>
                       <td className="px-4 py-3 align-middle border-b border-gray-100 font-bold text-emerald-700">
-                        {row?.shift_name ? (
+                        {row?.nama_shift ? (
                           <span className="inline-block bg-emerald-100 text-emerald-700 px-2 py-0.5 text-xs font-bold">
-                            {row.shift_name}
+                            {row.nama_shift}
                           </span>
                         ) : (
                           <span className="inline-block bg-gray-100 text-gray-400 px-2 py-0.5 text-xs">

@@ -8,6 +8,7 @@ export default function DetailHistoryPresensi() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { pegawai_id } = useParams();
+  const { unit_id } = useParams();
 
   const detailHistory = useSelector((state) => state.presensi.detailHistory);
   const detailHistoryLoading = useSelector(
@@ -16,6 +17,7 @@ export default function DetailHistoryPresensi() {
   const pegawai = useSelector((state) => state.pegawai.data);
   const token = useSelector((state) => state.auth.token);
   const user = useSelector((state) => state.auth.user);
+  const isSuperAdmin = user?.role === "super_admin";
 
   // Tambahkan state untuk filter tanggal
   const today = new Date();
@@ -36,7 +38,15 @@ export default function DetailHistoryPresensi() {
   // Fungsi untuk handle filter
   const handleFilter = () => {
     if (token && pegawai_id) {
-      dispatch(fetchPresensiDetailHistoryByUnit(pegawai_id, fromDate, toDate));
+      dispatch(
+        fetchPresensiDetailHistoryByUnit(
+          pegawai_id,
+          fromDate,
+          toDate,
+          unit_id,
+          isSuperAdmin
+        )
+      );
     }
   };
 
@@ -44,18 +54,14 @@ export default function DetailHistoryPresensi() {
   function toDatetimeLocal(val) {
     if (!val) return "";
     // val: '2025-08-05 08:00:00' => '2025-08-05T08:00'
-    const [date, time] = val.split(" ");
-    if (!date || !time) return "";
-    return `${date}T${time.slice(0, 5)}`;
+    const [time] = val.split(" ");
+    if (!time) return "";
+    return `${time.slice(0, 5)}`;
   }
   const handleEditPresensi = (row) => {
     setEditData({
-      waktu_masuk: row.masuk?.waktu
-        ? toDatetimeLocal(row.tanggal + " " + row.masuk.waktu)
-        : "",
-      waktu_pulang: row.pulang?.waktu
-        ? toDatetimeLocal(row.tanggal + " " + row.pulang.waktu)
-        : "",
+      waktu_masuk: row.masuk?.waktu ? toDatetimeLocal(row.masuk.waktu) : "",
+      waktu_pulang: row.pulang?.waktu ? toDatetimeLocal(row.pulang.waktu) : "",
       status_masuk: row.masuk?.status || "",
       status_pulang: row.pulang?.status || "",
       keterangan_masuk: row.masuk?.keterangan || "",
@@ -83,14 +89,17 @@ export default function DetailHistoryPresensi() {
     setIsSubmitting(true);
     setErrorMsg("");
     try {
+      // console.log(editData.waktu_masuk);
+      // console.log(editData.waktu_masuk.replace("T", " ") + ":00");
+
       // Siapkan endpoint dan body
       const base_url = import.meta.env.VITE_API_URL || "";
       const url = `${base_url}/api/presensi/update-by-admin-unit/${pegawai_id}/${editData.tanggal}`;
       const body = {
         updates: [
           {
-            waktu_masuk: editData.waktu_masuk.replace("T", " ") + ":00",
-            waktu_pulang: editData.waktu_pulang.replace("T", " ") + ":00",
+            waktu_masuk: editData.waktu_masuk,
+            waktu_pulang: editData.waktu_pulang,
             status_masuk: editData.status_masuk,
             status_pulang: editData.status_pulang,
             keterangan_masuk: editData.keterangan_masuk,
@@ -125,10 +134,18 @@ export default function DetailHistoryPresensi() {
   // Fetch data saat mount dan saat filter berubah
   useEffect(() => {
     if (token && pegawai_id) {
-      dispatch(fetchPresensiDetailHistoryByUnit(pegawai_id, fromDate, toDate));
+      dispatch(
+        fetchPresensiDetailHistoryByUnit(
+          pegawai_id,
+          fromDate,
+          toDate,
+          unit_id,
+          isSuperAdmin
+        )
+      );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, token, pegawai_id]);
+  }, [dispatch, token, pegawai_id, unit_id, isSuperAdmin]);
 
   useEffect(() => {
     if (token) {
@@ -229,6 +246,12 @@ export default function DetailHistoryPresensi() {
     <div className="w-full min-h-screen font-sans bg-gray-50">
       {/* Header */}
       <div className="px-4 sticky z-40 top-0 py-4 border-b border-gray-200 bg-white flex items-center gap-4">
+        <button
+          onClick={() => navigate(-1)}
+          className="p-2 hover:bg-gray-100 rounded-lg transition flex items-center"
+        >
+          <span className="material-icons text-gray-600">arrow_back</span>
+        </button>
         <span className="material-icons text-green-200 bg-primary p-2 rounded opacity-80">
           history
         </span>
@@ -243,17 +266,10 @@ export default function DetailHistoryPresensi() {
         </div>
       </div>
 
-      <div className="mx-auto p-4 max-w-5xl flex flex-col gap-6 px-2 md:px-0">
+      <div className="mx-auto p-4 max-w-5xl flex flex-col gap-4 px-2 md:px-0">
         {/* Navigation & Title */}
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-4">
-            <button
-              className="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg font-bold text-sm flex items-center gap-2 transition-colors"
-              onClick={() => navigate("/rekap_presensi")}
-            >
-              <span className="material-icons text-base">arrow_back</span>
-              Kembali
-            </button>
             <div className="text-xl font-bold text-emerald-700">
               History Presensi - {pegawaiFromResponse?.nama || "Loading..."}
             </div>
@@ -345,193 +361,204 @@ export default function DetailHistoryPresensi() {
             </p>
           </div>
           {detailHistoryLoading ? (
-            <div className="text-center py-12">
-              <div className="inline-flex items-center gap-2 text-emerald-600 font-bold">
-                <div className="animate-spin h-5 w-5 border-2 border-emerald-600 border-t-transparent rounded-full"></div>
-                Memuat data history presensi...
-              </div>
+            <div className="text-center py-12 text-emerald-600 font-bold flex items-center justify-center gap-2">
+              <span className="material-icons animate-spin">refresh</span>
+              Memuat data history presensi...
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="min-w-full">
-                <thead className="bg-emerald-50 border-b border-emerald-200">
-                  <tr>
-                    <th className="px-4 py-3 text-left font-bold text-emerald-800 text-sm uppercase tracking-wide w-16">
-                      No
-                    </th>
-                    <th className="px-4 py-3 text-left font-bold text-emerald-800 text-sm uppercase tracking-wide w-32">
-                      Tanggal
-                    </th>
-                    <th className="px-4 py-3 text-left font-bold text-emerald-800 text-sm uppercase tracking-wide w-24">
-                      Hari
-                    </th>
-                    <th className="px-4 py-3 text-center font-bold text-emerald-800 text-sm uppercase tracking-wide w-32">
-                      Masuk
-                    </th>
-                    <th className="px-4 py-3 text-center font-bold text-emerald-800 text-sm uppercase tracking-wide w-32">
-                      Pulang
-                    </th>
-                    <th className="px-4 py-3 text-center font-bold text-emerald-800 text-sm uppercase tracking-wide w-40">
-                      Status Presensi
-                    </th>
-                    <th className="px-4 py-3 text-left font-bold text-emerald-800 text-sm uppercase tracking-wide">
-                      Keterangan
-                    </th>
-                    <th className="px-4 py-3 text-left font-bold text-emerald-800 text-sm uppercase tracking-wide w-48">
-                      Lokasi
-                    </th>
-                    <th className="px-4 py-3 text-center font-bold text-emerald-800 text-sm uppercase tracking-wide w-20">
-                      Aksi
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-200">
-                  {presensiList?.length > 0 ? (
-                    presensiList.map((row, idx) => (
-                      <tr
-                        key={idx}
-                        className="hover:bg-gray-50 transition-colors"
-                      >
-                        <td className="px-4 py-3 font-semibold text-gray-900 text-center">
-                          {idx + 1}
-                        </td>
-                        <td className="px-4 py-3 text-gray-900">
-                          {new Date(row.tanggal).toLocaleDateString("id-ID", {
-                            year: "numeric",
-                            month: "long",
-                            day: "numeric",
-                          })}
-                        </td>
-                        <td className="px-4 py-3 text-gray-900 font-medium">
-                          {row.hari}
-                        </td>
-                        <td className="px-4 py-3 text-center">
-                          <div className="space-y-1">
-                            <div className="text-sm font-semibold text-gray-700">
-                              {formatWaktu(row.masuk?.waktu)}
+            <>
+              <div className="m-4 flex justify-between items-center">
+                <div className="flex items-center gap-2 text-emerald-700">
+                  <span className="material-icons">description</span>
+                  <span className="font-semibold">
+                    Total Data: {presensiList?.length || 0} records
+                  </span>
+                </div>
+              </div>
+              <div className="overflow-x-auto border border-gray-200 shadow-sm">
+                <table className="min-w-full text-xs">
+                  <thead className="bg-emerald-600 text-white">
+                    <tr>
+                      <th className="px-3 py-3 text-center font-bold text-sm border-r border-emerald-500 w-16">
+                        NO
+                      </th>
+                      <th className="px-3 py-3 text-center font-bold text-sm border-r border-emerald-500 w-32">
+                        TANGGAL
+                      </th>
+                      <th className="px-3 py-3 text-center font-bold text-sm border-r border-emerald-500 w-24">
+                        HARI
+                      </th>
+                      <th className="px-3 py-3 text-center font-bold text-sm border-r border-emerald-500 w-32">
+                        MASUK
+                      </th>
+                      <th className="px-3 py-3 text-center font-bold text-sm border-r border-emerald-500 w-32">
+                        PULANG
+                      </th>
+                      <th className="px-3 py-3 text-center font-bold text-sm border-r border-emerald-500 w-40">
+                        STATUS PRESENSI
+                      </th>
+                      <th className="px-3 py-3 text-center font-bold text-sm border-r border-emerald-500 w-48">
+                        KETERANGAN
+                      </th>
+                      <th className="px-3 py-3 text-center font-bold text-sm border-r border-emerald-500 w-48">
+                        LOKASI
+                      </th>
+                      <th className="px-3 py-3 text-center font-bold text-sm w-20">
+                        AKSI
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {presensiList?.length > 0 ? (
+                      presensiList.map((row, idx) => (
+                        <tr
+                          key={idx}
+                          className={`transition hover:bg-emerald-50 border-b border-gray-100 ${
+                            idx % 2 === 0 ? "bg-white" : "bg-gray-50"
+                          }`}
+                        >
+                          <td className="px-3 py-3 text-center align-middle text-sm border-r border-gray-200 font-semibold">
+                            {idx + 1}
+                          </td>
+                          <td className="px-3 py-3 text-center align-middle text-sm border-r border-gray-200">
+                            {new Date(row.tanggal).toLocaleDateString("id-ID", {
+                              year: "numeric",
+                              month: "long",
+                              day: "numeric",
+                            })}
+                          </td>
+                          <td className="px-3 py-3 text-center align-middle text-sm border-r border-gray-200 font-medium">
+                            {row.hari}
+                          </td>
+                          <td className="px-3 py-3 text-center align-middle text-sm border-r border-gray-200">
+                            <div className="space-y-1">
+                              <div className="text-sm font-semibold text-gray-700">
+                                {formatWaktu(row.masuk?.waktu)}
+                              </div>
+                              {row.masuk && (
+                                <div>{getStatusBadge(row.masuk.status)}</div>
+                              )}
                             </div>
-                            {row.masuk && (
-                              <div>{getStatusBadge(row.masuk.status)}</div>
-                            )}
-                          </div>
-                        </td>
-                        <td className="px-4 py-3 text-center">
-                          <div className="space-y-1">
-                            <div className="text-sm font-semibold text-gray-700">
-                              {formatWaktu(row.pulang?.waktu)}
+                          </td>
+                          <td className="px-3 py-3 text-center align-middle text-sm border-r border-gray-200">
+                            <div className="space-y-1">
+                              <div className="text-sm font-semibold text-gray-700">
+                                {formatWaktu(row.pulang?.waktu)}
+                              </div>
+                              {row.pulang && (
+                                <div>{getStatusBadge(row.pulang.status)}</div>
+                              )}
                             </div>
-                            {row.pulang && (
-                              <div>{getStatusBadge(row.pulang.status)}</div>
-                            )}
-                          </div>
-                        </td>
-                        {/* Status Presensi per hari dari row.masuk.status_presensi */}
-                        <td className="px-4 py-3 text-center">
-                          <div className="space-y-1">
-                            {row?.status_presensi && (
-                              <div className="text-xs">
-                                {getStatusPresensiBadge(row.status_presensi)}
-                              </div>
-                            )}
-                          </div>
-                        </td>
-                        <td className="px-4 py-3 text-gray-900">
-                          <div className="space-y-1 text-sm">
-                            {row.masuk?.keterangan && (
-                              <div className="flex items-start gap-1">
-                                <span className="font-semibold text-blue-600 text-xs mt-0.5">
-                                  M:
-                                </span>
-                                <span className="text-gray-700">
-                                  {row.masuk.keterangan}
-                                </span>
-                              </div>
-                            )}
-                            {row.pulang?.keterangan && (
-                              <div className="flex items-start gap-1">
-                                <span className="font-semibold text-green-600 text-xs mt-0.5">
-                                  P:
-                                </span>
-                                <span className="text-gray-700">
-                                  {row.pulang.keterangan}
-                                </span>
-                              </div>
-                            )}
-                            {!row.masuk?.keterangan &&
-                              !row.pulang?.keterangan && (
+                          </td>
+                          <td className="px-3 py-3 text-center align-middle text-sm border-r border-gray-200">
+                            <div className="space-y-1">
+                              {row?.status_presensi && (
+                                <div className="text-xs">
+                                  {getStatusPresensiBadge(row.status_presensi)}
+                                </div>
+                              )}
+                            </div>
+                          </td>
+                          <td className="px-3 py-3 text-center align-middle text-sm border-r border-gray-200">
+                            <div className="space-y-1 text-sm">
+                              {row.masuk?.keterangan && (
+                                <div className="flex items-start gap-1">
+                                  <span className="font-semibold text-blue-600 text-xs mt-0.5">
+                                    M:
+                                  </span>
+                                  <span className="text-gray-700">
+                                    {row.masuk.keterangan}
+                                  </span>
+                                </div>
+                              )}
+                              {row.pulang?.keterangan && (
+                                <div className="flex items-start gap-1">
+                                  <span className="font-semibold text-green-600 text-xs mt-0.5">
+                                    P:
+                                  </span>
+                                  <span className="text-gray-700">
+                                    {row.pulang.keterangan}
+                                  </span>
+                                </div>
+                              )}
+                              {!row.masuk?.keterangan &&
+                                !row.pulang?.keterangan && (
+                                  <span className="text-gray-400">-</span>
+                                )}
+                            </div>
+                          </td>
+                          <td className="px-3 py-3 text-center align-middle text-sm border-r border-gray-200">
+                            <div className="space-y-1 text-sm">
+                              {row.masuk?.lokasi && (
+                                <div className="flex items-start gap-1">
+                                  <span className="font-semibold text-blue-600 text-xs mt-0.5">
+                                    M:
+                                  </span>
+                                  <span className="text-gray-700 text-xs">
+                                    {formatLokasi(row.masuk.lokasi)}
+                                  </span>
+                                </div>
+                              )}
+                              {row.pulang?.lokasi && (
+                                <div className="flex items-start gap-1">
+                                  <span className="font-semibold text-green-600 text-xs mt-0.5">
+                                    P:
+                                  </span>
+                                  <span className="text-gray-700 text-xs">
+                                    {formatLokasi(row.pulang.lokasi)}
+                                  </span>
+                                </div>
+                              )}
+                              {!row.masuk?.lokasi && !row.pulang?.lokasi && (
                                 <span className="text-gray-400">-</span>
                               )}
-                          </div>
-                        </td>
-                        <td className="px-4 py-3 text-gray-900">
-                          <div className="space-y-1 text-sm">
-                            {row.masuk?.lokasi && (
-                              <div className="flex items-start gap-1">
-                                <span className="font-semibold text-blue-600 text-xs mt-0.5">
-                                  M:
-                                </span>
-                                <span className="text-gray-700 text-xs">
-                                  {formatLokasi(row.masuk.lokasi)}
-                                </span>
-                              </div>
-                            )}
-                            {row.pulang?.lokasi && (
-                              <div className="flex items-start gap-1">
-                                <span className="font-semibold text-green-600 text-xs mt-0.5">
-                                  P:
-                                </span>
-                                <span className="text-gray-700 text-xs">
-                                  {formatLokasi(row.pulang.lokasi)}
-                                </span>
-                              </div>
-                            )}
-                            {!row.masuk?.lokasi && !row.pulang?.lokasi && (
-                              <span className="text-gray-400">-</span>
-                            )}
-                          </div>
-                        </td>
-                        <td className="px-4 py-3 text-center">
-                          <button
-                            onClick={() => handleEditPresensi(row)}
-                            className="inline-flex items-center justify-center p-2 rounded hover:bg-emerald-100 text-emerald-600"
-                            title="Edit Pemutihan"
-                          >
-                            {/* Simple pencil/edit SVG icon */}
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              strokeWidth={1.5}
-                              stroke="currentColor"
-                              className="w-5 h-5"
+                            </div>
+                          </td>
+                          <td className="px-3 py-3 text-center align-middle text-sm">
+                            <button
+                              onClick={() => handleEditPresensi(row)}
+                              className="inline-flex items-center justify-center p-2 rounded hover:bg-emerald-100 text-emerald-600"
+                              title="Edit Pemutihan"
                             >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                d="M16.862 4.487a2.1 2.1 0 1 1 2.97 2.97L7.5 19.79l-4 1 1-4 14.362-14.303z"
-                              />
-                            </svg>
-                          </button>
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                strokeWidth={1.5}
+                                stroke="currentColor"
+                                className="w-5 h-5"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  d="M16.862 4.487a2.1 2.1 0 1 1 2.97 2.97L7.5 19.79l-4 1 1-4 14.362-14.303z"
+                                />
+                              </svg>
+                            </button>
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan={9} className="px-3 py-8 text-center">
+                          <div className="flex flex-col items-center gap-2">
+                            <span className="material-icons text-4xl text-gray-300">
+                              inbox
+                            </span>
+                            <span className="font-semibold text-gray-400">
+                              Tidak ada data
+                            </span>
+                            <span className="text-sm text-gray-400">
+                              Tidak ada data history presensi untuk pegawai ini
+                            </span>
+                          </div>
                         </td>
                       </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td colSpan={8} className="px-6 py-12 text-center">
-                        <div className="text-gray-500">
-                          <div className="text-lg font-semibold mb-2">
-                            Tidak ada data
-                          </div>
-                          <div className="text-sm">
-                            Tidak ada data history presensi untuk pegawai ini
-                          </div>
-                        </div>
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </>
           )}
         </div>
       </div>
@@ -568,7 +595,7 @@ export default function DetailHistoryPresensi() {
                   Waktu Masuk
                 </label>
                 <input
-                  type="datetime-local"
+                  type="time"
                   name="waktu_masuk"
                   value={editData?.waktu_masuk || ""}
                   onChange={handleEditInputChange}
@@ -581,7 +608,7 @@ export default function DetailHistoryPresensi() {
                   Waktu Pulang
                 </label>
                 <input
-                  type="datetime-local"
+                  type="time"
                   name="waktu_pulang"
                   value={editData?.waktu_pulang || ""}
                   onChange={handleEditInputChange}
@@ -605,7 +632,7 @@ export default function DetailHistoryPresensi() {
                     <option value="absen_masuk">Absen Masuk</option>
                     <option value="terlambat">Terlambat</option>
                     <option value="tidak_absen_masuk">Tidak Absen Masuk</option>
-                    <option value="tidak_masuk">Tidak Masuk</option>
+                    <option value="tidak_hadir">Tidak Hadir</option>
                     <option value="izin">Izin</option>
                     <option value="sakit_cuti">Sakit/Cuti</option>
                   </select>
@@ -627,7 +654,7 @@ export default function DetailHistoryPresensi() {
                     <option value="tidak_absen_pulang">
                       Tidak Absen Pulang
                     </option>
-                    <option value="tidak_masuk">Tidak Masuk</option>
+                    <option value="tidak_hadir">Tidak hadir</option>
                     <option value="izin">Izin</option>
                     <option value="sakit_cuti">Sakit/Cuti</option>
                   </select>
@@ -672,7 +699,7 @@ export default function DetailHistoryPresensi() {
                 >
                   <option value="">Pilih</option>
                   <option value="hadir">Hadir</option>
-                  <option value="tidak_masuk">Tidak Masuk</option>
+                  <option value="tidak_hadir">Tidak Hadir</option>
                   <option value="izin">Izin</option>
                   <option value="sakit">Sakit</option>
                   <option value="cuti">Cuti</option>

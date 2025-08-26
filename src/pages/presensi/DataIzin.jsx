@@ -2,6 +2,11 @@ import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import axios from "axios";
 import Swal from "sweetalert2";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
+
+// Logo ybwsa base64 PNG (dummy, ganti dengan logo asli jika ada)
+const logoBase64 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQC..."; // Potong, ganti dengan base64 logo asli jika ada
 
 const jenisList = ["izin", "sakit", "cuti"];
 
@@ -176,6 +181,114 @@ export default function DataIzin() {
     });
   };
 
+  // Function to download PDF for admin_unit
+  const downloadPDF = () => {
+    if (!pengajuan || pengajuan.length === 0) return;
+
+    const doc = new jsPDF("p", "mm", "a4"); // portrait A4
+
+    // Logo (opsional)
+    try {
+      doc.addImage(logoBase64, "PNG", 10, 10, 25, 25);
+    } catch {
+      // kalau logo gagal dimuat, lanjutkan
+    }
+
+    // Header
+    doc.setFontSize(16);
+    doc.text("YAYASAN BADAN WAKAF SULTAN AGUNG", 105, 20, {
+      align: "center",
+    });
+    doc.setFontSize(10);
+    doc.text(
+      "Jl.Raya Kaligawe Km.4 Semarang 50112; PO Box 1054/SM Indonesia",
+      105,
+      28,
+      { align: "center" }
+    );
+    doc.text("Telp (024) 6583584 Fax. (024) 6582455", 105, 34, {
+      align: "center",
+    });
+    doc.text(
+      "Email : informasi@ybwsa.ac.id Homepage : http://ybwsa.ac.id",
+      105,
+      40,
+      { align: "center" }
+    );
+
+    // Garis bawah
+    doc.setLineWidth(0.5);
+    doc.line(10, 44, 200, 44);
+
+    // Judul laporan
+    doc.setFontSize(12);
+    doc.text(`LAPORAN REKAP PENGAJUAN ${pengajuanTab.toUpperCase()}`, 105, 55, {
+      align: "center",
+    });
+    doc.setFontSize(10);
+    doc.text(`Tanggal: ${new Date().toLocaleDateString("id-ID")}`, 20, 65);
+    doc.text(`Total Data: ${pengajuan.length} pengajuan`, 20, 72);
+    doc.text(`Dibuat oleh: ${user?.name || "Admin Unit"}`, 20, 79);
+
+    // Tabel pengajuan
+    autoTable(doc, {
+      startY: 85,
+      head: [
+        [
+          "NO",
+          "Pegawai ID",
+          "Nama Pegawai",
+          "Tanggal Mulai",
+          "Tanggal Selesai",
+          "Alasan",
+          "Status",
+          "Aksi",
+        ],
+      ],
+      body: pengajuan.map((row, idx) => [
+        idx + 1,
+        row.pegawai_id || "-",
+        row.nama_pegawai || row.pegawai?.nama || "-",
+        row.tanggal_mulai || "-",
+        row.tanggal_selesai || "-",
+        row.alasan || "-",
+        row.status === "pending"
+          ? "Pending"
+          : row.status === "diterima"
+          ? "Diterima"
+          : row.status === "ditolak"
+          ? "Ditolak"
+          : "-",
+        "", // Empty column for checkbox
+      ]),
+      theme: "grid",
+      headStyles: {
+        fillColor: [22, 160, 133], // hijau emerald (sama dengan history)
+        halign: "center",
+        fontStyle: "bold",
+        fontSize: 10,
+        textColor: [255, 255, 255],
+      },
+      bodyStyles: {
+        fontSize: 9,
+        textColor: [0, 0, 0],
+      },
+      styles: {
+        cellPadding: 2,
+        font: "helvetica",
+      },
+      margin: { left: 10, right: 10 },
+      tableWidth: "auto",
+    });
+
+    // Simpan PDF
+    doc.save(
+      `laporan-pengajuan-${pengajuanTab}-${
+        new Date().toISOString().split("T")[0]
+      }.pdf`
+    );
+  };
+
   if (!isSuperAdmin) {
     return (
       <div className="w-full min-h-screen font-sans bg-gray-50">
@@ -221,15 +334,29 @@ export default function DataIzin() {
           </div>
 
           <div className="border border-gray-200 bg-white p-6 shadow flex flex-col gap-4">
-            <div className="font-bold text-emerald-600 text-xl flex items-center gap-2 mb-2">
-              <span className="material-icons text-emerald-600 text-2xl">
-                {pengajuanTab === "izin"
-                  ? "event_note"
-                  : pengajuanTab === "cuti"
-                  ? "event"
-                  : "healing"}
-              </span>
-              DATA PENGAJUAN {pengajuanTab.toUpperCase()}
+            <div className="flex justify-between items-center mb-2">
+              <div className="font-bold text-emerald-600 text-xl flex items-center gap-2">
+                <span className="material-icons text-emerald-600 text-2xl">
+                  {pengajuanTab === "izin"
+                    ? "event_note"
+                    : pengajuanTab === "cuti"
+                    ? "event"
+                    : "healing"}
+                </span>
+                DATA PENGAJUAN {pengajuanTab.toUpperCase()}
+              </div>
+              <button
+                onClick={downloadPDF}
+                className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm rounded flex items-center gap-2 transition shadow-md hover:shadow-lg"
+                title={`Download PDF Rekap Pengajuan ${
+                  pengajuanTab.charAt(0).toUpperCase() + pengajuanTab.slice(1)
+                }`}
+                disabled={pengajuan.length === 0}
+              >
+                <span className="material-icons text-sm">picture_as_pdf</span>
+                <span className="hidden sm:inline">Download PDF</span>
+                <span className="sm:hidden">PDF</span>
+              </button>
             </div>
             <div className="overflow-x-auto">
               <table className="min-w-full text-sm bg-white">

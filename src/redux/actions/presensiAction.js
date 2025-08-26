@@ -12,26 +12,32 @@ import {
   setDetailHistory,
   setDetailHistoryLoading,
   setDetailHistoryError,
+  setDinasLoading,
+  setDinasData,
+  setLemburData,
 } from "../reducers/presensiReducer";
 
-export const fetchPresensiHistoryByUnit = () => async (dispatch, getState) => {
-  dispatch(setLoading(true));
-  dispatch(setError(null));
-  const { token } = getState().auth;
-  try {
-    const response = await axios.get(
-      `${import.meta.env.VITE_API_URL}/api/presensi/history-by-unit`,
-      {
-        headers: { Authorization: `Bearer ${token}` },
-      }
-    );
-    dispatch(setData(response.data));
-    dispatch(setLoading(false));
-  } catch {
-    dispatch(setLoading(false));
-    dispatch(setError("Gagal mengambil data presensi"));
-  }
-};
+export const fetchPresensiHistoryByUnit =
+  (date) => async (dispatch, getState) => {
+    dispatch(setLoading(true));
+    dispatch(setError(null));
+    const { token } = getState().auth;
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_URL}/api/presensi/history-by-unit?tanggal=${
+          date || ""
+        }`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      dispatch(setData(response.data));
+      dispatch(setLoading(false));
+    } catch {
+      dispatch(setLoading(false));
+      dispatch(setError("Gagal mengambil data presensi"));
+    }
+  };
 
 export const fetchPresensiRekapByUnit =
   (tanggal) => async (dispatch, getState) => {
@@ -80,7 +86,8 @@ export const fetchPresensiRekapBulananPegawai =
   };
 
 export const fetchPresensiDetailHistoryByUnit =
-  (pegawai_id, from, to) => async (dispatch, getState) => {
+  (pegawai_id, from, to, unit_id, isSuperAdmin) =>
+  async (dispatch, getState) => {
     dispatch(setDetailHistoryLoading(true));
     dispatch(setDetailHistoryError(null));
     const { token } = getState().auth;
@@ -94,7 +101,9 @@ export const fetchPresensiDetailHistoryByUnit =
       const response = await axios.get(
         `${
           import.meta.env.VITE_API_URL
-        }/api/presensi/detail-history-by-unit?pegawai_id=${pegawai_id}&from=${defaultFrom}&to=${defaultTo}`,
+        }/api/presensi/detail-history-by-unit?pegawai_id=${pegawai_id}${
+          isSuperAdmin ? `&unit_id=${unit_id}` : ""
+        }&from=${defaultFrom}&to=${defaultTo}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -106,5 +115,58 @@ export const fetchPresensiDetailHistoryByUnit =
       dispatch(
         setDetailHistoryError("Gagal mengambil detail history presensi")
       );
+    }
+  };
+
+// Fetch data dinas
+export const fetchDinasData =
+  (params = "") =>
+  async (dispatch, getState) => {
+    dispatch(setDinasLoading(true));
+    const { token } = getState().auth;
+    try {
+      const url = `${import.meta.env.VITE_API_URL}/api/dinas${
+        params ? `?${params}` : ""
+      }`;
+
+      const response = await axios.get(url, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response && response.data) {
+        dispatch(setDinasData(response.data));
+      }
+    } catch (error) {
+      if (error) {
+        dispatch(setDinasLoading(false));
+      }
+    } finally {
+      dispatch(setDinasLoading(false));
+    }
+  };
+
+// Fetch lembur
+export const fetchLembur =
+  (mount, year, filterUnit, isSuperAdmin) => async (dispatch, getState) => {
+    const { token } = getState().auth;
+    try {
+      const response = await axios.get(
+        `${
+          import.meta.env.VITE_API_URL
+        }/api/presensi/overtime?bulan=${mount}&tahun=${year}${
+          isSuperAdmin ? `?unit_id=${filterUnit}` : ""
+        }`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      dispatch(setLemburData(response.data));
+    } catch (error) {
+      if (error) {
+        return;
+      }
     }
   };

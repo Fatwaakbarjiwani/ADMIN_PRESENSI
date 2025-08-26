@@ -64,15 +64,17 @@ export default function Sidebar() {
               },
             ]
           : []),
+        { icon: "work", label: "Dinas", link: "/dinas" },
         // { icon: "upload_file", label: "Import Data CSV", link: "/import_csv" },
       ],
     },
     {
-      ...(!isSuperAdmin
-        ? {
-            section: "REPORT",
-          }
-        : {}),
+      section: "REPORT",
+      // ...(!isSuperAdmin
+      //   ? {
+      //       section: "REPORT",
+      //     }
+      //   : {}),
       items: [
         ...(!isSuperAdmin
           ? [
@@ -85,6 +87,15 @@ export default function Sidebar() {
           : []),
         // Rekap Presensi hanya untuk non-superadmin
         ...(!isSuperAdmin
+          ? [
+              {
+                icon: "analytics",
+                label: "Rekap Presensi",
+                link: "/rekap_presensi",
+              },
+            ]
+          : []),
+        ...(isSuperAdmin
           ? [
               {
                 icon: "analytics",

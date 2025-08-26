@@ -18,29 +18,58 @@ export const DELETE_LAUK_PAUK_SUCCESS = "DELETE_LAUK_PAUK_SUCCESS";
 export const DELETE_LAUK_PAUK_FAILURE = "DELETE_LAUK_PAUK_FAILURE";
 
 // Fetch lauk pauk
-export const fetchLaukPauk = () => async (dispatch, getState) => {
-  dispatch({ type: FETCH_LAUK_PAUK_REQUEST });
-  const { token } = getState().auth;
+// export const fetchLaukPauk =
+//   (filterUnit, isSuperAdmin,id) => async (dispatch, getState) => {
+//     dispatch({ type: FETCH_LAUK_PAUK_REQUEST });
+//     const { token } = getState().auth;
 
-  try {
-    const response = await axios.get(
-      `${import.meta.env.VITE_API_URL}/api/lauk-pauk/by-admin-unit`,
-      {
-        headers: { Authorization: `Bearer ${token}` },
-      }
-    );
+//     try {
+//       const response = await axios.get(
+//         `${import.meta.env.VITE_API_URL}/api/lauk-pauk/get-by-id/${
+//           isSuperAdmin ? `?unit_id=${filterUnit}` : `${id}`
+//         }`,
+//         {
+//           headers: { Authorization: `Bearer ${token}` },
+//         }
+//       );
 
-    dispatch({
-      type: FETCH_LAUK_PAUK_SUCCESS,
-      payload: response.data,
-    });
-  } catch (error) {
-    dispatch({
-      type: FETCH_LAUK_PAUK_FAILURE,
-      payload: "Gagal mengambil data lauk pauk",
-    });
-  }
-};
+//       dispatch({
+//         type: FETCH_LAUK_PAUK_SUCCESS,
+//         payload: response.data,
+//       });
+//     } catch (error) {
+//       dispatch({
+//         type: FETCH_LAUK_PAUK_FAILURE,
+//         payload: "Gagal mengambil data lauk pauk",
+//       });
+//     }
+//   };
+export const fetchLaukPauk =
+  (filterUnit, isSuperAdmin) => async (dispatch, getState) => {
+    dispatch({ type: FETCH_LAUK_PAUK_REQUEST });
+    const { token } = getState().auth;
+
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_URL}/api/lauk-pauk/by-admin-unit${
+          isSuperAdmin ? `?unit_id=${filterUnit}` : ""
+        }`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      dispatch({
+        type: FETCH_LAUK_PAUK_SUCCESS,
+        payload: response.data,
+      });
+    } catch (error) {
+      dispatch({
+        type: FETCH_LAUK_PAUK_FAILURE,
+        payload: "Gagal mengambil data lauk pauk",
+      });
+    }
+  };
 
 // Create lauk pauk
 export const createLaukPauk = (data) => async (dispatch, getState) => {

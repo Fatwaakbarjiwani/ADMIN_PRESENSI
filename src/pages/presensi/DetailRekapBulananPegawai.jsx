@@ -85,6 +85,12 @@ export default function DetailRekapBulananPegawai() {
     <div className="w-full min-h-screen font-sans bg-gray-50">
       {/* Header */}
       <div className="px-4 sticky z-40 top-0 py-4 border-b border-gray-200 bg-white flex items-center gap-4">
+        <button
+          onClick={() => navigate(-1)}
+          className="p-2 hover:bg-gray-100 rounded-lg transition flex items-center"
+        >
+          <span className="material-icons text-gray-600">arrow_back</span>
+        </button>
         <span className="material-icons text-green-200 bg-primary p-2 rounded opacity-80">
           assessment
         </span>
@@ -98,17 +104,10 @@ export default function DetailRekapBulananPegawai() {
         </div>
       </div>
 
-      <div className="mx-auto p-4 max-w-5xl flex flex-col gap-6 px-2 md:px-0">
+      <div className="mx-auto p-4 max-w-5xl flex flex-col gap-4 px-2 md:px-0">
         {/* Navigation & Title */}
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-4">
-            <button
-              className="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg font-bold text-sm flex items-center gap-2 transition-colors"
-              onClick={() => navigate("/rekap_presensi")}
-            >
-              <span className="material-icons text-base">arrow_back</span>
-              Kembali
-            </button>
             <div className="text-xl font-bold text-emerald-700">
               Rekap Presensi Bulanan - {tahun}
             </div>
@@ -169,99 +168,112 @@ export default function DetailRekapBulananPegawai() {
           </div>
 
           {detailRekapLoading ? (
-            <div className="text-center py-12">
-              <div className="inline-flex items-center gap-2 text-emerald-600 font-bold">
-                <div className="animate-spin h-5 w-5 border-2 border-emerald-600 border-t-transparent rounded-full"></div>
-                Memuat data rekap...
-              </div>
+            <div className="text-center py-12 text-emerald-600 font-bold flex items-center justify-center gap-2">
+              <span className="material-icons animate-spin">refresh</span>
+              Memuat data rekap...
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="min-w-full">
-                <thead className="bg-emerald-50 border-b border-emerald-200">
-                  <tr>
-                    <th className="px-6 py-4 text-left font-bold text-emerald-800 text-sm uppercase tracking-wide">
-                      Bulan
-                    </th>
-                    <th className="px-6 py-4 text-center font-bold text-emerald-800 text-sm uppercase tracking-wide">
-                      Hadir
-                    </th>
-                    <th className="px-6 py-4 text-center font-bold text-emerald-800 text-sm uppercase tracking-wide">
-                      Izin
-                    </th>
-                    <th className="px-6 py-4 text-center font-bold text-emerald-800 text-sm uppercase tracking-wide">
-                      Sakit
-                    </th>
-                    <th className="px-6 py-4 text-center font-bold text-emerald-800 text-sm uppercase tracking-wide">
-                      Cuti
-                    </th>
-                    <th className="px-6 py-4 text-center font-bold text-emerald-800 text-sm uppercase tracking-wide">
-                      Tidak Hadir
-                    </th>
-                    <th className="px-6 py-4 text-center font-bold text-emerald-800 text-sm uppercase tracking-wide">
-                      Belum Presensi
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-200">
-                  {detailRekap?.length > 0 ? (
-                    detailRekap.map((row, idx) => (
-                      <tr
-                        key={idx}
-                        className="hover:bg-gray-50 transition-colors"
-                      >
-                        <td className="px-6 py-4 font-medium text-gray-800">
-                          {bulanLabels[row.bulan] || row.bulan}
-                        </td>
-                        <td className="px-6 py-4 text-center">
-                          <span className="font-bold text-emerald-700">
-                            {row.hadir}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 text-center">
-                          <span className="font-bold text-emerald-600">
-                            {row.izin}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 text-center">
-                          <span className="font-bold text-emerald-500">
-                            {row.sakit}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 text-center">
-                          <span className="font-bold text-emerald-400">
-                            {row.cuti}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 text-center">
-                          <span className="font-bold text-gray-500">
-                            {row.tidak_hadir}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 text-center">
-                          <span className="font-bold text-gray-400">
-                            {row.belum_presensi}
-                          </span>
+            <>
+              <div className="m-4 flex justify-between items-center">
+                <div className="flex items-center gap-2 text-emerald-700">
+                  <span className="material-icons">description</span>
+                  <span className="font-semibold">
+                    Total Data: {detailRekap?.length || 0} records
+                  </span>
+                </div>
+              </div>
+              <div className="overflow-x-auto border border-gray-200 shadow-sm">
+                <table className="min-w-full text-xs">
+                  <thead className="bg-emerald-600 text-white">
+                    <tr>
+                      <th className="px-3 py-3 text-center font-bold text-sm border-r border-emerald-500 w-32">
+                        BULAN
+                      </th>
+                      <th className="px-3 py-3 text-center font-bold text-sm border-r border-emerald-500 w-24">
+                        HADIR
+                      </th>
+                      <th className="px-3 py-3 text-center font-bold text-sm border-r border-emerald-500 w-24">
+                        IZIN
+                      </th>
+                      <th className="px-3 py-3 text-center font-bold text-sm border-r border-emerald-500 w-24">
+                        SAKIT
+                      </th>
+                      <th className="px-3 py-3 text-center font-bold text-sm border-r border-emerald-500 w-24">
+                        CUTI
+                      </th>
+                      <th className="px-3 py-3 text-center font-bold text-sm border-r border-emerald-500 w-28">
+                        TIDAK HADIR
+                      </th>
+                      <th className="px-3 py-3 text-center font-bold text-sm w-32">
+                        BELUM PRESENSI
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {detailRekap?.length > 0 ? (
+                      detailRekap.map((row, idx) => (
+                        <tr
+                          key={idx}
+                          className={`transition hover:bg-emerald-50 border-b border-gray-100 ${
+                            idx % 2 === 0 ? "bg-white" : "bg-gray-50"
+                          }`}
+                        >
+                          <td className="px-3 py-3 text-center align-middle text-sm border-r border-gray-200 font-semibold">
+                            {bulanLabels[row.bulan] || row.bulan}
+                          </td>
+                          <td className="px-3 py-3 text-center align-middle text-sm border-r border-gray-200">
+                            <span className="font-bold text-emerald-700">
+                              {row.hadir}
+                            </span>
+                          </td>
+                          <td className="px-3 py-3 text-center align-middle text-sm border-r border-gray-200">
+                            <span className="font-bold text-emerald-600">
+                              {row.izin}
+                            </span>
+                          </td>
+                          <td className="px-3 py-3 text-center align-middle text-sm border-r border-gray-200">
+                            <span className="font-bold text-emerald-500">
+                              {row.sakit}
+                            </span>
+                          </td>
+                          <td className="px-3 py-3 text-center align-middle text-sm border-r border-gray-200">
+                            <span className="font-bold text-emerald-400">
+                              {row.cuti}
+                            </span>
+                          </td>
+                          <td className="px-3 py-3 text-center align-middle text-sm border-r border-gray-200">
+                            <span className="font-bold text-gray-500">
+                              {row.tidak_hadir}
+                            </span>
+                          </td>
+                          <td className="px-3 py-3 text-center align-middle text-sm">
+                            <span className="font-bold text-gray-400">
+                              {row.belum_presensi}
+                            </span>
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan={7} className="px-3 py-8 text-center">
+                          <div className="flex flex-col items-center gap-2">
+                            <span className="material-icons text-4xl text-gray-300">
+                              inbox
+                            </span>
+                            <span className="font-semibold text-gray-400">
+                              Tidak ada data
+                            </span>
+                            <span className="text-sm text-gray-400">
+                              Tidak ada data rekap untuk tahun {tahun}
+                            </span>
+                          </div>
                         </td>
                       </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td colSpan={7} className="px-6 py-12 text-center">
-                        <div className="text-gray-500">
-                          <div className="text-lg font-semibold mb-2">
-                            Tidak ada data
-                          </div>
-                          <div className="text-sm">
-                            Tidak ada data rekap untuk tahun {tahun}
-                          </div>
-                        </div>
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </>
           )}
         </div>
       </div>

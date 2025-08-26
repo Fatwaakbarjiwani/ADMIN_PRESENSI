@@ -18,6 +18,9 @@ import TambahKaryawanKeShift from "./pages/presensi/TambahKaryawanKeShift";
 import TambahPegawaiKeUnitDetail from "./pages/data_pegawai/TambahPegawaiKeUnitDetail";
 import DetailRekapBulananPegawai from "./pages/presensi/DetailRekapBulananPegawai";
 import DetailHistoryPresensi from "./pages/presensi/DetailHistoryPresensi";
+import LaporanKehadiranPegawai from "./pages/presensi/LaporanKehadiranPegawai";
+import Dinas from "./pages/presensi/Dinas";
+import TambahDinas from "./pages/presensi/TambahDinas";
 
 function App() {
   return (
@@ -132,6 +135,26 @@ function App() {
           }
         />
         <Route
+          path="/dinas"
+          element={
+            <Protected>
+              <MainLayout>
+                <Dinas />
+              </MainLayout>
+            </Protected>
+          }
+        />
+        <Route
+          path="/dinas/tambah"
+          element={
+            <Protected>
+              <MainLayout>
+                <TambahDinas />
+              </MainLayout>
+            </Protected>
+          }
+        />
+        <Route
           path="/shift-detail/:id"
           element={
             <Protected>
@@ -172,11 +195,21 @@ function App() {
           }
         />
         <Route
-          path="/presensi/detail-history-presensi/:pegawai_id"
+          path="/presensi/detail-history-presensi/:pegawai_id/:unit_id"
           element={
             <Protected>
               <MainLayout>
                 <DetailHistoryPresensi />
+              </MainLayout>
+            </Protected>
+          }
+        />
+        <Route
+          path="/presensi/laporan-kehadiran/:pegawai_id"
+          element={
+            <Protected>
+              <MainLayout>
+                <LaporanKehadiranPegawai />
               </MainLayout>
             </Protected>
           }

@@ -50,6 +50,12 @@ export default function TambahKaryawanKeShift() {
   return (
     <div className="w-full min-h-screen font-sans bg-gray-50">
       <div className="px-4 sticky z-40 top-0 py-4 border-b border-gray-200 bg-white flex items-center gap-4">
+        <button
+          onClick={() => navigate(-1)}
+          className="p-2 hover:bg-gray-100 rounded-lg transition flex items-center"
+        >
+          <span className="material-icons text-gray-600">arrow_back</span>
+        </button>
         <span className="material-icons text-lg text-green-200 bg-primary p-2 rounded opacity-80">
           person_add
         </span>
@@ -64,20 +70,7 @@ export default function TambahKaryawanKeShift() {
         </div>
       </div>
       <div className="mx-auto p-4 max-w-5xl flex flex-col gap-8 px-2 md:px-0">
-        <div className="flex mb-2">
-          <button
-            className="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded font-bold text-sm mr-auto"
-            onClick={() => navigate("/atur_shift")}
-          >
-            <span
-              className="material-icons align-middle mr-1"
-              style={{ fontSize: "18px", verticalAlign: "middle" }}
-            >
-              arrow_back
-            </span>
-            Kembali
-          </button>
-        </div>
+        
         <div className="border border-gray-200 bg-white p-6 shadow flex flex-col gap-4">
           <div className="flex items-start justify-between">
             <div className="font-bold text-emerald-600 mb-2 text-xl flex items-center gap-2">
@@ -115,10 +108,16 @@ export default function TambahKaryawanKeShift() {
                     </div>
                   </th>
                   <th className="px-2 py-3 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-32">
-                    NIP
+                    NIK
                   </th>
                   <th className="px-2 py-3 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-40">
-                    Jabatan
+                    No. HP
+                  </th>
+                  <th className="px-2 py-3 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-40">
+                    Tempat Lahir
+                  </th>
+                  <th className="px-2 py-3 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-40">
+                    Tanggal Lahir
                   </th>
                   <th className="px-2 py-3 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-40">
                     Unit Detail
@@ -150,18 +149,24 @@ export default function TambahKaryawanKeShift() {
                           .join(" ")}
                       </td>
                       <td className="px-2 py-3 align-middle border-b border-gray-100">
-                        {row.nipy || row.no_ktp}
+                        {row.no_ktp}
                       </td>
                       <td className="px-2 py-3 align-middle border-b border-gray-100">
-                        {row.jabatan}
+                        {row.no_hp}
                       </td>
                       <td className="px-2 py-3 align-middle border-b border-gray-100">
-                        {row.unit_detail_name}
+                        {row.tmpt_lahir}
+                      </td>
+                      <td className="px-2 py-3 align-middle border-b border-gray-100">
+                        {row.tgl_lahir}
+                      </td>
+                      <td className="px-2 py-3 align-middle border-b border-gray-100">
+                        {row.nama_unit}
                       </td>
                       <td className="px-2 py-3 align-middle text-center border-b border-gray-100">
-                        {row.shift_name ? (
+                        {row.nama_shift ? (
                           <span className="inline-block bg-emerald-100 text-emerald-700 px-2 py-0.5 text-xs font-bold">
-                            {row.shift_name}
+                            {row.nama_shift}
                           </span>
                         ) : (
                           <span className="inline-block bg-gray-100 text-gray-400 px-2 py-0.5 text-xs">
