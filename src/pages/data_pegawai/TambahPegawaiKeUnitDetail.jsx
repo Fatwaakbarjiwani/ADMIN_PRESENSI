@@ -9,7 +9,7 @@ import {
 } from "../../redux/actions/pegawaiAction";
 import {
   fetchUnitDetails,
-  fetchUnitDetailByUserId,
+  // fetchUnitDetailByUserId,
 } from "../../redux/actions/unitDetailAction";
 
 export default function TambahPegawaiKeUnitDetail() {
@@ -34,12 +34,13 @@ export default function TambahPegawaiKeUnitDetail() {
     if (user?.role === "super_admin") {
       dispatch(fetchUnitDetails());
     } else if (user?.unit_id) {
-      dispatch(fetchUnitDetailByUserId(user.unit_id));
+      // dispatch(fetchUnitDetailByUserId(user.unit_id));
+      dispatch(fetchUnitDetails());
     }
   }, [dispatch, user]);
 
   const unitOptions = useMemo(
-    () => unitDetails.map((u) => ({ value: u.id, label: u.name })),
+    () => unitDetails.map((u) => ({ value: u.id, label: u.nama })),
     [unitDetails]
   );
 
@@ -163,7 +164,7 @@ export default function TambahPegawaiKeUnitDetail() {
                     NIK
                   </th>
                   <th className="px-2 py-3 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-32">
-                    No. HP  
+                    No. HP
                   </th>
                   <th className="px-2 py-3 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-32">
                     Tempat Lahir
@@ -172,7 +173,12 @@ export default function TambahPegawaiKeUnitDetail() {
                     Tanggal Lahir
                   </th>
                   <th className="px-2 py-3 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-40">
-                    Unit
+                    <div className="flex flex-col leading-tight">
+                      <span>Unit</span>
+                      <span className="text-xs font-normal text-gray-400 normal-case">
+                        Detail Unit
+                      </span>
+                    </div>
                   </th>
                   <th className="px-2 py-3 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-40">
                     Shift

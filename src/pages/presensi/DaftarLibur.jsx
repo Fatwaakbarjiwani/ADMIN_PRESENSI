@@ -9,7 +9,7 @@ import {
   updateHariLibur,
   deleteHariLibur,
 } from "../../redux/actions/hariLiburAction";
-import { fetchUnitDetailByUserId } from "../../redux/actions/unitDetailAction";
+import { fetchUnitDetails } from "../../redux/actions/unitDetailAction";
 
 function formatTanggal(tgl) {
   if (!tgl) return "-";
@@ -43,7 +43,7 @@ export default function DaftarLibur() {
 
   useEffect(() => {
     if (user?.unit_id) {
-      dispatch(fetchUnitDetailByUserId(user.unit_id));
+      dispatch(fetchUnitDetails());
     }
   }, [dispatch, user]);
 
@@ -80,7 +80,7 @@ export default function DaftarLibur() {
   ];
   const unitOptions = [
     { value: "ALL", label: "Pilih Semua Unit Detail" },
-    ...unitDetails.map((u) => ({ value: u.id, label: u.name })),
+    ...unitDetails.map((u) => ({ value: u.id, label: u.nama })),
   ];
 
   // Handler tambah per tanggal

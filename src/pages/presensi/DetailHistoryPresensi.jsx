@@ -633,8 +633,9 @@ export default function DetailHistoryPresensi() {
                     <option value="terlambat">Terlambat</option>
                     <option value="tidak_absen_masuk">Tidak Absen Masuk</option>
                     <option value="tidak_hadir">Tidak Hadir</option>
-                    <option value="izin">Izin</option>
-                    <option value="sakit_cuti">Sakit/Cuti</option>
+                    <option value="izin">Izin</option>  
+                    <option value="sakit">Sakit</option>
+                    <option value="cuti">Cuti</option>
                   </select>
                 </div>
                 <div className="flex-1">
@@ -656,7 +657,8 @@ export default function DetailHistoryPresensi() {
                     </option>
                     <option value="tidak_hadir">Tidak hadir</option>
                     <option value="izin">Izin</option>
-                    <option value="sakit_cuti">Sakit/Cuti</option>
+                    <option value="sakit">Sakit</option>
+                    <option value="cuti">Cuti</option>
                   </select>
                 </div>
               </div>
@@ -703,6 +705,7 @@ export default function DetailHistoryPresensi() {
                   <option value="izin">Izin</option>
                   <option value="sakit">Sakit</option>
                   <option value="cuti">Cuti</option>
+                  <option value="dinas">Dinas</option>
                 </select>
               </div>
               {errorMsg && (

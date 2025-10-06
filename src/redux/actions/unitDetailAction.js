@@ -8,7 +8,7 @@ export const fetchUnitDetails = () => async (dispatch, getState) => {
   const { token } = getState().auth;
   try {
     const response = await axios.get(
-      `${import.meta.env.VITE_API_URL}/api/unit-detail`,
+      `${import.meta.env.VITE_API_URL}/api/unit/with-location`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -102,7 +102,9 @@ export const fetchUnitDetailByUserId =
     const { token } = getState().auth;
     try {
       const response = await axios.get(
-        `${import.meta.env.VITE_API_URL}/api/unit-detail/${userId}`,
+        `${
+          import.meta.env.VITE_API_URL
+        }/api/unit-detail/get-by-unit-id/${userId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,

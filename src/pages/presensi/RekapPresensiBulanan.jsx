@@ -16,6 +16,7 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import Swal from "sweetalert2";
 import { fetchAllUnit } from "../../redux/actions/unitDetailAction";
+import SettingPresensi from "./SettingPresensi";
 
 // Logo ybwsa base64 PNG (dummy, ganti dengan logo asli jika ada)
 const logoBase64 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQC..."; // Potong, ganti dengan base64 logo asli jika ada
@@ -581,10 +582,10 @@ export default function RekapPresensiBulanan() {
       </div>
       <div className="mx-auto p-4 max-w-5xl flex flex-col gap-8 px-2 md:px-0">
         <div className="border border-gray-300 bg-white p-4">
-          <div className="flex gap-2 mb-6">
+          <div className="grid grid-cols-5 gap-2 mb-6">
             {!isSuperAdmin ? (
               <button
-                className={`px-6 py-3 font-bold text-sm transition border-2 flex items-center gap-2 ${
+                className={`px-4 py-2 font-bold text-sm transition border-2 flex items-center gap-2 ${
                   tab === "history"
                     ? "bg-emerald-600 text-white border-emerald-600"
                     : "bg-white text-emerald-700 border-gray-300 hover:bg-gray-50"
@@ -596,7 +597,7 @@ export default function RekapPresensiBulanan() {
               </button>
             ) : null}
             <button
-              className={`px-6 py-3 font-bold text-sm transition border-2 flex items-center gap-2 ${
+              className={`px-4 py-2 font-bold text-sm transition border-2 flex items-center gap-2 ${
                 tab === "rekap"
                   ? "bg-emerald-600 text-white border-emerald-600"
                   : "bg-white text-emerald-700 border-gray-300 hover:bg-gray-50"
@@ -608,7 +609,7 @@ export default function RekapPresensiBulanan() {
             </button>
             {!isSuperAdmin && (
               <button
-                className={`px-6 py-3 font-bold text-sm transition border-2 flex items-center gap-2 ${
+                className={`px-4 py-2 font-bold text-sm transition border-2 flex items-center gap-2 ${
                   tab === "lembur"
                     ? "bg-emerald-600 text-white border-emerald-600"
                     : "bg-white text-emerald-700 border-gray-300 hover:bg-gray-50"
@@ -620,7 +621,7 @@ export default function RekapPresensiBulanan() {
               </button>
             )}
             <button
-              className={`px-6 py-3 font-bold text-sm transition border-2 flex items-center gap-2 ${
+              className={`px-4 py-2 font-bold text-sm transition border-2 flex items-center gap-2 ${
                 tab === "laukPauk"
                   ? "bg-emerald-600 text-white border-emerald-600"
                   : "bg-white text-emerald-700 border-gray-300 hover:bg-gray-50"
@@ -629,6 +630,17 @@ export default function RekapPresensiBulanan() {
             >
               <span className="material-icons text-base">restaurant</span>
               Rekap Lauk Pauk
+            </button>
+            <button
+              className={`px-4 py-2 font-bold text-sm transition border-2 flex items-center gap-2 ${
+                tab === "controlPresensi"
+                  ? "bg-emerald-600 text-white border-emerald-600"
+                  : "bg-white text-emerald-700 border-gray-300 hover:bg-gray-50"
+              }`}
+              onClick={() => setTab("controlPresensi")}
+            >
+              <span className="material-icons text-base">settings</span>
+              Kontrol Presensi
             </button>
           </div>
           {tab === "history" &&
@@ -1757,7 +1769,7 @@ export default function RekapPresensiBulanan() {
                               CUTI
                             </th>
                             <th className="px-3 py-3 text-center font-bold text-sm border-r border-emerald-500 w-28">
-                              TIDAK MASUK
+                              TIDAK HADIR
                             </th>
                             <th className="px-3 py-3 text-center font-bold text-sm border-r border-emerald-500 w-20">
                               DINAS
@@ -1769,13 +1781,16 @@ export default function RekapPresensiBulanan() {
                               PULANG AWAL
                             </th>
                             <th className="px-3 py-3 text-center font-bold text-sm border-r border-emerald-500 w-32">
-                              JAM DATANG KOSONG
+                              TIDAK ABSEN MASUK
                             </th>
                             <th className="px-3 py-3 text-center font-bold text-sm border-r border-emerald-500 w-32">
-                              JAM PULANG KOSONG
+                              TIDAK ABSEN PULANG
                             </th>
                             <th className="px-3 py-3 text-center font-bold text-sm border-r border-emerald-500 w-20">
                               LEMBUR
+                            </th>
+                            <th className="px-3 py-3 text-center font-bold text-sm border-r border-emerald-500 w-28">
+                              BELUM PRESENSI
                             </th>
                             <th className="px-3 py-3 text-center font-bold text-sm border-r border-emerald-500 w-20">
                               LIBUR
@@ -1810,57 +1825,62 @@ export default function RekapPresensiBulanan() {
                               </td>
                               <td className="px-3 py-3 text-center align-middle text-sm border-r border-gray-200">
                                 <span className="inline-flex items-center px-2 py-1 text-xs font-semibold bg-emerald-100 text-emerald-800 rounded">
-                                  {row.jumlah_hadir}
+                                  {row.hadir}
                                 </span>
                               </td>
                               <td className="px-3 py-3 text-center align-middle text-sm border-r border-gray-200">
                                 <span className="inline-flex items-center px-2 py-1 text-xs font-semibold bg-sky-100 text-sky-800 rounded">
-                                  {row.jumlah_izin}
+                                  {row.izin}
                                 </span>
                               </td>
                               <td className="px-3 py-3 text-center align-middle text-sm border-r border-gray-200">
                                 <span className="inline-flex items-center px-2 py-1 text-xs font-semibold bg-red-100 text-red-800 rounded">
-                                  {row.jumlah_sakit}
+                                  {row.sakit}
                                 </span>
                               </td>
                               <td className="px-3 py-3 text-center align-middle text-sm border-r border-gray-200">
                                 <span className="inline-flex items-center px-2 py-1 text-xs font-semibold bg-yellow-100 text-yellow-800 rounded">
-                                  {row.jumlah_cuti}
+                                  {row.cuti}
                                 </span>
                               </td>
                               <td className="px-3 py-3 text-center align-middle text-sm border-r border-gray-200">
                                 <span className="inline-flex items-center px-2 py-1 text-xs font-semibold bg-gray-100 text-gray-800 rounded">
-                                  {row.jumlah_tidak_masuk}
+                                  {row.tidak_hadir}
                                 </span>
                               </td>
                               <td className="px-3 py-3 text-center align-middle text-sm border-r border-gray-200">
                                 <span className="inline-flex items-center px-2 py-1 text-xs font-semibold bg-purple-100 text-purple-800 rounded">
-                                  {row.jumlah_dinas}
+                                  {row.dinas}
                                 </span>
                               </td>
                               <td className="px-3 py-3 text-center align-middle text-sm border-r border-gray-200">
                                 <span className="inline-flex items-center px-2 py-1 text-xs font-semibold bg-orange-100 text-orange-800 rounded">
-                                  {row.jumlah_terlambat}
+                                  {row.terlambat}
                                 </span>
                               </td>
                               <td className="px-3 py-3 text-center align-middle text-sm border-r border-gray-200">
                                 <span className="inline-flex items-center px-2 py-1 text-xs font-semibold bg-pink-100 text-pink-800 rounded">
-                                  {row.jumlah_pulang_awal}
+                                  {row.pulang_awal}
                                 </span>
                               </td>
                               <td className="px-3 py-3 text-center align-middle text-sm border-r border-gray-200">
                                 <span className="inline-flex items-center px-2 py-1 text-xs font-semibold bg-indigo-100 text-indigo-800 rounded">
-                                  {row.jumlah_jam_datang_kosong}
+                                  {row.tidak_absen_masuk}
                                 </span>
                               </td>
                               <td className="px-3 py-3 text-center align-middle text-sm border-r border-gray-200">
                                 <span className="inline-flex items-center px-2 py-1 text-xs font-semibold bg-teal-100 text-teal-800 rounded">
-                                  {row.jumlah_jam_pulang_kosong}
+                                  {row.tidak_absen_pulang}
                                 </span>
                               </td>
                               <td className="px-3 py-3 text-center align-middle text-sm border-r border-gray-200">
                                 <span className="inline-flex items-center px-2 py-1 text-xs font-semibold bg-amber-100 text-amber-800 rounded">
                                   {row.lembur}
+                                </span>
+                              </td>
+                              <td className="px-3 py-3 text-center align-middle text-sm border-r border-gray-200">
+                                <span className="inline-flex items-center px-2 py-1 text-xs font-semibold bg-slate-100 text-slate-800 rounded">
+                                  {row.belum_presensi}
                                 </span>
                               </td>
                               <td className="px-3 py-3 text-center align-middle text-sm border-r border-gray-200">
@@ -1884,6 +1904,7 @@ export default function RekapPresensiBulanan() {
               </div>
             </div>
           )}
+          {tab === "controlPresensi" && <SettingPresensi />}
         </div>
       </div>
     </div>

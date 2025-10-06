@@ -359,9 +359,9 @@ export default function TambahDinas() {
                             <th className="px-3 py-2 text-left font-semibold">
                               NIK
                             </th>
-                            <th className="px-3 py-2 text-left font-semibold">
+                            {/* <th className="px-3 py-2 text-left font-semibold">
                               Unit
-                            </th>
+                            </th> */}
                             <th className="px-3 py-2 text-left font-semibold">
                               Unit Detail
                             </th>
@@ -396,13 +396,13 @@ export default function TambahDinas() {
                                 </td>
                                 <td className="px-3 py-2">{p.no_ktp}</td>
                                 <td className="px-3 py-2">
-                                  {p.unit_name || "-"}
+                                  {p.nama_unit || "-"}
                                 </td>
+                                {/* <td className="px-3 py-2">
+                                  {p.nama_unit_detail || "-"}
+                                </td> */}
                                 <td className="px-3 py-2">
-                                  {p.unit_detail_name || "-"}
-                                </td>
-                                <td className="px-3 py-2">
-                                  {p.shift_name || "-"}
+                                  {p.nama_shift || "-"}
                                 </td>
                               </tr>
                             ))

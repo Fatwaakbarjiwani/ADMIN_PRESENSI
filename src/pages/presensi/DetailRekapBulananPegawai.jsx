@@ -40,20 +40,34 @@ export default function DetailRekapBulananPegawai() {
 
     return detailRekap.reduce(
       (acc, item) => {
+        acc.hari_efektif += item.hari_efektif || 0;
         acc.hadir += item.hadir || 0;
         acc.izin += item.izin || 0;
         acc.sakit += item.sakit || 0;
         acc.cuti += item.cuti || 0;
         acc.tidak_hadir += item.tidak_hadir || 0;
+        acc.dinas += item.dinas || 0;
+        acc.lembur += item.lembur || 0;
+        acc.terlambat += item.terlambat || 0;
+        acc.pulang_awal += item.pulang_awal || 0;
+        acc.tidak_absen_masuk += item.tidak_absen_masuk || 0;
+        acc.tidak_absen_pulang += item.tidak_absen_pulang || 0;
         acc.belum_presensi += item.belum_presensi || 0;
         return acc;
       },
       {
+        hari_efektif: 0,
         hadir: 0,
         izin: 0,
         sakit: 0,
         cuti: 0,
         tidak_hadir: 0,
+        dinas: 0,
+        lembur: 0,
+        terlambat: 0,
+        pulang_awal: 0,
+        tidak_absen_masuk: 0,
+        tidak_absen_pulang: 0,
         belum_presensi: 0,
       }
     );
@@ -116,39 +130,103 @@ export default function DetailRekapBulananPegawai() {
 
         {/* Summary Cards */}
         {totalStats && (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
-            <div className="bg-white p-4 rounded-lg border border-gray-100">
-              <div className="text-xs text-gray-500 mb-1">Hadir</div>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-4 mb-6">
+            <div className="bg-white p-4 rounded-lg border border-gray-100 shadow-sm">
+              <div className="text-xs text-gray-500 mb-1 font-medium">
+                Hari Efektif
+              </div>
+              <div className="text-xl font-bold text-blue-600">
+                {totalStats.hari_efektif}
+              </div>
+            </div>
+            <div className="bg-white p-4 rounded-lg border border-gray-100 shadow-sm">
+              <div className="text-xs text-gray-500 mb-1 font-medium">
+                Hadir
+              </div>
               <div className="text-xl font-bold text-emerald-700">
                 {totalStats.hadir}
               </div>
             </div>
-            <div className="bg-white p-4 rounded-lg border border-gray-100">
-              <div className="text-xs text-gray-500 mb-1">Izin</div>
+            <div className="bg-white p-4 rounded-lg border border-gray-100 shadow-sm">
+              <div className="text-xs text-gray-500 mb-1 font-medium">Izin</div>
               <div className="text-xl font-bold text-emerald-600">
                 {totalStats.izin}
               </div>
             </div>
-            <div className="bg-white p-4 rounded-lg border border-gray-100">
-              <div className="text-xs text-gray-500 mb-1">Sakit</div>
+            <div className="bg-white p-4 rounded-lg border border-gray-100 shadow-sm">
+              <div className="text-xs text-gray-500 mb-1 font-medium">
+                Sakit
+              </div>
               <div className="text-xl font-bold text-emerald-500">
                 {totalStats.sakit}
               </div>
             </div>
-            <div className="bg-white p-4 rounded-lg border border-gray-100">
-              <div className="text-xs text-gray-500 mb-1">Cuti</div>
+            <div className="bg-white p-4 rounded-lg border border-gray-100 shadow-sm">
+              <div className="text-xs text-gray-500 mb-1 font-medium">Cuti</div>
               <div className="text-xl font-bold text-emerald-400">
                 {totalStats.cuti}
               </div>
             </div>
-            <div className="bg-white p-4 rounded-lg border border-gray-100">
-              <div className="text-xs text-gray-500 mb-1">Tidak Hadir</div>
-              <div className="text-xl font-bold text-gray-500">
+            <div className="bg-white p-4 rounded-lg border border-gray-100 shadow-sm">
+              <div className="text-xs text-gray-500 mb-1 font-medium">
+                Tidak Hadir
+              </div>
+              <div className="text-xl font-bold text-red-500">
                 {totalStats.tidak_hadir}
               </div>
             </div>
-            <div className="bg-white p-4 rounded-lg border border-gray-100">
-              <div className="text-xs text-gray-500 mb-1">Belum Presensi</div>
+            <div className="bg-white p-4 rounded-lg border border-gray-100 shadow-sm">
+              <div className="text-xs text-gray-500 mb-1 font-medium">
+                Dinas
+              </div>
+              <div className="text-xl font-bold text-purple-600">
+                {totalStats.dinas}
+              </div>
+            </div>
+            <div className="bg-white p-4 rounded-lg border border-gray-100 shadow-sm">
+              <div className="text-xs text-gray-500 mb-1 font-medium">
+                Lembur
+              </div>
+              <div className="text-xl font-bold text-indigo-600">
+                {totalStats.lembur}
+              </div>
+            </div>
+            <div className="bg-white p-4 rounded-lg border border-gray-100 shadow-sm">
+              <div className="text-xs text-gray-500 mb-1 font-medium">
+                Terlambat
+              </div>
+              <div className="text-xl font-bold text-orange-500">
+                {totalStats.terlambat}
+              </div>
+            </div>
+            <div className="bg-white p-4 rounded-lg border border-gray-100 shadow-sm">
+              <div className="text-xs text-gray-500 mb-1 font-medium">
+                Pulang Awal
+              </div>
+              <div className="text-xl font-bold text-orange-600">
+                {totalStats.pulang_awal}
+              </div>
+            </div>
+            <div className="bg-white p-4 rounded-lg border border-gray-100 shadow-sm">
+              <div className="text-xs text-gray-500 mb-1 font-medium">
+                Tidak Absen Masuk
+              </div>
+              <div className="text-xl font-bold text-red-600">
+                {totalStats.tidak_absen_masuk}
+              </div>
+            </div>
+            <div className="bg-white p-4 rounded-lg border border-gray-100 shadow-sm">
+              <div className="text-xs text-gray-500 mb-1 font-medium">
+                Tidak Absen Pulang
+              </div>
+              <div className="text-xl font-bold text-red-700">
+                {totalStats.tidak_absen_pulang}
+              </div>
+            </div>
+            <div className="bg-white p-4 rounded-lg border border-gray-100 shadow-sm">
+              <div className="text-xs text-gray-500 mb-1 font-medium">
+                Belum Presensi
+              </div>
               <div className="text-xl font-bold text-gray-400">
                 {totalStats.belum_presensi}
               </div>
@@ -190,6 +268,9 @@ export default function DetailRekapBulananPegawai() {
                         BULAN
                       </th>
                       <th className="px-3 py-3 text-center font-bold text-sm border-r border-emerald-500 w-24">
+                        HARI EFEKTIF
+                      </th>
+                      <th className="px-3 py-3 text-center font-bold text-sm border-r border-emerald-500 w-24">
                         HADIR
                       </th>
                       <th className="px-3 py-3 text-center font-bold text-sm border-r border-emerald-500 w-24">
@@ -203,6 +284,24 @@ export default function DetailRekapBulananPegawai() {
                       </th>
                       <th className="px-3 py-3 text-center font-bold text-sm border-r border-emerald-500 w-28">
                         TIDAK HADIR
+                      </th>
+                      <th className="px-3 py-3 text-center font-bold text-sm border-r border-emerald-500 w-28">
+                        DINAS
+                      </th>
+                      <th className="px-3 py-3 text-center font-bold text-sm border-r border-emerald-500 w-28">
+                        LEMBUR
+                      </th>
+                      <th className="px-3 py-3 text-center font-bold text-sm border-r border-emerald-500 w-28">
+                        TERLAMBAT
+                      </th>
+                      <th className="px-3 py-3 text-center font-bold text-sm border-r border-emerald-500 w-28">
+                        PULANG AWAL
+                      </th>
+                      <th className="px-3 py-3 text-center font-bold text-sm border-r border-emerald-500 w-28">
+                        TIDAK ABSEN MASUK
+                      </th>
+                      <th className="px-3 py-3 text-center font-bold text-sm border-r border-emerald-500 w-28">
+                        TIDAK ABSEN PULANG
                       </th>
                       <th className="px-3 py-3 text-center font-bold text-sm w-32">
                         BELUM PRESENSI
@@ -220,6 +319,11 @@ export default function DetailRekapBulananPegawai() {
                         >
                           <td className="px-3 py-3 text-center align-middle text-sm border-r border-gray-200 font-semibold">
                             {bulanLabels[row.bulan] || row.bulan}
+                          </td>
+                          <td className="px-3 py-3 text-center align-middle text-sm border-r border-gray-200">
+                            <span className="font-bold text-emerald-700">
+                              {row.hari_efektif}
+                            </span>
                           </td>
                           <td className="px-3 py-3 text-center align-middle text-sm border-r border-gray-200">
                             <span className="font-bold text-emerald-700">
@@ -246,6 +350,36 @@ export default function DetailRekapBulananPegawai() {
                               {row.tidak_hadir}
                             </span>
                           </td>
+                          <td className="px-3 py-3 text-center align-middle text-sm border-r border-gray-200">
+                            <span className="font-bold text-gray-500">
+                              {row.dinas}
+                            </span>
+                          </td>
+                          <td className="px-3 py-3 text-center align-middle text-sm border-r border-gray-200">
+                            <span className="font-bold text-gray-500">
+                              {row.lembur}
+                            </span>
+                          </td>
+                          <td className="px-3 py-3 text-center align-middle text-sm border-r border-gray-200">
+                            <span className="font-bold text-gray-500">
+                              {row.terlambat}
+                            </span>
+                          </td>
+                          <td className="px-3 py-3 text-center align-middle text-sm border-r border-gray-200">
+                            <span className="font-bold text-gray-500">
+                              {row.pulang_awal}
+                            </span>
+                          </td>
+                          <td className="px-3 py-3 text-center align-middle text-sm border-r border-gray-200">
+                            <span className="font-bold text-gray-500">
+                              {row.tidak_absen_masuk}
+                            </span>
+                          </td>
+                          <td className="px-3 py-3 text-center align-middle text-sm border-r border-gray-200">
+                            <span className="font-bold text-gray-500">
+                              {row.tidak_absen_pulang}
+                            </span>
+                          </td>
                           <td className="px-3 py-3 text-center align-middle text-sm">
                             <span className="font-bold text-gray-400">
                               {row.belum_presensi}
@@ -255,7 +389,7 @@ export default function DetailRekapBulananPegawai() {
                       ))
                     ) : (
                       <tr>
-                        <td colSpan={7} className="px-3 py-8 text-center">
+                        <td colSpan={14} className="px-3 py-8 text-center">
                           <div className="flex flex-col items-center gap-2">
                             <span className="material-icons text-4xl text-gray-300">
                               inbox

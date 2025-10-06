@@ -92,9 +92,9 @@ export default function Home() {
           value:
             dashboard.ringkasan?.ringkasan_presensi?.attendance_rate !==
             undefined
-              ? (
-                  dashboard.ringkasan.ringkasan_presensi.attendance_rate
-                ).toFixed(2) 
+              ? dashboard.ringkasan.ringkasan_presensi.attendance_rate.toFixed(
+                  2
+                )
               : "-",
           color: "#6366f1",
           icon: "percent",
@@ -160,7 +160,8 @@ export default function Home() {
     : [];
 
   // Total summary dari total_pegawai (100%)
-  const totalSummary = dashboard?.ringkasan?.ringkasan_presensi?.total_expected || 0;
+  const totalSummary =
+    dashboard?.ringkasan?.ringkasan_presensi?.total_expected || 0;
 
   // Pie Presensi User
   const userPresensiData = dashboard
@@ -509,7 +510,7 @@ export default function Home() {
                         {row.pegawai}
                       </td>
                       <td className="p-3 border-t border-gray-100 capitalize">
-                        {row.status.replace("_", " ")}
+                        {row.status ? row.status.replace("_", " ") : ""}
                       </td>
                       <td className="p-3 border-t border-gray-100">
                         {row.tanggal}

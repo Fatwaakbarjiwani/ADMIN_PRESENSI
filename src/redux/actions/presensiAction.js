@@ -125,7 +125,7 @@ export const fetchDinasData =
     dispatch(setDinasLoading(true));
     const { token } = getState().auth;
     try {
-      const url = `${import.meta.env.VITE_API_URL}/api/dinas${
+      const url = `${import.meta.env.VITE_API_URL}/api/dinas/get-all${
         params ? `?${params}` : ""
       }`;
 

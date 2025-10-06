@@ -9,9 +9,9 @@ import {
 } from "../../redux/actions/adminAction";
 import { fetchAllUnit } from "../../redux/actions/unitDetailAction";
 import {
-  createUnit,
-  updateUnit,
-  deleteUnit,
+  // createUnit,
+  // updateUnit,
+  // deleteUnit,
 } from "../../redux/actions/unitAction";
 
 export default function ManajemenAdmin() {
@@ -33,19 +33,23 @@ export default function ManajemenAdmin() {
   const [showPassword, setShowPassword] = useState(false);
 
   // Unit management state
-  const [unitForm, setUnitForm] = useState({
-    id: null,
-    name: "",
-  });
-  const [unitFormLoading, setUnitFormLoading] = useState(false);
+  // const [unitForm, setUnitForm] = useState({
+  //   id: null,
+  //   name: "",
+  // });
+  // const [unitFormLoading, setUnitFormLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("admin"); // "admin" or "unit"
 
   useEffect(() => {
-    if (user || formLoading == false || unitFormLoading == false) {
+    if (user || formLoading == false) {
       dispatch(fetchAdmin());
       dispatch(fetchAllUnit());
     }
-  }, [user, dispatch, formLoading, unitFormLoading]);
+    // if (user || formLoading == false || unitFormLoading == false) {
+    //   dispatch(fetchAdmin());
+    //   dispatch(fetchAllUnit());
+    // }
+  }, [user, dispatch, formLoading]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -191,84 +195,84 @@ export default function ManajemenAdmin() {
   };
 
   // Unit management functions
-  const handleUnitSubmit = (e) => {
-    e.preventDefault();
-    setUnitFormLoading(true);
-    const body = { name: unitForm.name };
-    if (unitForm.id) {
-      // Update unit
-      dispatch(updateUnit(unitForm.id, body)).finally(() => {
-        setUnitFormLoading(false);
-      });
-    } else {
-      // Tambah unit baru
-      dispatch(
-        createUnit(
-          body,
-          () => {
-            setUnitForm({ id: null, name: "" });
-            setUnitFormLoading(false);
-            Swal.fire({
-              icon: "success",
-              title: "Berhasil tambah unit",
-              timer: 1200,
-              showConfirmButton: false,
-            });
-          },
-          (err) => {
-            let msg = "Gagal menyimpan data unit";
-            if (
-              err.response &&
-              (err.response.data?.message || err.response.data?.errors)
-            ) {
-              if (err.response.data.errors) {
-                msg = Object.values(err.response.data.errors).flat().join("\n");
-              } else {
-                msg = err.response.data.message;
-              }
-            }
-            Swal.fire({ icon: "error", title: "Validasi Gagal", text: msg });
-            setUnitFormLoading(false);
-          }
-        )
-      );
-    }
-  };
+  // const handleUnitSubmit = (e) => {
+  //   e.preventDefault();
+  //   setUnitFormLoading(true);
+  //   const body = { name: unitForm.name };
+  //   if (unitForm.id) {
+  //     // Update unit
+  //     dispatch(updateUnit(unitForm.id, body)).finally(() => {
+  //       setUnitFormLoading(false);
+  //     });
+  //   } else {
+  //     // Tambah unit baru
+  //     dispatch(
+  //       createUnit(
+  //         body,
+  //         () => {
+  //           setUnitForm({ id: null, name: "" });
+  //           setUnitFormLoading(false);
+  //           Swal.fire({
+  //             icon: "success",
+  //             title: "Berhasil tambah unit",
+  //             timer: 1200,
+  //             showConfirmButton: false,
+  //           });
+  //         },
+  //         (err) => {
+  //           let msg = "Gagal menyimpan data unit";
+  //           if (
+  //             err.response &&
+  //             (err.response.data?.message || err.response.data?.errors)
+  //           ) {
+  //             if (err.response.data.errors) {
+  //               msg = Object.values(err.response.data.errors).flat().join("\n");
+  //             } else {
+  //               msg = err.response.data.message;
+  //             }
+  //           }
+  //           Swal.fire({ icon: "error", title: "Validasi Gagal", text: msg });
+  //           setUnitFormLoading(false);
+  //         }
+  //       )
+  //     );
+  //   }
+  // };
 
-  const handleUnitEdit = (row) => {
-    setUnitForm({
-      id: row.id,
-      name: row.name,
-    });
-  };
+  // const handleUnitEdit = (row) => {
+  //   setUnitForm({
+  //     id: row.id,
+  //     name: row.name,
+  //   });
+  // };
 
-  const handleUnitDelete = (id) => {
-    if (!id) {
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: "ID unit tidak valid",
-      });
-      return;
-    }
+  // const handleUnitDelete = (id) => {
+  //   if (!id) {
+  //     Swal.fire({
+  //       icon: "error",
+  //       title: "Error",
+  //       text: "ID unit tidak valid",
+  //     });
+  //     return;
+  //   }
 
-    Swal.fire({
-      title: "Yakin hapus unit ini?",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#d33",
-      cancelButtonColor: "#3085d6",
-      confirmButtonText: "Ya, Hapus",
-      cancelButtonText: "Batal",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        setUnitFormLoading(true);
-        dispatch(deleteUnit(id)).finally(() => {
-          setUnitFormLoading(false);
-        });
-      }
-    });
-  };
+  //   Swal.fire({
+  //     title: "Yakin hapus unit ini?",
+  //     icon: "warning",
+  //     showCancelButton: true,
+  //     confirmButtonColor: "#d33",
+  //     cancelButtonColor: "#3085d6",
+  //     confirmButtonText: "Ya, Hapus",
+  //     cancelButtonText: "Batal",
+  //   }).then((result) => {
+  //     if (result.isConfirmed) {
+  //       setUnitFormLoading(true);
+  //       dispatch(deleteUnit(id)).finally(() => {
+  //         setUnitFormLoading(false);
+  //       });
+  //     }
+  //   });
+  // };
 
   return (
     <div className="w-full min-h-screen font-sans bg-gray-50">
@@ -403,7 +407,7 @@ export default function ManajemenAdmin() {
                   <option value="">Pilih Unit</option>
                   {units.map((u) => (
                     <option key={u.id} value={u.id}>
-                      {u?.name}
+                      {u?.nama}
                     </option>
                   ))}
                 </select>
@@ -652,7 +656,7 @@ export default function ManajemenAdmin() {
               </span>
               Data Unit
             </div>
-            <form
+            {/* <form
               className="flex flex-wrap gap-4 mb-6 items-end"
               onSubmit={handleUnitSubmit}
             >
@@ -715,7 +719,7 @@ export default function ManajemenAdmin() {
               <div className="mb-4 text-sm text-yellow-700 font-semibold bg-yellow-50 px-3 py-2 rounded">
                 Edit Unit: {unitForm?.name || ""}
               </div>
-            )}
+            )} */}
             <div className="overflow-x-auto">
               <table className="min-w-full text-sm bg-white">
                 <thead className="sticky top-0 z-10 bg-white border-b-2 border-emerald-100">
@@ -729,9 +733,9 @@ export default function ManajemenAdmin() {
                     <th className="px-4 py-4 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase">
                       Detail Unit
                     </th>
-                    <th className="px-4 py-4 text-center font-extrabold text-emerald-700 tracking-wide text-base uppercase w-24">
+                    {/* <th className="px-4 py-4 text-center font-extrabold text-emerald-700 tracking-wide text-base uppercase w-24">
                       Aksi
-                    </th>
+                    </th> */}
                   </tr>
                 </thead>
                 <tbody>
@@ -748,17 +752,17 @@ export default function ManajemenAdmin() {
                           {idx + 1}
                         </td>
                         <td className="px-4 py-4 align-middle border-b border-gray-100 font-bold text-emerald-800 text-base">
-                          {row?.name}
+                          {row?.nama}
                         </td>
                         <td className="px-4 py-4 align-middle border-b border-gray-100 text-base">
-                          {row?.unit_details?.length > 0 ? (
+                          {row?.children?.length > 0 ? (
                             <div className="flex flex-wrap gap-1">
-                              {row?.unit_details?.map((detail) => (
+                              {row?.children?.map((detail) => (
                                 <span
                                   key={detail?.id || Math.random()}
                                   className="inline-block bg-emerald-100 text-emerald-800 text-xs px-2 py-1 rounded"
                                 >
-                                  {detail?.name || "Unknown"}
+                                  {detail?.nama || "Unknown"}
                                 </span>
                               ))}
                             </div>
@@ -768,7 +772,7 @@ export default function ManajemenAdmin() {
                             </span>
                           )}
                         </td>
-                        <td className="px-4 py-4 text-center align-middle border-b border-gray-100">
+                        {/* <td className="px-4 py-4 text-center align-middle border-b border-gray-100">
                           <div className="flex gap-1 justify-center">
                             <button
                               className="w-8 h-8 flex items-center justify-center text-yellow-600 hover:text-yellow-800 rounded transition-colors"
@@ -791,7 +795,7 @@ export default function ManajemenAdmin() {
                               </span>
                             </button>
                           </div>
-                        </td>
+                        </td> */}
                       </tr>
                     ))
                   ) : (
