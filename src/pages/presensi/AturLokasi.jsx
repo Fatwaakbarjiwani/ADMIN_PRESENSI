@@ -79,6 +79,8 @@ export default function AturLokasi() {
   const token = useSelector((state) => state.auth.token);
   const drawnItemsRef = useRef();
   const layerIndexMapRef = useRef(new Map());
+  const [selectedPolygonIndex, setSelectedPolygonIndex] = useState(0);
+  const [isPanelCollapsed, setIsPanelCollapsed] = useState(false);
 
   const unitDetails = useSelector((state) => state.unitDetail.data);
 
@@ -430,10 +432,12 @@ export default function AturLokasi() {
                     ];
 
                     const colorIndex = index % colors.length;
+                    const isSelected = selectedPolygonIndex === index;
                     const polygon = L.polygon(validCoords, {
                       color: colors[colorIndex].color,
                       fillColor: colors[colorIndex].fillColor,
-                      fillOpacity: 0.2,
+                      fillOpacity: isSelected ? 0.4 : 0.2,
+                      weight: isSelected ? 4 : 2,
                     });
 
                     const lokasiName =
@@ -446,13 +450,20 @@ export default function AturLokasi() {
                     layerIndexMapRef.current.set(polygon, index);
                     polygon._polygonIndex = index;
 
+                    // Add click event to polygon for selection
+                    polygon.on("click", () => {
+                      setSelectedPolygonIndex(index);
+                    });
+
+                    // Fit map to first polygon (main location) when map loads
                     if (index === 0) {
-                      map.fitBounds(polygon.getBounds());
+                      map.fitBounds(polygon.getBounds(), { padding: [20, 20] });
                     } else {
+                      // For additional polygons, extend bounds to include all
                       const currentBounds = map.getBounds();
                       const newBounds = polygon.getBounds();
                       const combinedBounds = currentBounds.extend(newBounds);
-                      map.fitBounds(combinedBounds);
+                      map.fitBounds(combinedBounds, { padding: [20, 20] });
                     }
                   } catch (error) {
                     console.error("Error creating polygon:", error);
@@ -472,6 +483,43 @@ export default function AturLokasi() {
     return () => clearTimeout(timer);
   }, [editId, polygonCoords]);
 
+  // Update polygon visual when selectedPolygonIndex changes
+  useEffect(() => {
+    if (
+      !drawnItemsRef.current ||
+      !mapRef.current ||
+      !mapRef.current._leaflet_map
+    ) {
+      return;
+    }
+
+    const drawnItems = drawnItemsRef.current;
+    const layers = drawnItems.getLayers();
+
+    layers.forEach((layer, index) => {
+      if (layer instanceof L.Polygon) {
+        const colors = [
+          { color: "#10b981", fillColor: "#10b981" },
+          { color: "#3b82f6", fillColor: "#3b82f6" },
+          { color: "#f59e0b", fillColor: "#f59e0b" },
+          { color: "#ef4444", fillColor: "#ef4444" },
+          { color: "#8b5cf6", fillColor: "#8b5cf6" },
+          { color: "#06b6d4", fillColor: "#06b6d4" },
+        ];
+
+        const colorIndex = index % colors.length;
+        const isSelected = selectedPolygonIndex === index;
+
+        layer.setStyle({
+          color: colors[colorIndex].color,
+          fillColor: colors[colorIndex].fillColor,
+          fillOpacity: isSelected ? 0.4 : 0.2,
+          weight: isSelected ? 4 : 2,
+        });
+      }
+    });
+  }, [selectedPolygonIndex]);
+
   useEffect(() => {
     if (!editId && drawnItemsRef.current) {
       drawnItemsRef.current.clearLayers();
@@ -483,8 +531,36 @@ export default function AturLokasi() {
   useEffect(() => {
     if (!editId) {
       setSearchTerm("");
+      setSelectedPolygonIndex(0);
+      setIsPanelCollapsed(false);
     }
   }, [editId]);
+
+  // Function to navigate to specific polygon
+  const navigateToPolygon = (index) => {
+    if (
+      !mapRef.current ||
+      !mapRef.current._leaflet_map ||
+      !drawnItemsRef.current
+    ) {
+      return;
+    }
+
+    const map = mapRef.current._leaflet_map;
+    const drawnItems = drawnItemsRef.current;
+    const layers = drawnItems.getLayers();
+
+    if (layers.length > index) {
+      const targetPolygon = layers[index];
+      if (targetPolygon) {
+        map.fitBounds(targetPolygon.getBounds(), {
+          padding: [20, 20],
+          maxZoom: 18,
+        });
+        setSelectedPolygonIndex(index);
+      }
+    }
+  };
 
   return (
     <div className="w-full min-h-screen font-sans bg-gray-50">
@@ -650,158 +726,194 @@ export default function AturLokasi() {
                       <p className="text-xs opacity-90">Gambar polygon area</p>
                     </div>
                   </div>
-                  <button
-                    className="text-white hover:bg-white/20 rounded-lg p-1 transition-colors"
-                    onClick={() => {
-                      setEditId(null);
-                      setPolygonCoords([]);
-                    }}
-                    title="Tutup panel"
-                  >
-                    <span className="material-icons text-sm">close</span>
-                  </button>
-                </div>
-
-                <div className="p-4">
-                  <div className="mb-4">
-                    {polygonCoords.length > 0 ? (
-                      <div>
-                        <div className="flex items-center gap-2 mb-3">
-                          <span className="material-icons text-emerald-600 text-sm">
-                            layers
-                          </span>
-                          <h4 className="font-semibold text-gray-800 text-sm">
-                            Polygon ({polygonCoords.length}/3)
-                          </h4>
-                        </div>
-
-                        <div className="space-y-2">
-                          {polygonCoords.map((polygon, index) => {
-                            const colors = [
-                              {
-                                color: "#10b981",
-                                name: "Hijau",
-                                bg: "bg-emerald-50",
-                              },
-                              {
-                                color: "#3b82f6",
-                                name: "Biru",
-                                bg: "bg-blue-50",
-                              },
-                              {
-                                color: "#f59e0b",
-                                name: "Orange",
-                                bg: "bg-orange-50",
-                              },
-                              {
-                                color: "#ef4444",
-                                name: "Merah",
-                                bg: "bg-red-50",
-                              },
-                              {
-                                color: "#8b5cf6",
-                                name: "Ungu",
-                                bg: "bg-purple-50",
-                              },
-                              {
-                                color: "#06b6d4",
-                                name: "Cyan",
-                                bg: "bg-cyan-50",
-                              },
-                            ];
-                            const colorIndex = index % colors.length;
-                            const color = colors[colorIndex];
-
-                            return (
-                              <div
-                                key={index}
-                                className={`${color.bg} p-2 rounded-lg border-l-3 flex items-center justify-between`}
-                                style={{ borderLeftColor: color.color }}
-                              >
-                                <div className="flex items-center gap-2">
-                                  <div
-                                    className="w-3 h-3 rounded-full"
-                                    style={{ backgroundColor: color.color }}
-                                  ></div>
-                                  <div>
-                                    <div className="font-semibold text-gray-800 text-xs">
-                                      {index === 0
-                                        ? "Lokasi Utama"
-                                        : `Lokasi ${index + 1}`}
-                                    </div>
-                                    <div className="text-xs text-gray-600">
-                                      {color.name}
-                                    </div>
-                                  </div>
-                                </div>
-                                <button
-                                  onClick={() => handleDeletePolygon(index)}
-                                  className="text-red-500 hover:text-red-700 hover:bg-red-100 rounded p-1 transition-colors"
-                                  title="Hapus polygon"
-                                >
-                                  <span className="material-icons text-xs">
-                                    delete
-                                  </span>
-                                </button>
-                              </div>
-                            );
-                          })}
-                        </div>
-
-                        {polygonCoords.length < 3 && (
-                          <div className="mt-3 p-2 bg-blue-50 border border-blue-200 rounded-lg">
-                            <div className="flex items-center gap-1 text-blue-700">
-                              <span className="material-icons text-xs">
-                                info
-                              </span>
-                              <span className="text-xs">
-                                Gunakan tool di pojok kiri peta (maks 3)
-                              </span>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    ) : (
-                      <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-                        <div className="flex items-center gap-2 text-yellow-700">
-                          <span className="material-icons text-yellow-600 text-sm">
-                            warning
-                          </span>
-                          <div>
-                            <div className="font-semibold text-xs">
-                              Belum ada polygon
-                            </div>
-                            <div className="text-xs">
-                              Gunakan tool di pojok kiri peta
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="flex gap-2">
+                  <div className="flex items-center gap-1">
                     <button
-                      className="flex-1 px-4 py-2 bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white font-bold rounded-lg flex items-center justify-center gap-2 transition-all shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed text-sm"
-                      onClick={handleEdit}
-                      disabled={editLoading || polygonCoords.length === 0}
+                      className="text-white hover:bg-white/20 rounded-lg p-1 transition-colors"
+                      onClick={() => setIsPanelCollapsed(!isPanelCollapsed)}
+                      title={
+                        isPanelCollapsed
+                          ? "Tampilkan panel"
+                          : "Sembunyikan panel"
+                      }
                     >
-                      <span className="material-icons text-sm">save</span>
-                      <span>{editLoading ? "Saving..." : "Simpan"}</span>
+                      <span
+                        className={`material-icons text-sm transition-transform ${
+                          isPanelCollapsed ? "rotate-180" : ""
+                        }`}
+                      >
+                        keyboard_arrow_up
+                      </span>
                     </button>
-
                     <button
-                      className="flex-1 px-4 py-2 bg-gradient-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700 text-white font-bold rounded-lg flex items-center justify-center gap-2 transition-all shadow-md hover:shadow-lg text-sm"
+                      className="text-white hover:bg-white/20 rounded-lg p-1 transition-colors"
                       onClick={() => {
                         setEditId(null);
                         setPolygonCoords([]);
                       }}
+                      title="Tutup panel"
                     >
-                      <span className="material-icons text-sm">cancel</span>
-                      <span>Batal</span>
+                      <span className="material-icons text-sm">close</span>
                     </button>
                   </div>
                 </div>
+
+                {!isPanelCollapsed && (
+                  <div className="p-4">
+                    <div className="mb-4">
+                      {polygonCoords.length > 0 ? (
+                        <div>
+                          <div className="flex items-center gap-2 mb-3">
+                            <span className="material-icons text-emerald-600 text-sm">
+                              layers
+                            </span>
+                            <h4 className="font-semibold text-gray-800 text-sm">
+                              Polygon ({polygonCoords.length}/3)
+                            </h4>
+                          </div>
+
+                          <div className="space-y-2">
+                            {polygonCoords.map((polygon, index) => {
+                              const colors = [
+                                {
+                                  color: "#10b981",
+                                  name: "Hijau",
+                                  bg: "bg-emerald-50",
+                                },
+                                {
+                                  color: "#3b82f6",
+                                  name: "Biru",
+                                  bg: "bg-blue-50",
+                                },
+                                {
+                                  color: "#f59e0b",
+                                  name: "Orange",
+                                  bg: "bg-orange-50",
+                                },
+                                {
+                                  color: "#ef4444",
+                                  name: "Merah",
+                                  bg: "bg-red-50",
+                                },
+                                {
+                                  color: "#8b5cf6",
+                                  name: "Ungu",
+                                  bg: "bg-purple-50",
+                                },
+                                {
+                                  color: "#06b6d4",
+                                  name: "Cyan",
+                                  bg: "bg-cyan-50",
+                                },
+                              ];
+                              const colorIndex = index % colors.length;
+                              const color = colors[colorIndex];
+
+                              return (
+                                <div
+                                  key={index}
+                                  className={`${color.bg} p-2 rounded-lg border-l-3 flex items-center justify-between`}
+                                  style={{ borderLeftColor: color.color }}
+                                >
+                                  <div className="flex items-center gap-2">
+                                    <div
+                                      className="w-3 h-3 rounded-full"
+                                      style={{ backgroundColor: color.color }}
+                                    ></div>
+                                    <div>
+                                      <div className="font-semibold text-gray-800 text-xs">
+                                        {index === 0
+                                          ? "Lokasi Utama"
+                                          : `Lokasi ${index + 1}`}
+                                      </div>
+                                      <div className="text-xs text-gray-600">
+                                        {color.name}
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <div className="flex items-center gap-1">
+                                    <button
+                                      onClick={() => navigateToPolygon(index)}
+                                      className={`text-gray-500 hover:text-emerald-600 hover:bg-emerald-100 rounded p-1 transition-colors ${
+                                        selectedPolygonIndex === index
+                                          ? "text-emerald-600 bg-emerald-100"
+                                          : ""
+                                      }`}
+                                      title="Lihat lokasi ini"
+                                    >
+                                      <span className="material-icons text-xs">
+                                        my_location
+                                      </span>
+                                    </button>
+                                    <button
+                                      onClick={() => handleDeletePolygon(index)}
+                                      className="text-red-500 hover:text-red-700 hover:bg-red-100 rounded p-1 transition-colors"
+                                      title="Hapus polygon"
+                                    >
+                                      <span className="material-icons text-xs">
+                                        delete
+                                      </span>
+                                    </button>
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+
+                          {polygonCoords.length < 3 && (
+                            <div className="mt-3 p-2 bg-blue-50 border border-blue-200 rounded-lg">
+                              <div className="flex items-center gap-1 text-blue-700">
+                                <span className="material-icons text-xs">
+                                  info
+                                </span>
+                                <span className="text-xs">
+                                  Gunakan tool di pojok kiri peta (maks 3)
+                                </span>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      ) : (
+                        <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                          <div className="flex items-center gap-2 text-yellow-700">
+                            <span className="material-icons text-yellow-600 text-sm">
+                              warning
+                            </span>
+                            <div>
+                              <div className="font-semibold text-xs">
+                                Belum ada polygon
+                              </div>
+                              <div className="text-xs">
+                                Gunakan tool di pojok kiri peta
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="flex gap-2">
+                      <button
+                        className="flex-1 px-4 py-2 bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white font-bold rounded-lg flex items-center justify-center gap-2 transition-all shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                        onClick={handleEdit}
+                        disabled={editLoading || polygonCoords.length === 0}
+                      >
+                        <span className="material-icons text-sm">save</span>
+                        <span>{editLoading ? "Saving..." : "Simpan"}</span>
+                      </button>
+
+                      <button
+                        className="flex-1 px-4 py-2 bg-gradient-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700 text-white font-bold rounded-lg flex items-center justify-center gap-2 transition-all shadow-md hover:shadow-lg text-sm"
+                        onClick={() => {
+                          setEditId(null);
+                          setPolygonCoords([]);
+                        }}
+                      >
+                        <span className="material-icons text-sm">cancel</span>
+                        <span>Batal</span>
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
