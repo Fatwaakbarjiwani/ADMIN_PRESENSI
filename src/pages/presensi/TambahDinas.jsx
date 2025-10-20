@@ -288,11 +288,33 @@ export default function TambahDinas() {
                   >
                     <option value="">Semua Unit</option>
                     {Array.isArray(units) &&
-                      units.map((u) => (
-                        <option key={u.id} value={u.id}>
-                          {u.name}
-                        </option>
-                      ))}
+                      units.map((unit) => {
+                        const level = parseInt(unit?.level) || 0;
+                        const indent = "\u00A0".repeat(level * 4);
+
+                        // Icon berdasarkan level
+                        let icon = "";
+                        if (level === 0) {
+                          icon = "🏢"; // Building untuk level 0 (root)
+                        } else if (level === 1) {
+                          icon = "📁"; // Folder untuk level 1
+                        } else if (level === 2) {
+                          icon = "📂"; // Open folder untuk level 2
+                        } else if (level === 3) {
+                          icon = "📄"; // Document untuk level 3
+                        } else if (level === 4) {
+                          icon = "📋"; // Clipboard untuk level 4
+                        } else {
+                          icon = "🔗"; // Link untuk level 5+
+                        }
+
+                        return (
+                          <option key={unit.id} value={unit.id}>
+                            {indent}
+                            {icon} {unit?.nama}
+                          </option>
+                        );
+                      })}
                   </select>
                 </div>
               )}

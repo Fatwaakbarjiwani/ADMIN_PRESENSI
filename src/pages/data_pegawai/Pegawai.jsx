@@ -43,51 +43,60 @@ export default function Pegawai() {
           </div>
         </div>
       </div>
-      <div className="mx-auto p-4 max-w-5xl flex flex-col gap-8 px-2 md:px-0">
-        <div className="border border-gray-200 bg-white p-6 shadow flex flex-col gap-4">
-          <div className="flex justify-between items-start">
-            <div className="font-bold text-emerald-600 text-xl flex items-center gap-2 mb-2">
-              <span className="material-icons text-emerald-600 text-2xl">
+      <div className="mx-auto py-6 max-w-6xl px-4">
+        {/* Action Bar */}
+        <div className="flex justify-between items-center mb-6">
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => navigate("/tambah-karyawan-ke-unit-detail")}
+              className="px-4 py-2 bg-emerald-600 text-white font-bold text-sm hover:bg-emerald-700 transition flex items-center gap-2"
+            >
+              <span className="material-icons text-base">person_add</span>
+              Tambah Pegawai
+            </button>
+          </div>
+
+          {/* Search Filter */}
+          <div className="flex items-center gap-3">
+            <label className="text-sm font-medium text-gray-700">
+              Cari Pegawai:
+            </label>
+            <input
+              type="text"
+              placeholder="Cari Nama/NIK/Unit..."
+              value={searchValue}
+              onChange={handleSearch}
+              className="border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 min-w-[250px]"
+            />
+          </div>
+        </div>
+
+        {/* Data Table Section */}
+        <div className="bg-white border border-gray-200 shadow-sm">
+          {/* Section Header */}
+          <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
+            <div className="flex items-center gap-3">
+              <span className="material-icons text-emerald-600 text-xl">
                 people
               </span>
-              DATA PEGAWAI
-            </div>
-            <div className="flex items-end gap-2">
-              <div>
-                <span className="text-gray-400">
-                  <span className="text-xs">search :</span>
-                </span>
-                <div className="relative bg-white flex items-center">
-                  <input
-                    type="text"
-                    placeholder="Cari Nama/NIK/Unit"
-                    className="p-2 w-full rounded border border-gray-200 outline-none text-sm"
-                    value={searchValue}
-                    onChange={handleSearch}
-                  />
-                </div>
-              </div>
-              <button
-                className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded font-bold text-sm flex items-center gap-2"
-                onClick={() => navigate("/tambah-karyawan-ke-unit-detail")}
-              >
-                <span className="material-icons text-base">person_add</span>{" "}
-                Tambah Pegawai
-              </button>
+              <h2 className="text-lg font-semibold text-gray-800">
+                Data Pegawai
+              </h2>
             </div>
           </div>
 
+          {/* Table Section */}
           <div className="overflow-x-auto">
-            <table className="min-w-full text-sm bg-white">
-              <thead className="sticky top-0 z-10 bg-white border-b-2 border-emerald-100">
+            <table className="w-full text-sm">
+              <thead className="bg-gray-50 border-b border-gray-200">
                 <tr>
-                  <th className="px-2 py-3 text-center font-extrabold text-emerald-700 tracking-wide text-base uppercase w-12">
+                  <th className="px-4 py-3 text-center font-semibold text-gray-700 w-12">
                     No
                   </th>
-                  <th className="px-2 py-3 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-32">
+                  <th className="px-4 py-3 text-left font-semibold text-gray-700 w-32">
                     NIK
                   </th>
-                  <th className="px-2 py-3 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-56">
+                  <th className="px-4 py-3 text-left font-semibold text-gray-700 w-56">
                     <div className="flex flex-col leading-tight">
                       <span>Nama Lengkap</span>
                       <span className="text-xs font-normal text-gray-400 normal-case">
@@ -95,10 +104,10 @@ export default function Pegawai() {
                       </span>
                     </div>
                   </th>
-                  <th className="px-2 py-3 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-48">
+                  <th className="px-4 py-3 text-left font-semibold text-gray-700 w-48">
                     No. HP
                   </th>
-                  <th className="px-2 py-3 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-40">
+                  <th className="px-4 py-3 text-left font-semibold text-gray-700 w-40">
                     <div className="flex flex-col leading-tight">
                       <span>Unit</span>
                       <span className="text-xs font-normal text-gray-400 normal-case">
@@ -106,16 +115,16 @@ export default function Pegawai() {
                       </span>
                     </div>
                   </th>
-                  <th className="px-2 py-3 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-32">
+                  <th className="px-4 py-3 text-left font-semibold text-gray-700 w-32">
                     Tempat Lahir
                   </th>
-                  <th className="px-2 py-3 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-32">
+                  <th className="px-4 py-3 text-left font-semibold text-gray-700 w-32">
                     Tanggal Lahir
                   </th>
-                  <th className="px-2 py-3 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-32">
+                  <th className="px-4 py-3 text-left font-semibold text-gray-700 w-32">
                     Jenis Kelamin
                   </th>
-                  <th className="px-2 py-3 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-32">
+                  <th className="px-4 py-3 text-left font-semibold text-gray-700 w-32">
                     Shift
                   </th>
                 </tr>
@@ -125,54 +134,55 @@ export default function Pegawai() {
                   data?.map((row, idx) => (
                     <tr
                       key={row.id}
-                      className={
-                        "transition hover:bg-emerald-50 " +
-                        (idx % 2 === 0 ? "bg-white" : "bg-gray-50")
-                      }
+                      className="border-b border-gray-200 hover:bg-gray-50 transition-colors"
                     >
-                      <td className="px-4 py-3 text-center align-middle border-b border-gray-100 font-semibold">
+                      <td className="px-4 py-3 text-center text-gray-600 font-medium">
                         {idx + 1 + (pagination.current_page - 1) * 20}
                       </td>
-                      <td className="px-4 py-3 align-middle border-b border-gray-100">
-                        {row.no_ktp}
-                      </td>
-                      <td className="px-4 py-3 truncate font-bold align-middle border-b border-gray-100 text-emerald-800">
+                      <td className="px-4 py-3 text-gray-600">{row.no_ktp}</td>
+                      <td className="px-4 py-3 font-semibold text-gray-800">
                         {row.nama}
                       </td>
-                      <td className="px-4 py-3 align-middle border-b border-gray-100">
-                        {row.no_hp}
-                      </td>
-                      <td className="px-4 py-3 align-middle border-b border-gray-100 font-bold text-emerald-700">
+                      <td className="px-4 py-3 text-gray-600">{row.no_hp}</td>
+                      <td className="px-4 py-3">
                         {row?.nama_unit ? (
-                          <span className="inline-block bg-emerald-100 text-emerald-700 px-2 py-0.5 text-xs font-bold">
+                          <span className="inline-flex items-center px-2 py-1 text-xs font-medium bg-emerald-100 text-emerald-700">
                             {row.nama_unit}
                           </span>
                         ) : (
-                          <span className="inline-block bg-gray-100 text-gray-400 px-2 py-0.5 text-xs">
+                          <span className="inline-flex items-center px-2 py-1 text-xs font-medium bg-gray-100 text-gray-400">
                             -
                           </span>
                         )}
                       </td>
-                      <td className="px-4 py-3 align-middle border-b border-gray-100 whitespace-nowrap">
+                      <td className="px-4 py-3 text-gray-600 whitespace-nowrap">
                         {row.tmpt_lahir}
                       </td>
-                      <td className="px-4 py-3 align-middle border-b border-gray-100 whitespace-nowrap">
+                      <td className="px-4 py-3 text-gray-600 whitespace-nowrap">
                         {row.tgl_lahir}
                       </td>
-                      <td className="px-4 py-3 align-middle border-b border-gray-100">
-                        {row.jenis_kelamin === "l"
-                          ? "Laki-laki"
-                          : row.jenis_kelamin === "p"
-                          ? "Perempuan"
-                          : "-"}
+                      <td className="px-4 py-3">
+                        {row.jenis_kelamin === "l" ? (
+                          <span className="inline-flex items-center px-2 py-1 text-xs font-medium bg-blue-100 text-blue-700">
+                            Laki-laki
+                          </span>
+                        ) : row.jenis_kelamin === "p" ? (
+                          <span className="inline-flex items-center px-2 py-1 text-xs font-medium bg-pink-100 text-pink-700">
+                            Perempuan
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center px-2 py-1 text-xs font-medium bg-gray-100 text-gray-400">
+                            -
+                          </span>
+                        )}
                       </td>
-                      <td className="px-4 py-3 align-middle border-b border-gray-100 font-bold text-emerald-700">
+                      <td className="px-4 py-3">
                         {row?.nama_shift ? (
-                          <span className="inline-block bg-emerald-100 text-emerald-700 px-2 py-0.5 text-xs font-bold">
+                          <span className="inline-flex items-center px-2 py-1 text-xs font-medium bg-emerald-100 text-emerald-700">
                             {row.nama_shift}
                           </span>
                         ) : (
-                          <span className="inline-block bg-gray-100 text-gray-400 px-2 py-0.5 text-xs">
+                          <span className="inline-flex items-center px-2 py-1 text-xs font-medium bg-gray-100 text-gray-400">
                             -
                           </span>
                         )}
@@ -181,8 +191,15 @@ export default function Pegawai() {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={7} className="text-center text-gray-400 py-4">
-                      Tidak ada data ditemukan.
+                    <td colSpan={9} className="text-center text-gray-400 py-8">
+                      <div className="flex flex-col items-center gap-2">
+                        <span className="material-icons text-4xl text-gray-300">
+                          people
+                        </span>
+                        <div className="font-semibold text-gray-600">
+                          Tidak ada data pegawai.
+                        </div>
+                      </div>
                     </td>
                   </tr>
                 )}
@@ -190,8 +207,9 @@ export default function Pegawai() {
             </table>
           </div>
 
+          {/* Pagination */}
           {pagination.last_page > 1 && (
-            <div className="flex flex-wrap gap-1 justify-center mt-4">
+            <div className="flex flex-wrap gap-1 justify-center p-4 bg-gray-50 border-t border-gray-200">
               {pagination.links.map((link, i) => (
                 <button
                   key={i}

@@ -8,11 +8,11 @@ import {
   deleteAdmin,
 } from "../../redux/actions/adminAction";
 import { fetchAllUnit } from "../../redux/actions/unitDetailAction";
-import {
-  // createUnit,
-  // updateUnit,
-  // deleteUnit,
-} from "../../redux/actions/unitAction";
+// import {
+//   createUnit,
+//   updateUnit,
+//   deleteUnit,
+// } from "../../redux/actions/unitAction";
 
 export default function ManajemenAdmin() {
   const user = useSelector((state) => state.auth.user);
@@ -289,255 +289,330 @@ export default function ManajemenAdmin() {
           </div>
         </div>
       </div>
-      <div className="mx-auto py-4 max-w-5xl flex flex-col gap-6">
+      <div className="mx-auto py-6 max-w-6xl px-4">
         {/* Tab Navigation */}
-        <div className="flex border-b border-gray-200 bg-white shadow-sm rounded-t-lg">
-          <button
-            className={`px-6 py-3 font-semibold text-sm transition-colors ${
-              activeTab === "admin"
-                ? "text-emerald-600 border-b-2 border-emerald-600 bg-emerald-50"
-                : "text-gray-600 hover:text-emerald-600 hover:bg-gray-50"
-            }`}
-            onClick={() => setActiveTab("admin")}
-          >
-            <span className="material-icons text-lg mr-2">
-              admin_panel_settings
-            </span>
-            Admin Unit
-          </button>
-          <button
-            className={`px-6 py-3 font-semibold text-sm transition-colors ${
-              activeTab === "unit"
-                ? "text-emerald-600 border-b-2 border-emerald-600 bg-emerald-50"
-                : "text-gray-600 hover:text-emerald-600 hover:bg-gray-50"
-            }`}
-            onClick={() => setActiveTab("unit")}
-          >
-            <span className="material-icons text-lg mr-2">business</span>
-            Unit
-          </button>
+        <div className="bg-white border-b border-gray-200 shadow-sm">
+          <div className="flex">
+            <button
+              className={`px-6 py-4 font-semibold text-sm transition-colors flex items-center gap-2 ${
+                activeTab === "admin"
+                  ? "text-emerald-600 border-b-2 border-emerald-600 bg-emerald-50"
+                  : "text-gray-600 hover:text-emerald-600 hover:bg-gray-50"
+              }`}
+              onClick={() => setActiveTab("admin")}
+            >
+              <span className="material-icons text-lg">
+                admin_panel_settings
+              </span>
+              Admin Unit
+            </button>
+            <button
+              className={`px-6 py-4 font-semibold text-sm transition-colors flex items-center gap-2 ${
+                activeTab === "unit"
+                  ? "text-emerald-600 border-b-2 border-emerald-600 bg-emerald-50"
+                  : "text-gray-600 hover:text-emerald-600 hover:bg-gray-50"
+              }`}
+              onClick={() => setActiveTab("unit")}
+            >
+              <span className="material-icons text-lg">business</span>
+              Unit
+            </button>
+          </div>
         </div>
 
         {/* Admin Tab */}
         {activeTab === "admin" && (
-          <div className="border border-gray-200 bg-white p-6 shadow-sm rounded-b-lg">
-            <div className="font-bold text-emerald-600 text-xl flex items-center gap-2 mb-4">
-              <span className="material-icons text-emerald-600 text-2xl">
-                admin_panel_settings
-              </span>
-              DATA ADMIN UNIT
+          <div className="bg-white border border-gray-200 shadow-sm">
+            {/* Section Header */}
+            <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
+              <div className="flex items-center gap-3">
+                <span className="material-icons text-emerald-600 text-xl">
+                  admin_panel_settings
+                </span>
+                <h2 className="text-lg font-semibold text-gray-800">
+                  Data Admin Unit
+                </h2>
+              </div>
             </div>
-            <form
-              className="flex flex-wrap gap-4 mb-6 items-end"
-              onSubmit={handleSubmit}
-            >
-              <div className="flex flex-col flex-1 min-w-[160px]">
-                <label className="text-sm font-semibold text-gray-600 mb-2">
-                  Nama
-                </label>
-                <input
-                  className="border border-gray-300 px-3 py-2 text-sm rounded"
-                  placeholder="Nama"
-                  value={form.name}
-                  onChange={(e) =>
-                    setForm((f) => ({ ...f, name: e.target.value }))
-                  }
-                  disabled={formLoading}
-                  required
-                />
-              </div>
-              <div className="flex flex-col flex-1 min-w-[160px]">
-                <label className="text-sm font-semibold text-gray-600 mb-2">
-                  Email
-                </label>
-                <input
-                  className="border border-gray-300 px-3 py-2 text-sm rounded"
-                  placeholder="Email"
-                  value={form.email}
-                  onChange={(e) =>
-                    setForm((f) => ({ ...f, email: e.target.value }))
-                  }
-                  disabled={formLoading}
-                  required
-                />
-              </div>
-              <div className="flex flex-col flex-1 min-w-[120px] relative">
-                <label className="text-sm font-semibold text-gray-600 mb-2">
-                  Password
-                </label>
-                <input
-                  className="border border-gray-300 px-3 py-2 text-sm pr-10 rounded"
-                  placeholder="Password"
-                  type={showPassword ? "text" : "password"}
-                  value={form.password}
-                  onChange={(e) =>
-                    setForm((f) => ({ ...f, password: e.target.value }))
-                  }
-                  disabled={formLoading}
-                  required={!form.id}
-                />
-                <button
-                  type="button"
-                  className="absolute right-2 top-1/2 text-gray-400 hover:text-emerald-600"
-                  tabIndex={-1}
-                  onClick={() => setShowPassword((v) => !v)}
-                  style={{ background: "none", border: "none", padding: 0 }}
-                  title={
-                    showPassword ? "Sembunyikan Password" : "Tampilkan Password"
-                  }
-                >
-                  <span className="material-icons text-lg">
-                    {showPassword ? "visibility_off" : "visibility"}
-                  </span>
-                </button>
-              </div>
-              <div className="flex flex-col min-w-[120px]">
-                <label className="text-sm font-semibold text-gray-600 mb-2">
-                  Unit
-                </label>
-                <select
-                  className="border border-gray-300 px-3 py-2 text-sm rounded"
-                  value={form.unit_id}
-                  onChange={(e) =>
-                    setForm((f) => ({ ...f, unit_id: e.target.value }))
-                  }
-                  disabled={formLoading}
-                  required
-                >
-                  <option value="">Pilih Unit</option>
-                  {units.map((u) => (
-                    <option key={u.id} value={u.id}>
-                      {u?.nama}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div className="flex flex-col min-w-[100px]">
-                <label className="text-sm font-semibold text-gray-600 mb-2">
-                  Status
-                </label>
-                <select
-                  className="border border-gray-300 px-3 py-2 text-sm rounded"
-                  value={form.status}
-                  onChange={(e) =>
-                    setForm((f) => ({ ...f, status: e.target.value }))
-                  }
-                  disabled={formLoading}
-                  required
-                >
-                  <option value="aktif">Aktif</option>
-                  <option value="nonaktif">Nonaktif</option>
-                </select>
-              </div>
-              <div className="flex flex-col justify-end min-w-[120px]">
-                <button
-                  type="submit"
-                  className={`px-4 py-2 font-bold text-sm transition-colors rounded ${
-                    form.id
-                      ? "bg-yellow-500 hover:bg-yellow-600 text-white"
-                      : "bg-emerald-600 hover:bg-emerald-700 text-white"
-                  }`}
-                  disabled={formLoading}
-                >
-                  {formLoading && (
-                    <span className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></span>
-                  )}
-                  {form.id
-                    ? formLoading
-                      ? "Menyimpan..."
-                      : "Simpan Perubahan"
-                    : formLoading
-                    ? "Menambah..."
-                    : "Tambah"}
-                </button>
-              </div>
+
+            {/* Form Section */}
+            <div className="p-6 border-b border-gray-200">
+              <form onSubmit={handleSubmit}>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      Nama Admin
+                    </label>
+                    <input
+                      className="w-full border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                      placeholder="Masukkan nama admin"
+                      value={form.name}
+                      onChange={(e) =>
+                        setForm((f) => ({ ...f, name: e.target.value }))
+                      }
+                      disabled={formLoading}
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      Email
+                    </label>
+                    <input
+                      className="w-full border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                      placeholder="Masukkan email"
+                      value={form.email}
+                      onChange={(e) =>
+                        setForm((f) => ({ ...f, email: e.target.value }))
+                      }
+                      disabled={formLoading}
+                      required
+                    />
+                  </div>
+
+                  <div className="relative">
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      Password
+                    </label>
+                    <input
+                      className="w-full border border-gray-300 px-3 py-2 pr-10 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                      placeholder="Masukkan password"
+                      type={showPassword ? "text" : "password"}
+                      value={form.password}
+                      onChange={(e) =>
+                        setForm((f) => ({ ...f, password: e.target.value }))
+                      }
+                      disabled={formLoading}
+                      required={!form.id}
+                    />
+                    <button
+                      type="button"
+                      className="absolute right-2 top-8 text-gray-400 hover:text-emerald-600"
+                      onClick={() => setShowPassword((v) => !v)}
+                      title={
+                        showPassword
+                          ? "Sembunyikan Password"
+                          : "Tampilkan Password"
+                      }
+                    >
+                      <span className="material-icons text-lg">
+                        {showPassword ? "visibility_off" : "visibility"}
+                      </span>
+                    </button>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      Unit
+                    </label>
+                    <select
+                      className="w-full border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                      value={form.unit_id}
+                      onChange={(e) =>
+                        setForm((f) => ({ ...f, unit_id: e.target.value }))
+                      }
+                      disabled={formLoading}
+                      required
+                    >
+                      <option value="">Pilih Unit</option>
+                      {units.map((unit) => {
+                        const level = parseInt(unit?.level) || 0;
+                        const indent = "\u00A0".repeat(level * 4);
+
+                        // Icon berdasarkan level
+                        let icon = "";
+                        if (level === 0) {
+                          icon = "🏢"; // Building untuk level 0 (root)
+                        } else if (level === 1) {
+                          icon = "📁"; // Folder untuk level 1
+                        } else if (level === 2) {
+                          icon = "📂"; // Open folder untuk level 2
+                        } else if (level === 3) {
+                          icon = "📄"; // Document untuk level 3
+                        } else if (level === 4) {
+                          icon = "📋"; // Clipboard untuk level 4
+                        } else {
+                          icon = "🔗"; // Link untuk level 5+
+                        }
+
+                        return (
+                          <option key={unit.id} value={unit.id}>
+                            {indent}
+                            {icon} {unit?.nama}
+                          </option>
+                        );
+                      })}
+                    </select>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        Status
+                      </label>
+                      <select
+                        className="border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                        value={form.status}
+                        onChange={(e) =>
+                          setForm((f) => ({ ...f, status: e.target.value }))
+                        }
+                        disabled={formLoading}
+                      >
+                        <option value="aktif">Aktif</option>
+                        <option value="nonaktif">Nonaktif</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <button
+                      type="submit"
+                      disabled={formLoading}
+                      className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2 text-sm font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                    >
+                      {formLoading ? (
+                        <>
+                          <span className="material-icons text-sm animate-spin">
+                            hourglass_empty
+                          </span>
+                          Loading...
+                        </>
+                      ) : form.id ? (
+                        <>
+                          <span className="material-icons text-sm">edit</span>
+                          Update Admin
+                        </>
+                      ) : (
+                        <>
+                          <span className="material-icons text-sm">add</span>
+                          Tambah Admin
+                        </>
+                      )}
+                    </button>
+                    {form.id && (
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setForm({
+                            id: null,
+                            name: "",
+                            email: "",
+                            password: "",
+                            role: "admin_unit",
+                            unit_id: "",
+                            status: "aktif",
+                          })
+                        }
+                        className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 text-sm font-semibold transition-colors flex items-center gap-2"
+                      >
+                        <span className="material-icons text-sm">cancel</span>
+                        Batal
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </form>
               {form.id && (
-                <div className="flex flex-col justify-end min-w-[80px]">
-                  <button
-                    type="button"
-                    className="px-4 py-2 font-bold text-sm bg-gray-300 hover:bg-gray-400 text-gray-700 rounded transition-colors"
-                    onClick={() =>
-                      setForm({
-                        id: null,
-                        name: "",
-                        email: "",
-                        password: "",
-                        role: "admin_unit",
-                        unit_id: "",
-                        status: "aktif",
-                      })
-                    }
-                    disabled={formLoading}
-                  >
-                    Batal
-                  </button>
+                <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200">
+                  <div className="flex items-center gap-2 text-yellow-700 font-medium">
+                    <span className="material-icons text-lg">edit</span>
+                    Edit Admin: {form.name} ({form.email})
+                  </div>
                 </div>
               )}
-            </form>
-            {form.id && (
-              <div className="mb-4 text-sm text-yellow-700 font-semibold bg-yellow-50 px-3 py-2 rounded">
-                Edit Admin: {form.name} ({form.email})
-              </div>
-            )}
+            </div>
 
             {/* Filter Section */}
-            <div className="mb-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-              <div className="flex items-center gap-2 bg-white">
-                <label className="text-sm font-semibold text-gray-600">
-                  Filter Unit:
-                </label>
-                <select
-                  className="border border-gray-300 px-3 py-2 text-sm min-w-[160px] rounded"
-                  value={filterUnit}
-                  onChange={(e) => setFilterUnit(e.target.value)}
-                >
-                  <option value="">Semua Unit</option>
-                  {units.map((u) => (
-                    <option key={u.id} value={u.id}>
-                      {u.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="flex items-center gap-1 bg-white border border-gray-200 shadow-sm px-3 py-1.5 rounded">
-                  <span className="material-icons text-emerald-600 text-lg">
-                    verified_user
-                  </span>
-                  <span className="text-xs text-emerald-600">Super Admin</span>
+            <div className="p-6 border-b border-gray-200 bg-gray-50">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-2 px-3 py-1 bg-white border border-gray-200">
+                    <span className="material-icons text-emerald-600 text-lg">
+                      verified_user
+                    </span>
+                    <span className="text-sm text-emerald-600 font-medium">
+                      Super Admin
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2 px-3 py-1 bg-white border border-gray-200">
+                    <span className="material-icons text-gray-600 text-lg">
+                      person
+                    </span>
+                    <span className="text-sm text-gray-600 font-medium">
+                      Admin Unit
+                    </span>
+                  </div>
                 </div>
-                <div className="flex items-center gap-1 bg-white border border-gray-200 shadow-sm px-3 py-1.5 rounded">
-                  <span className="material-icons text-gray-600 text-lg">
-                    person
-                  </span>
-                  <span className="text-xs text-gray-600">Admin Unit</span>
+
+                <div className="flex items-center gap-3">
+                  <label className="text-sm font-medium text-gray-700">
+                    Filter Unit:
+                  </label>
+                  <select
+                    className="border border-gray-300 px-3 py-1 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                    value={filterUnit}
+                    onChange={(e) => setFilterUnit(e.target.value)}
+                  >
+                    <option value="">Semua Unit</option>
+                    {units.map((unit) => {
+                      const level = parseInt(unit?.level) || 0;
+                      const indent = "\u00A0".repeat(level * 4);
+
+                      // Icon berdasarkan level
+                      let icon = "";
+                      if (level === 0) {
+                        icon = "🏢"; // Building untuk level 0 (root)
+                      } else if (level === 1) {
+                        icon = "📁"; // Folder untuk level 1
+                      } else if (level === 2) {
+                        icon = "📂"; // Open folder untuk level 2
+                      } else if (level === 3) {
+                        icon = "📄"; // Document untuk level 3
+                      } else if (level === 4) {
+                        icon = "📋"; // Clipboard untuk level 4
+                      } else {
+                        icon = "🔗"; // Link untuk level 5+
+                      }
+
+                      return (
+                        <option key={unit.id} value={unit.id}>
+                          {indent}
+                          {icon} {unit?.nama}
+                        </option>
+                      );
+                    })}
+                  </select>
                 </div>
               </div>
             </div>
 
+            {/* Table Section */}
             <div className="overflow-x-auto">
-              <table className="min-w-full text-sm bg-white">
-                <thead className="sticky top-0 z-10 bg-white border-b-2 border-emerald-100">
+              <table className="w-full text-sm">
+                <thead className="bg-gray-50 border-b border-gray-200">
                   <tr>
-                    <th className="px-4 py-4 text-center font-extrabold text-emerald-700 tracking-wide text-base uppercase w-12">
+                    <th className="px-4 py-3 text-center font-semibold text-gray-700 w-12">
                       No
                     </th>
-                    <th className="px-4 py-4 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-40">
+                    <th className="px-4 py-3 text-left font-semibold text-gray-700">
                       Nama
                     </th>
-                    <th className="px-4 py-4 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-40">
+                    <th className="px-4 py-3 text-left font-semibold text-gray-700">
                       Email
                     </th>
-                    <th className="px-4 py-4 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-24">
+                    <th className="px-4 py-3 text-center font-semibold text-gray-700 w-20">
                       Role
                     </th>
-                    <th className="px-4 py-4 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-32">
+                    <th className="px-4 py-3 text-left font-semibold text-gray-700">
                       Unit
                     </th>
-                    <th className="px-4 py-4 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-24">
+                    <th className="px-4 py-3 text-center font-semibold text-gray-700 w-20">
                       Status
                     </th>
-                    <th className="px-4 py-4 text-center font-extrabold text-emerald-700 tracking-wide text-base uppercase w-24">
+                    <th className="px-4 py-3 text-center font-semibold text-gray-700 w-24">
                       Aksi
                     </th>
                   </tr>
@@ -557,66 +632,63 @@ export default function ManajemenAdmin() {
                     ).map((row, idx) => (
                       <tr
                         key={`admin-${row?.id || idx}`}
-                        className={
-                          "transition hover:bg-emerald-50 " +
-                          (idx % 2 === 0 ? "bg-white" : "bg-gray-50")
-                        }
+                        className="border-b border-gray-200 hover:bg-gray-50 transition-colors"
                       >
-                        <td className="px-4 py-4 text-center align-middle border-b border-gray-100 font-semibold text-base">
+                        <td className="px-4 py-3 text-center text-gray-600 font-medium">
                           {idx + 1}
                         </td>
-                        <td className="px-4 py-4 align-middle border-b border-gray-100 font-bold text-emerald-800 text-base">
+                        <td className="px-4 py-3 font-semibold text-gray-800">
                           {row.name}
                         </td>
-                        <td className="px-4 py-4 align-middle border-b border-gray-100 text-base">
-                          {row.email}
-                        </td>
-                        <td className="px-4 py-4 align-middle border-b border-gray-100 text-base text-center">
+                        <td className="px-4 py-3 text-gray-600">{row.email}</td>
+                        <td className="px-4 py-3 text-center">
                           {row.role === "super_admin" ? (
                             <span
-                              className="material-icons text-emerald-600 text-2xl"
+                              className="material-icons text-emerald-600 text-xl"
                               title="Super Admin"
                             >
                               verified_user
                             </span>
                           ) : (
                             <span
-                              className="material-icons text-gray-600 text-2xl"
+                              className="material-icons text-gray-600 text-xl"
                               title="Admin Unit"
                             >
                               person
                             </span>
                           )}
                         </td>
-                        <td className="px-4 py-4 align-middle border-b border-gray-100 text-base">
-                          {row.unit?.name || "-"}
+                        <td className="px-4 py-3 text-gray-600">
+                          {row.unit?.nama || "-"}
                         </td>
-                        <td className="px-4 py-4 align-middle border-b border-gray-100 text-base font-bold">
+                        <td className="px-4 py-3 text-center">
                           {row.status === "aktif" ? (
-                            <span className="text-emerald-700">Aktif</span>
+                            <span className="inline-flex items-center px-2 py-1 text-xs font-medium bg-emerald-100 text-emerald-700">
+                              Aktif
+                            </span>
                           ) : (
-                            <span className="text-red-700">Nonaktif</span>
+                            <span className="inline-flex items-center px-2 py-1 text-xs font-medium bg-red-100 text-red-700">
+                              Nonaktif
+                            </span>
                           )}
                         </td>
-                        <td className="px-4 py-4 text-center align-middle border-b border-gray-100">
-                          <div className="flex gap-1 justify-center">
+                        <td className="px-4 py-3 text-center">
+                          <div className="flex justify-center gap-2">
                             <button
-                              className="w-8 h-8 flex items-center justify-center text-yellow-600 hover:text-yellow-800 rounded transition-colors"
-                              onClick={() => row && handleEdit(row)}
-                              disabled={formLoading}
-                              title="Edit"
+                              onClick={() => handleEdit(row)}
+                              className="p-1 text-emerald-600 hover:text-emerald-800 hover:bg-emerald-50 transition-colors"
+                              title="Edit Admin"
                             >
-                              <span className="material-icons text-base">
+                              <span className="material-icons text-lg">
                                 edit
                               </span>
                             </button>
                             <button
-                              className="w-8 h-8 flex items-center justify-center text-red-600 hover:text-red-800 rounded transition-colors"
-                              onClick={() => handleDelete(row?.id)}
-                              disabled={formLoading}
-                              title="Hapus"
+                              onClick={() => handleDelete(row.id)}
+                              className="p-1 text-red-600 hover:text-red-800 hover:bg-red-50 transition-colors"
+                              title="Hapus Admin"
                             >
-                              <span className="material-icons text-base">
+                              <span className="material-icons text-lg">
                                 delete
                               </span>
                             </button>
@@ -649,14 +721,22 @@ export default function ManajemenAdmin() {
 
         {/* Unit Tab */}
         {activeTab === "unit" && (
-          <div className="border border-gray-200 bg-white p-6 shadow-sm rounded-b-lg">
-            <div className="font-bold text-emerald-600 text-xl flex items-center gap-2 mb-4">
-              <span className="material-icons text-emerald-600 text-2xl">
-                business
-              </span>
-              Data Unit
+          <div className="bg-white border border-gray-200 shadow-sm">
+            {/* Section Header */}
+            <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
+              <div className="flex items-center gap-3">
+                <span className="material-icons text-emerald-600 text-xl">
+                  business
+                </span>
+                <h2 className="text-lg font-semibold text-gray-800">
+                  Data Unit
+                </h2>
+              </div>
             </div>
-            {/* <form
+
+            {/* Content */}
+            <div className="p-6">
+              {/* <form
               className="flex flex-wrap gap-4 mb-6 items-end"
               onSubmit={handleUnitSubmit}
             >
@@ -720,59 +800,59 @@ export default function ManajemenAdmin() {
                 Edit Unit: {unitForm?.name || ""}
               </div>
             )} */}
-            <div className="overflow-x-auto">
-              <table className="min-w-full text-sm bg-white">
-                <thead className="sticky top-0 z-10 bg-white border-b-2 border-emerald-100">
-                  <tr>
-                    <th className="px-4 py-4 text-center font-extrabold text-emerald-700 tracking-wide text-base uppercase w-12">
-                      No
-                    </th>
-                    <th className="px-4 py-4 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase">
-                      Nama Unit
-                    </th>
-                    <th className="px-4 py-4 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase">
-                      Detail Unit
-                    </th>
-                    {/* <th className="px-4 py-4 text-center font-extrabold text-emerald-700 tracking-wide text-base uppercase w-24">
+              <div className="overflow-x-auto">
+                <table className="min-w-full text-sm bg-white">
+                  <thead className="sticky top-0 z-10 bg-white border-b-2 border-emerald-100">
+                    <tr>
+                      <th className="px-4 py-4 text-center font-extrabold text-emerald-700 tracking-wide text-base uppercase w-12">
+                        No
+                      </th>
+                      <th className="px-4 py-4 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase">
+                        Nama Unit
+                      </th>
+                      <th className="px-4 py-4 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase">
+                        Detail Unit
+                      </th>
+                      {/* <th className="px-4 py-4 text-center font-extrabold text-emerald-700 tracking-wide text-base uppercase w-24">
                       Aksi
                     </th> */}
-                  </tr>
-                </thead>
-                <tbody>
-                  {units ? (
-                    units.map((row, idx) => (
-                      <tr
-                        key={idx}
-                        className={
-                          "transition hover:bg-emerald-50 " +
-                          (idx % 2 === 0 ? "bg-white" : "bg-gray-50")
-                        }
-                      >
-                        <td className="px-4 py-4 text-center align-middle border-b border-gray-100 font-semibold text-base">
-                          {idx + 1}
-                        </td>
-                        <td className="px-4 py-4 align-middle border-b border-gray-100 font-bold text-emerald-800 text-base">
-                          {row?.nama}
-                        </td>
-                        <td className="px-4 py-4 align-middle border-b border-gray-100 text-base">
-                          {row?.children?.length > 0 ? (
-                            <div className="flex flex-wrap gap-1">
-                              {row?.children?.map((detail) => (
-                                <span
-                                  key={detail?.id || Math.random()}
-                                  className="inline-block bg-emerald-100 text-emerald-800 text-xs px-2 py-1 rounded"
-                                >
-                                  {detail?.nama || "Unknown"}
-                                </span>
-                              ))}
-                            </div>
-                          ) : (
-                            <span className="text-gray-400">
-                              Tidak ada detail
-                            </span>
-                          )}
-                        </td>
-                        {/* <td className="px-4 py-4 text-center align-middle border-b border-gray-100">
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {units ? (
+                      units.map((row, idx) => (
+                        <tr
+                          key={idx}
+                          className={
+                            "transition hover:bg-emerald-50 " +
+                            (idx % 2 === 0 ? "bg-white" : "bg-gray-50")
+                          }
+                        >
+                          <td className="px-4 py-4 text-center align-middle border-b border-gray-100 font-semibold text-base">
+                            {idx + 1}
+                          </td>
+                          <td className="px-4 py-4 align-middle border-b border-gray-100 font-bold text-emerald-800 text-base">
+                            {row?.nama}
+                          </td>
+                          <td className="px-4 py-4 align-middle border-b border-gray-100 text-base">
+                            {row?.children?.length > 0 ? (
+                              <div className="flex flex-wrap gap-1">
+                                {row?.children?.map((detail) => (
+                                  <span
+                                    key={detail?.id || Math.random()}
+                                    className="inline-block bg-emerald-100 text-emerald-800 text-xs px-2 py-1 rounded"
+                                  >
+                                    {detail?.nama || "Unknown"}
+                                  </span>
+                                ))}
+                              </div>
+                            ) : (
+                              <span className="text-gray-400">
+                                Tidak ada detail
+                              </span>
+                            )}
+                          </td>
+                          {/* <td className="px-4 py-4 text-center align-middle border-b border-gray-100">
                           <div className="flex gap-1 justify-center">
                             <button
                               className="w-8 h-8 flex items-center justify-center text-yellow-600 hover:text-yellow-800 rounded transition-colors"
@@ -796,27 +876,28 @@ export default function ManajemenAdmin() {
                             </button>
                           </div>
                         </td> */}
-                      </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td
-                        colSpan={4}
-                        className="text-center text-gray-400 py-8"
-                      >
-                        <div className="flex flex-col items-center gap-2">
-                          <span className="material-icons text-4xl text-gray-300">
-                            business
-                          </span>
-                          <div className="font-semibold text-gray-600">
-                            Tidak ada data unit.
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td
+                          colSpan={4}
+                          className="text-center text-gray-400 py-8"
+                        >
+                          <div className="flex flex-col items-center gap-2">
+                            <span className="material-icons text-4xl text-gray-300">
+                              business
+                            </span>
+                            <div className="font-semibold text-gray-600">
+                              Tidak ada data unit.
+                            </div>
                           </div>
-                        </div>
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         )}

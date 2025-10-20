@@ -19,13 +19,11 @@ import axios from "axios";
 
 const kampusCenter = [-6.954089024622504, 110.45883246944116];
 
-// Helper function untuk memvalidasi dan membersihkan data polygon
 const validateAndCleanPolygonData = (data) => {
   if (!data || !Array.isArray(data)) {
     return [];
   }
 
-  // Jika data adalah array of arrays (multiple polygon)
   if (Array.isArray(data[0])) {
     const validPolygons = data.filter(
       (polygon) =>
@@ -40,15 +38,14 @@ const validateAndCleanPolygonData = (data) => {
             !isNaN(coord[0]) &&
             !isNaN(coord[1]) &&
             coord[0] >= -90 &&
-            coord[0] <= 90 && // latitude valid
+            coord[0] <= 90 &&
             coord[1] >= -180 &&
-            coord[1] <= 180 // longitude valid
+            coord[1] <= 180
         )
     );
     return validPolygons;
   }
 
-  // Jika data adalah single polygon array (seperti data yang Anda berikan)
   if (
     data.length >= 3 &&
     data.every(
@@ -60,12 +57,12 @@ const validateAndCleanPolygonData = (data) => {
         !isNaN(coord[0]) &&
         !isNaN(coord[1]) &&
         coord[0] >= -90 &&
-        coord[0] <= 90 && // latitude valid
+        coord[0] <= 90 &&
         coord[1] >= -180 &&
-        coord[1] <= 180 // longitude valid
+        coord[1] <= 180
     )
   ) {
-    return [data]; // Wrap dalam array untuk konsistensi
+    return [data];
   }
 
   return [];
@@ -73,90 +70,34 @@ const validateAndCleanPolygonData = (data) => {
 
 export default function AturLokasi() {
   const mapRef = useRef(null);
-  const [polygonCoords, setPolygonCoords] = useState([]); // Array of polygon arrays
-  // const [form, setForm] = useState({ name: "" });
-  // const user = useSelector((state) => state.auth.user);
+  const [polygonCoords, setPolygonCoords] = useState([]);
   const dispatch = useDispatch();
   const [editId, setEditId] = useState(null);
-  // const [editForm, setEditForm] = useState({ name: "" });
   const [editLoading, setEditLoading] = useState(false);
+  const [mapLoading, setMapLoading] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
   const token = useSelector((state) => state.auth.token);
   const drawnItemsRef = useRef();
-  const layerIndexMapRef = useRef(new Map()); // Untuk mapping layer dengan index
+  const layerIndexMapRef = useRef(new Map());
 
-  // Ambil data unit detail dari redux
   const unitDetails = useSelector((state) => state.unitDetail.data);
-  // const units = useSelector((state) => state.unitDetail.units);
-  // const isSuperAdmin = user?.role === "super_admin";
+
+  // Filter unit details based on search term
+  const filteredUnits = unitDetails.filter(
+    (unit) =>
+      unit.nama?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      unit.level?.toString().includes(searchTerm)
+  );
 
   useEffect(() => {
     if (editLoading == false) {
       dispatch(fetchUnitDetails());
-      // dispatch(fetchAllUnit());
     }
-    // if (user?.role !== "super_admin" && editLoading == false) {
-    //   dispatch(fetchUnitDetailByUserId(user?.unit_id));
-    // }
   }, [dispatch, editLoading]);
 
-  // const handleCreate = () => {
-  //   if (
-  //     !form.name.trim() ||
-  //     polygonCoords.length === 0 ||
-  //     (isSuperAdmin && !form.unit_id)
-  //   ) {
-  //     Swal.fire({
-  //       icon: "error",
-  //       title: isSuperAdmin
-  //         ? "Pilih unit, lengkapi nama detail dan gambar area!"
-  //         : "Lengkapi nama detail dan gambar area!",
-  //     });
-  //     return;
-  //   }
-  //   setEditLoading(true);
-  //   if (isSuperAdmin) {
-  //     // Super admin: kirim unit_id
-
-  //     dispatch(
-  //       createUnitDetailV1(
-  //         { name: form.name, lokasi: polygonCoords, unit_id: form.unit_id },
-  //         () => {
-  //           setForm({ name: "", unit_id: "" });
-  //           setPolygonCoords([]);
-  //         }
-  //       )
-  //     ).finally(() => setEditLoading(false));
-  //   } else {
-  //     // Admin unit: tanpa unit_id
-  //     dispatch(
-  //       createUnitDetailV2(form.name, polygonCoords, () => {
-  //         setForm({ name: "" });
-  //         setPolygonCoords([]);
-  //       })
-  //     ).finally(() => setEditLoading(false));
-  //   }
-  // };
-
-  // const handleDelete = (id) => {
-  //   setEditLoading(true);
-  //   Swal.fire({
-  //     title: "Yakin hapus unit detail ini?",
-  //     icon: "warning",
-  //     showCancelButton: true,
-  //     confirmButtonColor: "#d33",
-  //     cancelButtonColor: "#3085d6",
-  //     confirmButtonText: "Ya, Hapus",
-  //     cancelButtonText: "Batal",
-  //   }).then((result) => {
-  //     if (result.isConfirmed) {
-  //       dispatch(deleteUnitDetail(id)).finally(() => setEditLoading(false));
-  //     }
-  //   });
-  // };
-
-  // Handler untuk mulai edit
   const handleStartEdit = async (id) => {
     setEditLoading(true);
+    setMapLoading(true);
     try {
       const res = await axios.get(
         `${import.meta.env.VITE_API_URL}/api/unit-detail/get-by-unit-id/${id}`,
@@ -168,12 +109,9 @@ export default function AturLokasi() {
       );
       const data = res.data;
       setEditId(id);
-      // Pastikan data valid sebelum set polygonCoords
       if (data && data.length > 0 && data[0]) {
         const unitDetail = data[0];
         const allPolygons = [];
-
-        // Ambil semua lokasi yang ada (lokasi, lokasi2, lokasi3, dst)
         Object.keys(unitDetail).forEach((key) => {
           if (
             key.startsWith("lokasi") &&
@@ -182,18 +120,13 @@ export default function AturLokasi() {
           ) {
             const lokasiData = unitDetail[key];
 
-            // Cek apakah data adalah array of coordinates (format: [[lat,lng], [lat,lng], ...])
             if (Array.isArray(lokasiData[0]) && lokasiData[0].length === 2) {
-              // Format: [[lat,lng], [lat,lng], ...] - single polygon
               allPolygons.push(lokasiData);
-            }
-            // Cek apakah data adalah array of arrays of coordinates (format: [[[lat,lng], [lat,lng], ...], [[lat,lng], [lat,lng], ...], ...])
-            else if (
+            } else if (
               Array.isArray(lokasiData[0]) &&
               Array.isArray(lokasiData[0][0]) &&
               lokasiData[0][0].length === 2
             ) {
-              // Format: [[[lat,lng], [lat,lng], ...], [[lat,lng], [lat,lng], ...], ...] - multiple polygons
               lokasiData.forEach((polygon) => {
                 allPolygons.push(polygon);
               });
@@ -209,31 +142,36 @@ export default function AturLokasi() {
       Swal.fire({ icon: "error", title: "Gagal mengambil data unit detail" });
     }
     setEditLoading(false);
+
+    // Hide loading after map is ready
+    setTimeout(() => {
+      setMapLoading(false);
+      // Force map refresh after loading is hidden
+      if (mapRef.current && mapRef.current._leaflet_map) {
+        mapRef.current._leaflet_map.invalidateSize();
+      }
+    }, 800);
   };
 
-  // Handler untuk menghapus polygon
   const handleDeletePolygon = (index) => {
-    // Update polygonCoords dengan array kosong untuk polygon yang dihapus
     const newPolygonCoords = [...polygonCoords];
     newPolygonCoords[index] = [];
     setPolygonCoords(newPolygonCoords);
 
-    // Clear polygon dari map dan re-render
     if (drawnItemsRef.current) {
       drawnItemsRef.current.clearLayers();
-      // Re-render semua polygon kecuali yang dihapus
       setTimeout(() => {
         const drawnItems = drawnItemsRef.current;
 
         newPolygonCoords.forEach((coords, idx) => {
           if (coords && Array.isArray(coords) && coords.length >= 3) {
             const colors = [
-              { color: "#10b981", fillColor: "#10b981" }, // Hijau
-              { color: "#3b82f6", fillColor: "#3b82f6" }, // Biru
-              { color: "#f59e0b", fillColor: "#f59e0b" }, // Orange
-              { color: "#ef4444", fillColor: "#ef4444" }, // Merah
-              { color: "#8b5cf6", fillColor: "#8b5cf6" }, // Ungu
-              { color: "#06b6d4", fillColor: "#06b6d4" }, // Cyan
+              { color: "#10b981", fillColor: "#10b981" },
+              { color: "#3b82f6", fillColor: "#3b82f6" },
+              { color: "#f59e0b", fillColor: "#f59e0b" },
+              { color: "#ef4444", fillColor: "#ef4444" },
+              { color: "#8b5cf6", fillColor: "#8b5cf6" },
+              { color: "#06b6d4", fillColor: "#06b6d4" },
             ];
 
             const colorIndex = idx % colors.length;
@@ -256,29 +194,25 @@ export default function AturLokasi() {
     }
   };
 
-  // Handler submit edit
   const handleEdit = async () => {
     setEditLoading(true);
     try {
-      // Format data untuk request edit
       const requestData = {};
 
-      // Selalu kirim lokasi (polygon pertama)
       if (polygonCoords.length > 0) {
         requestData.lokasi = polygonCoords[0];
       }
 
-      // Kirim lokasi2 dan lokasi3 jika ada
       if (polygonCoords.length > 1) {
         requestData.lokasi2 = polygonCoords[1];
       } else {
-        requestData.lokasi2 = []; // Kosongkan lokasi2 jika tidak ada
+        requestData.lokasi2 = [];
       }
 
       if (polygonCoords.length > 2) {
         requestData.lokasi3 = polygonCoords[2];
       } else {
-        requestData.lokasi3 = []; // Kosongkan lokasi3 jika tidak ada
+        requestData.lokasi3 = [];
       }
 
       await axios.put(
@@ -293,7 +227,6 @@ export default function AturLokasi() {
         }
       );
       setEditId(null);
-      // setEditForm({ name: "" });
       setPolygonCoords([]);
       dispatch(fetchUnitDetails());
       Swal.fire({ icon: "success", title: "Unit detail berhasil diupdate" });
@@ -304,25 +237,42 @@ export default function AturLokasi() {
   };
 
   useEffect(() => {
-    if (!mapRef.current) return;
+    if (!editId) return;
 
-    // Prevent double-initialization
-    if (mapRef.current._leaflet_map) {
-      mapRef.current._leaflet_map.remove();
-      mapRef.current._leaflet_map = null;
+    const mapElement = mapRef.current;
+    if (!mapElement) return;
+
+    if (mapElement._leaflet_map) {
+      return;
     }
 
-    const map = L.map(mapRef.current).setView(kampusCenter, 17);
-    if (mapRef.current) {
-      mapRef.current._leaflet_map = map;
+    const map = L.map(mapElement).setView(kampusCenter, 17);
+    if (mapElement) {
+      mapElement._leaflet_map = map;
     }
 
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
       attribution:
         '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      maxZoom: 19,
+      loadingTimeout: 10000,
     }).addTo(map);
 
-    // Tambahkan search control
+    // Force map to refresh and invalidate size
+    setTimeout(() => {
+      if (map) {
+        map.invalidateSize();
+      }
+    }, 100);
+
+    // Additional refresh when map container is ready
+    setTimeout(() => {
+      if (map) {
+        map.invalidateSize();
+        map.setView(kampusCenter, 17);
+      }
+    }, 300);
+
     L.Control.geocoder({
       defaultMarkGeocode: true,
     })
@@ -331,12 +281,9 @@ export default function AturLokasi() {
       })
       .addTo(map);
 
-    // Tambahkan feature group untuk hasil gambar
     const drawnItems = new L.FeatureGroup();
     map.addLayer(drawnItems);
     drawnItemsRef.current = drawnItems;
-
-    // Tambahkan draw control
     const drawControl = new L.Control.Draw({
       draw: {
         polygon: {
@@ -361,12 +308,9 @@ export default function AturLokasi() {
     });
     map.addControl(drawControl);
 
-    // Handler saat polygon baru dibuat
     map.on(L.Draw.Event.CREATED, function (e) {
-      // Cek jumlah polygon yang sudah ada
       const currentLayers = drawnItems.getLayers();
       if (currentLayers.length >= 3) {
-        // Hapus polygon yang baru dibuat karena sudah maksimal
         drawnItems.removeLayer(e.layer);
         Swal.fire({
           icon: "warning",
@@ -376,29 +320,22 @@ export default function AturLokasi() {
         return;
       }
 
-      // Tidak clear layers lagi, biarkan polygon lama tetap ada
       drawnItems.addLayer(e.layer);
       updatePolygonCoords();
     });
 
-    // Handler saat polygon diedit
     map.on(L.Draw.Event.EDITED, function () {
       updatePolygonCoords();
     });
 
-    // Handler saat polygon dihapus
     map.on(L.Draw.Event.DELETED, function () {
-      // Gunakan updatePolygonCoords untuk memastikan state terupdate dengan benar
       setTimeout(() => {
         updatePolygonCoords();
       }, 100);
     });
-
-    // Fungsi untuk update koordinat dari semua polygon di drawnItems
     function updatePolygonCoords() {
       const layers = drawnItems.getLayers();
       if (layers.length > 0) {
-        // Ambil semua polygon, bukan hanya yang pertama
         const allPolygons = layers
           .map((layer) => {
             try {
@@ -411,7 +348,6 @@ export default function AturLokasi() {
                 latlng.lat,
                 latlng.lng,
               ]);
-              // Hapus titik duplikat jika ada
               if (
                 latlngs.length > 1 &&
                 latlngs[0][0] === latlngs[latlngs.length - 1][0] &&
@@ -424,7 +360,7 @@ export default function AturLokasi() {
               return null;
             }
           })
-          .filter((polygon) => polygon !== null); // Filter out null polygons
+          .filter((polygon) => polygon !== null);
 
         const validPolygons = validateAndCleanPolygonData(allPolygons);
         setPolygonCoords(validPolygons);
@@ -432,32 +368,21 @@ export default function AturLokasi() {
         setPolygonCoords([]);
       }
     }
-
-    // Clean up map on unmount or when showCreate becomes false
     return () => {
-      if (mapRef.current && mapRef.current._leaflet_map) {
-        mapRef.current._leaflet_map.remove();
-        mapRef.current._leaflet_map = null;
+      if (mapElement && mapElement._leaflet_map) {
+        mapElement._leaflet_map.remove();
+        mapElement._leaflet_map = null;
       }
     };
-  }, []);
+  }, [editId]);
 
-  // Tambahkan efek untuk render polygon saat edit
   useEffect(() => {
-    // Tambahkan delay untuk memastikan map sudah siap
+    if (!editId || !mapRef.current || !drawnItemsRef.current) {
+      return;
+    }
+
     const timer = setTimeout(() => {
       try {
-        if (
-          !editId ||
-          !Array.isArray(polygonCoords) ||
-          !polygonCoords.length ||
-          !mapRef.current ||
-          !drawnItemsRef.current
-        ) {
-          return;
-        }
-
-        // Pastikan map sudah siap
         if (!mapRef.current._leaflet_map) {
           return;
         }
@@ -465,14 +390,15 @@ export default function AturLokasi() {
         const map = mapRef.current._leaflet_map;
         const drawnItems = drawnItemsRef.current;
         drawnItems.clearLayers();
-        // Clear mapping
         layerIndexMapRef.current.clear();
+
+        if (!Array.isArray(polygonCoords) || !polygonCoords.length) {
+          return;
+        }
 
         polygonCoords.forEach((coords, index) => {
           try {
-            // Data coords adalah array of coordinates, langsung gunakan
             if (coords && Array.isArray(coords) && coords.length >= 3) {
-              // Validasi koordinat
               const validCoords = coords.filter(
                 (coord) =>
                   Array.isArray(coord) &&
@@ -482,27 +408,25 @@ export default function AturLokasi() {
               );
 
               if (validCoords.length >= 3) {
-                // Validasi koordinat lebih lanjut
                 const isValidCoords = validCoords.every(
                   (coord) =>
                     coord[0] >= -90 &&
-                    coord[0] <= 90 && // latitude valid
+                    coord[0] <= 90 &&
                     coord[1] >= -180 &&
-                    coord[1] <= 180 && // longitude valid
+                    coord[1] <= 180 &&
                     !isNaN(coord[0]) &&
-                    !isNaN(coord[1]) // bukan NaN
+                    !isNaN(coord[1])
                 );
 
                 if (isValidCoords) {
                   try {
-                    // Warna berbeda untuk setiap polygon
                     const colors = [
-                      { color: "#10b981", fillColor: "#10b981" }, // Hijau
-                      { color: "#3b82f6", fillColor: "#3b82f6" }, // Biru
-                      { color: "#f59e0b", fillColor: "#f59e0b" }, // Orange
-                      { color: "#ef4444", fillColor: "#ef4444" }, // Merah
-                      { color: "#8b5cf6", fillColor: "#8b5cf6" }, // Ungu
-                      { color: "#06b6d4", fillColor: "#06b6d4" }, // Cyan
+                      { color: "#10b981", fillColor: "#10b981" },
+                      { color: "#3b82f6", fillColor: "#3b82f6" },
+                      { color: "#f59e0b", fillColor: "#f59e0b" },
+                      { color: "#ef4444", fillColor: "#ef4444" },
+                      { color: "#8b5cf6", fillColor: "#8b5cf6" },
+                      { color: "#06b6d4", fillColor: "#06b6d4" },
                     ];
 
                     const colorIndex = index % colors.length;
@@ -512,7 +436,6 @@ export default function AturLokasi() {
                       fillOpacity: 0.2,
                     });
 
-                    // Tambahkan popup dengan nama lokasi
                     const lokasiName =
                       index === 0 ? "Lokasi" : `Lokasi${index + 1}`;
                     polygon.bindPopup(
@@ -520,47 +443,52 @@ export default function AturLokasi() {
                     );
 
                     drawnItems.addLayer(polygon);
-                    // Simpan mapping layer dengan index dan tambahkan custom property
                     layerIndexMapRef.current.set(polygon, index);
-                    polygon._polygonIndex = index; // Tambahkan custom property
+                    polygon._polygonIndex = index;
 
-                    // Fit bounds untuk polygon pertama atau gabungan semua
                     if (index === 0) {
                       map.fitBounds(polygon.getBounds());
                     } else {
-                      // Gabungkan bounds dari semua polygon
                       const currentBounds = map.getBounds();
                       const newBounds = polygon.getBounds();
                       const combinedBounds = currentBounds.extend(newBounds);
                       map.fitBounds(combinedBounds);
                     }
-                  } catch {
-                    // Error handling
+                  } catch (error) {
+                    console.error("Error creating polygon:", error);
                   }
                 }
               }
             }
-          } catch {
-            // Error handling
+          } catch (error) {
+            console.error("Error processing polygon:", error);
           }
         });
-      } catch {
-        // Error handling
+      } catch (error) {
+        console.error("Error in polygon rendering:", error);
       }
-    }, 300); // Delay 300ms
+    }, 100);
 
     return () => clearTimeout(timer);
   }, [editId, polygonCoords]);
 
-  // Bersihkan polygon di peta saat batal edit
   useEffect(() => {
     if (!editId && drawnItemsRef.current) {
       drawnItemsRef.current.clearLayers();
+      setMapLoading(false);
+    }
+  }, [editId]);
+
+  // Reset search when exiting edit mode
+  useEffect(() => {
+    if (!editId) {
+      setSearchTerm("");
     }
   }, [editId]);
 
   return (
     <div className="w-full min-h-screen font-sans bg-gray-50">
+      {/* Header */}
       <div className="px-4 sticky z-50 top-0 py-4 border-b border-gray-200 bg-white flex items-center gap-4">
         <span className="material-icons text-lg text-green-200 bg-primary p-2 rounded opacity-80">
           add_location_alt
@@ -574,243 +502,311 @@ export default function AturLokasi() {
           </div>
         </div>
       </div>
-      <div className="mx-auto max-w-5xl p-4 flex flex-col gap-8 px-2 md:px-0">
-        <div className="flex flex-col md:flex-row  items-start gap-8">
-          {/* Kiri: Daftar unit detail */}
-          <div className="flex-1">
-            <div className="font-bold text-emerald-700 text-lg mb-2">
-              DAFTAR UNIT DETAIL
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {unitDetails.map((u) => (
-                <div
-                  key={u.id}
-                  className="bg-white border border-gray-200 rounded-xl shadow-md p-2 flex flex-col gap-2 min-h-[140px] transition hover:shadow-lg hover:border-emerald-400"
-                >
-                  <div className="flex w-full items-center justify-between gap-2">
-                    <div className="flex flex-col gap-1">
-                      <div className="flex items-center gap-2">
-                        <span className="material-icons text-emerald-400 text-2xl">
-                          apartment
-                        </span>
-                        <span className="font-bold text-lg text-emerald-700 text-sm">
-                          Level. {u.level}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-2 text-gray-600 text-sm">
-                        <span className="material-icons text-emerald-400 text-base">
-                          location_on
-                        </span>
-                        <span className="text-xs">{u.nama}</span>
-                      </div>
-                    </div>
-                    <div>
-                      <button
-                        className="flex items-center justify-center w-8 h-8 rounded-full transition hover:bg-slate-100 focus:bg-slate-200"
-                        onClick={() => {
-                          handleStartEdit(u.id);
-                        }}
-                        disabled={editLoading && editId === u.id}
-                        title="Edit"
-                      >
-                        {editLoading && editId === u.id ? (
-                          <span className="animate-spin inline-block align-middle">
-                            <svg
-                              className="w-5 h-5 text-yellow-500"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                            >
-                              <circle
-                                className="opacity-25"
-                                cx="12"
-                                cy="12"
-                                r="10"
-                                stroke="currentColor"
-                                strokeWidth="4"
-                              ></circle>
-                              <path
-                                className="opacity-75"
-                                fill="currentColor"
-                                d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-                              ></path>
-                            </svg>
-                          </span>
-                        ) : (
-                          <span className="material-icons text-yellow-500 text-xl">
-                            edit
-                          </span>
-                        )}
-                      </button>
-                      {/* <button
-                        className="flex items-center justify-center w-8 h-8 rounded-full transition hover:bg-slate-100 focus:bg-slate-200"
-                        onClick={() => handleDelete(u.id)}
-                        title="Hapus"
-                      >
-                        <span className="material-icons text-red-500 text-xl">
-                          delete
-                        </span>
-                      </button> */}
-                    </div>
-                  </div>
-                  <div className="flex flex-col gap-0.5 mt-2 text-xs text-gray-500">
-                    <div>
-                      Created:{" "}
-                      {new Date(u.created_at).toLocaleString("id-ID", {
-                        day: "2-digit",
-                        month: "long",
-                        year: "numeric",
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
-                    </div>
-                    <div>
-                      Updated:{" "}
-                      {new Date(u.updated_at).toLocaleString("id-ID", {
-                        day: "2-digit",
-                        month: "long",
-                        year: "numeric",
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-          {/* Kanan: Form create/edit unit detail */}
-          <div className="flex-1 sticky top-24">
-            <div className="font-bold text-emerald-700 text-lg mb-2">
-              {/* {editId ? "EDIT UNIT DETAIL" : "TAMBAH UNIT DETAIL"} */}
-              {editId ? "EDIT UNIT DETAIL" : ""}
-            </div>
-            {editId && polygonCoords.length > 0 && (
-              <div className="text-sm text-gray-600 mb-2">
-                <div className="mb-2">
-                  Jumlah polygon: {polygonCoords.length}/3
-                  {polygonCoords.length > 1 && (
-                    <span className="text-xs">
-                      {" "}
-                      (Lokasi
-                      {Array.from({ length: polygonCoords.length }, (_, i) =>
-                        i === 0 ? "" : i + 1
-                      ).join(", ")}
-                      )
+
+      <main className="flex-1">
+        {!editId ? (
+          <section className="bg-white min-h-screen">
+            <div className="max-w-5xl mx-auto px-2 py-8">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-semibold text-gray-800 flex items-center gap-2">
+                  <span className="material-icons text-emerald-600">
+                    apartment
+                  </span>
+                  Pilih Unit Detail untuk Edit Lokasi
+                </h2>
+                <span className="text-sm text-gray-500">
+                  {filteredUnits.length} dari {unitDetails.length} unit
+                </span>
+              </div>
+
+              {/* Search Bar */}
+              <div className="mb-6">
+                <div className="relative max-w-md">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <span className="material-icons text-gray-400 text-lg">
+                      search
                     </span>
+                  </div>
+                  <input
+                    type="text"
+                    placeholder="Cari unit berdasarkan nama atau level..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-sm"
+                  />
+                  {searchTerm && (
+                    <button
+                      onClick={() => setSearchTerm("")}
+                      className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                    >
+                      <span className="material-icons text-gray-400 hover:text-gray-600 text-lg">
+                        clear
+                      </span>
+                    </button>
                   )}
                 </div>
-                <div className="space-y-1">
-                  {polygonCoords.map((polygon, index) => {
-                    const colors = [
-                      { color: "#10b981", name: "Hijau" }, // Hijau
-                      { color: "#3b82f6", name: "Biru" }, // Biru
-                      { color: "#f59e0b", name: "Orange" }, // Orange
-                      { color: "#ef4444", name: "Merah" }, // Merah
-                      { color: "#8b5cf6", name: "Ungu" }, // Ungu
-                      { color: "#06b6d4", name: "Cyan" }, // Cyan
-                    ];
-                    const colorIndex = index % colors.length;
-                    const color = colors[colorIndex];
+              </div>
 
-                    return (
-                      <div
-                        key={index}
-                        className="flex items-center justify-between bg-gray-50 p-2 rounded border-l-4"
-                        style={{ borderLeftColor: color.color }}
-                      >
-                        <div className="flex items-center gap-2">
-                          <div
-                            className="w-3 h-3 rounded-full"
-                            style={{ backgroundColor: color.color }}
-                          ></div>
-                          <span className="text-xs font-medium">
-                            {index === 0 ? "Lokasi" : `Lokasi${index + 1}`}
-                          </span>
-                          <span className="text-xs text-gray-500">
-                            ({color.name})
-                          </span>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {filteredUnits.length > 0 ? (
+                  filteredUnits.map((unit) => (
+                    <div
+                      key={unit.id}
+                      className="relative bg-white border-2 border-gray-200 rounded-xl shadow-sm p-6 transition-all duration-200 cursor-pointer group hover:border-emerald-300 hover:shadow-lg"
+                      onClick={() => {
+                        if (!editLoading) {
+                          handleStartEdit(unit.id);
+                        }
+                      }}
+                    >
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="flex-1">
+                          {/* Building Info */}
+                          <div className="flex items-start gap-3">
+                            <div className="flex items-center justify-center w-12 h-12 bg-emerald-100 rounded-lg flex-shrink-0">
+                              <span className="material-icons text-emerald-600 text-xl">
+                                business
+                              </span>
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <h3 className="font-bold text-gray-800 text-lg leading-tight mb-1">
+                                {unit.nama || "Nama tidak tersedia"}
+                              </h3>
+                              <div className="flex items-center gap-2">
+                                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700">
+                                  Level {unit.level}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
                         </div>
-                        <button
-                          onClick={() => handleDeletePolygon(index)}
-                          className="text-red-500 hover:text-red-700 text-xs px-2 py-1 rounded hover:bg-red-50"
-                        >
-                          Hapus
-                        </button>
+
+                        {/* Action Button */}
+                        <div className="flex-shrink-0">
+                          <div className="w-10 h-10 flex items-center justify-center bg-gray-100 text-gray-400 group-hover:bg-emerald-100 group-hover:text-emerald-600 rounded-lg transition-colors">
+                            <span className="material-icons text-xl">edit</span>
+                          </div>
+                        </div>
                       </div>
-                    );
-                  })}
+                    </div>
+                  ))
+                ) : (
+                  <div className="col-span-full flex flex-col items-center justify-center py-12 text-center">
+                    <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                      <span className="material-icons text-gray-400 text-2xl">
+                        search_off
+                      </span>
+                    </div>
+                    <h3 className="text-lg font-semibold text-gray-700 mb-2">
+                      Tidak ada unit ditemukan
+                    </h3>
+                    <p className="text-gray-500 text-sm mb-4">
+                      Tidak ada unit yang cocok dengan pencarian &ldquo;
+                      {searchTerm}&rdquo;
+                    </p>
+                    <button
+                      onClick={() => setSearchTerm("")}
+                      className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg text-sm font-medium transition-colors"
+                    >
+                      Hapus Filter
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          </section>
+        ) : (
+          <div className="relative w-full h-screen">
+            <div ref={mapRef} className="w-full h-full" />
+
+            {/* Map Loading Indicator */}
+            {mapLoading && (
+              <div className="absolute inset-0 bg-white/80 flex items-center justify-center z-[999]">
+                <div className="bg-white rounded-xl shadow-lg p-6 flex flex-col items-center gap-4">
+                  <div className="w-12 h-12 border-4 border-emerald-200 border-t-emerald-600 rounded-full animate-spin"></div>
+                  <div className="text-center">
+                    <div className="font-semibold text-gray-800">
+                      Memuat Peta
+                    </div>
+                    <div className="text-sm text-gray-600">
+                      Mohon tunggu sebentar...
+                    </div>
+                  </div>
                 </div>
               </div>
             )}
-            <div className="mb-2">
-              {/* {isSuperAdmin && !editId && (
-                <select
-                  className="w-full px-3 py-2 border border-gray-300 rounded mb-2"
-                  value={form.unit_id || ""}
-                  onChange={(e) =>
-                    setForm((f) => ({ ...f, unit_id: e.target.value }))
-                  }
-                  disabled={editLoading}
-                >
-                  <option value="">Pilih Unit</option>
-                  {units.map((unit) => (
-                    <option key={unit.id} value={unit.id}>
-                      {unit.name}
-                    </option>
-                  ))}
-                </select>
-              )} */}
-              {/* <input
-                className="w-full px-3 py-2 border border-gray-300 rounded mb-2"
-                placeholder="Nama Unit Detail"
-                value={editId ? editForm.name : form.name}
-                onChange={(e) =>
-                  editId
-                    ? setEditForm((f) => ({ ...f, name: e.target.value }))
-                    : setForm((f) => ({ ...f, name: e.target.value }))
-                }
-                disabled={editLoading}
-              /> */}
-              {/* Map tetap di sini, polygonCoords tetap dipakai untuk create/edit */}
-              <div
-                ref={mapRef}
-                className="w-full h-64 rounded border border-emerald-200 mb-2"
-              />
-              <button
-                className={`px-4 py-2 ${
-                  editId && "bg-yellow-500 hover:bg-yellow-600"
-                  // editId
-                  //   ? "bg-yellow-500 hover:bg-yellow-600"
-                  //   : "bg-emerald-600 hover:bg-emerald-700"
-                } text-white font-bold rounded w-full`}
-                // onClick={editId ? handleEdit : handleCreate}
-                onClick={editId && handleEdit}
-                disabled={editLoading}
-              >
-                {editId
-                  ? editLoading
-                    ? "Menyimpan..."
-                    : "Simpan Perubahan"
-                  : " "}
-              </button>
 
-              {editId && (
-                <button
-                  className="mt-2 px-4 py-2 bg-gray-300 hover:bg-gray-400 text-gray-700 font-bold rounded w-full"
-                  onClick={() => {
-                    setEditId(null);
-                    // setEditForm({ name: "" });
-                    setPolygonCoords([]);
-                  }}
-                  // disabled={editLoading}
-                >
-                  Batal Edit
-                </button>
-              )}
+            <div className="absolute top-6 right-6 z-[1000] w-96">
+              <div className="bg-white rounded-2xl shadow-2xl border-2 border-emerald-500 overflow-hidden">
+                <div className="bg-gradient-to-r from-emerald-500 to-emerald-600 px-4 py-3 flex items-center justify-between">
+                  <div className="flex items-center gap-2 text-white">
+                    <div className="w-6 h-6 bg-white/20 rounded-lg flex items-center justify-center">
+                      <span className="material-icons text-white text-sm">
+                        edit_location
+                      </span>
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-xs">EDIT LOKASI</h3>
+                      <p className="text-xs opacity-90">Gambar polygon area</p>
+                    </div>
+                  </div>
+                  <button
+                    className="text-white hover:bg-white/20 rounded-lg p-1 transition-colors"
+                    onClick={() => {
+                      setEditId(null);
+                      setPolygonCoords([]);
+                    }}
+                    title="Tutup panel"
+                  >
+                    <span className="material-icons text-sm">close</span>
+                  </button>
+                </div>
+
+                <div className="p-4">
+                  <div className="mb-4">
+                    {polygonCoords.length > 0 ? (
+                      <div>
+                        <div className="flex items-center gap-2 mb-3">
+                          <span className="material-icons text-emerald-600 text-sm">
+                            layers
+                          </span>
+                          <h4 className="font-semibold text-gray-800 text-sm">
+                            Polygon ({polygonCoords.length}/3)
+                          </h4>
+                        </div>
+
+                        <div className="space-y-2">
+                          {polygonCoords.map((polygon, index) => {
+                            const colors = [
+                              {
+                                color: "#10b981",
+                                name: "Hijau",
+                                bg: "bg-emerald-50",
+                              },
+                              {
+                                color: "#3b82f6",
+                                name: "Biru",
+                                bg: "bg-blue-50",
+                              },
+                              {
+                                color: "#f59e0b",
+                                name: "Orange",
+                                bg: "bg-orange-50",
+                              },
+                              {
+                                color: "#ef4444",
+                                name: "Merah",
+                                bg: "bg-red-50",
+                              },
+                              {
+                                color: "#8b5cf6",
+                                name: "Ungu",
+                                bg: "bg-purple-50",
+                              },
+                              {
+                                color: "#06b6d4",
+                                name: "Cyan",
+                                bg: "bg-cyan-50",
+                              },
+                            ];
+                            const colorIndex = index % colors.length;
+                            const color = colors[colorIndex];
+
+                            return (
+                              <div
+                                key={index}
+                                className={`${color.bg} p-2 rounded-lg border-l-3 flex items-center justify-between`}
+                                style={{ borderLeftColor: color.color }}
+                              >
+                                <div className="flex items-center gap-2">
+                                  <div
+                                    className="w-3 h-3 rounded-full"
+                                    style={{ backgroundColor: color.color }}
+                                  ></div>
+                                  <div>
+                                    <div className="font-semibold text-gray-800 text-xs">
+                                      {index === 0
+                                        ? "Lokasi Utama"
+                                        : `Lokasi ${index + 1}`}
+                                    </div>
+                                    <div className="text-xs text-gray-600">
+                                      {color.name}
+                                    </div>
+                                  </div>
+                                </div>
+                                <button
+                                  onClick={() => handleDeletePolygon(index)}
+                                  className="text-red-500 hover:text-red-700 hover:bg-red-100 rounded p-1 transition-colors"
+                                  title="Hapus polygon"
+                                >
+                                  <span className="material-icons text-xs">
+                                    delete
+                                  </span>
+                                </button>
+                              </div>
+                            );
+                          })}
+                        </div>
+
+                        {polygonCoords.length < 3 && (
+                          <div className="mt-3 p-2 bg-blue-50 border border-blue-200 rounded-lg">
+                            <div className="flex items-center gap-1 text-blue-700">
+                              <span className="material-icons text-xs">
+                                info
+                              </span>
+                              <span className="text-xs">
+                                Gunakan tool di pojok kiri peta (maks 3)
+                              </span>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                        <div className="flex items-center gap-2 text-yellow-700">
+                          <span className="material-icons text-yellow-600 text-sm">
+                            warning
+                          </span>
+                          <div>
+                            <div className="font-semibold text-xs">
+                              Belum ada polygon
+                            </div>
+                            <div className="text-xs">
+                              Gunakan tool di pojok kiri peta
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="flex gap-2">
+                    <button
+                      className="flex-1 px-4 py-2 bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white font-bold rounded-lg flex items-center justify-center gap-2 transition-all shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                      onClick={handleEdit}
+                      disabled={editLoading || polygonCoords.length === 0}
+                    >
+                      <span className="material-icons text-sm">save</span>
+                      <span>{editLoading ? "Saving..." : "Simpan"}</span>
+                    </button>
+
+                    <button
+                      className="flex-1 px-4 py-2 bg-gradient-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700 text-white font-bold rounded-lg flex items-center justify-center gap-2 transition-all shadow-md hover:shadow-lg text-sm"
+                      onClick={() => {
+                        setEditId(null);
+                        setPolygonCoords([]);
+                      }}
+                    >
+                      <span className="material-icons text-sm">cancel</span>
+                      <span>Batal</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      </div>
+        )}
+      </main>
     </div>
   );
 }

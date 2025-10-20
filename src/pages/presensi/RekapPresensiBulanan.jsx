@@ -51,8 +51,62 @@ export default function RekapPresensiBulanan() {
   const [tahunLaukPauk, setTahunLaukPauk] = useState(new Date().getFullYear());
   const [rekapLaukPauk, setRekapLaukPauk] = useState([]);
   const [loadingLaukPauk, setLoadingLaukPauk] = useState(false);
+
+  // State untuk checklist lembur - menggunakan kombinasi ID dan index
+  const [selectedLembur, setSelectedLembur] = useState([]);
+
+  // Fungsi untuk handle checklist lembur - menggunakan index sebagai identifier
+  const handleLemburCheckbox = (index) => {
+    console.log("=== DEBUG CHECKBOX ===");
+    console.log("Clicked index:", index);
+    console.log("Current selectedLembur:", selectedLembur);
+
+    setSelectedLembur((prev) => {
+      if (prev.includes(index)) {
+        const newSelection = prev.filter((idx) => idx !== index);
+        console.log("Removing, new selection:", newSelection);
+        return newSelection;
+      } else {
+        const newSelection = [...prev, index];
+        console.log("Adding, new selection:", newSelection);
+        return newSelection;
+      }
+    });
+  };
+
+  // Fungsi untuk select all - menggunakan index
+  const handleSelectAllLembur = () => {
+    if (!lemburData || lemburData.length === 0) return;
+
+    if (selectedLembur.length === lemburData.length) {
+      setSelectedLembur([]);
+    } else {
+      setSelectedLembur(lemburData.map((_, index) => index));
+    }
+  };
   // lembur
   const [loadingLembur, setLoadingLembur] = useState(false);
+
+  // Reset checklist ketika data lembur berubah
+  useEffect(() => {
+    console.log("=== LEMBUR DATA CHANGED ===");
+    console.log("New lemburData:", lemburData);
+    if (lemburData) {
+      console.log(
+        "IDs in lemburData:",
+        lemburData.map((item) => item.id)
+      );
+      console.log("Unique IDs:", [
+        ...new Set(lemburData.map((item) => item.id)),
+      ]);
+      console.log(
+        "Has duplicates:",
+        lemburData.map((item) => item.id).length !==
+          [...new Set(lemburData.map((item) => item.id))].length
+      );
+    }
+    setSelectedLembur([]);
+  }, [lemburData]);
   // State untuk setting lauk pauk
   const laukPaukData = useSelector((state) => state.laukPauk.data);
   const laukPaukLoading = useSelector((state) => state.laukPauk.loading);
@@ -94,7 +148,7 @@ export default function RekapPresensiBulanan() {
         )
       );
     }
-  }, [token, user, currentPage, searchValue, tab]);
+  }, [dispatch, token, user, currentPage, searchValue, tab]);
 
   useEffect(() => {
     if (token && tab === "laukPauk") {
@@ -304,91 +358,308 @@ export default function RekapPresensiBulanan() {
     });
     doc.save("history-presensi-ybwsa.pdf");
   };
-  const handleDownloadPDFLembur = () => {
-    if (!lemburData || lemburData.length === 0) return;
+  // Fungsi untuk generate SURAT TUGAS lembur
+  const handleDownloadSuratTugasLembur = () => {
+    const filteredData = lemburData.filter((_, index) =>
+      selectedLembur.includes(index)
+    );
+    if (!filteredData || filteredData.length === 0) {
+      Swal.fire({
+        icon: "warning",
+        title: "Peringatan",
+        text: "Pilih minimal satu pegawai untuk diunduh!",
+        confirmButtonColor: "#10b981",
+      });
+      return;
+    }
 
-    const doc = new jsPDF("l", "mm", "a4"); // landscape A4
+    const doc = new jsPDF("p", "mm", "a4"); // portrait A4
 
-    // Logo (opsional)
+    // Logo kiri atas
     try {
-      doc.addImage(logoBase64, "PNG", 10, 10, 25, 25);
+      doc.addImage(logoBase64, "PNG", 20, 20, 30, 30);
     } catch {
       // kalau logo gagal dimuat, lanjutkan
     }
 
-    // Header
+    // Header YBW-SA
     doc.setFontSize(16);
-    doc.text("YAYASAN BADAN WAKAF SULTAN AGUNG", 148, 20, {
-      align: "center",
-    });
-    doc.setFontSize(10);
-    doc.text(
-      "Jl.Raya Kaligawe Km.4 Semarang 50112; PO Box 1054/SM Indonesia",
-      148,
-      28,
-      { align: "center" }
-    );
-    doc.text("Telp (024) 6583584 Fax. (024) 6582455", 148, 34, {
-      align: "center",
-    });
-    doc.text(
-      "Email : informasi@ybwsa.ac.id Homepage : http://ybwsa.ac.id",
-      148,
-      40,
-      { align: "center" }
-    );
-
-    // Garis bawah
-    doc.setLineWidth(0.5);
-    doc.line(10, 44, 287, 44);
-
-    // Judul laporan
+    doc.setFont("times", "bold");
+    doc.text("YBW SA", 20, 25);
     doc.setFontSize(12);
-    doc.text("LAPORAN REKAP LEMBUR PEGAWAI", 148, 55, { align: "center" });
-    doc.setFontSize(10);
+    doc.setFont("times", "normal");
+    doc.text("YAYASAN BADAN WAKAF SULTAN AGUNG", 20, 30);
+
+    // Logo kanan atas (circular)
+    doc.setFontSize(8);
+    doc.setFont("times", "normal");
+    doc.text("BERKHIDMAT UNTUK", 150, 25, { align: "center" });
+    doc.setFontSize(12);
+    doc.setFont("times", "bold");
+    doc.text("1950", 150, 32, { align: "center" });
+    doc.setFontSize(8);
+    doc.setFont("times", "normal");
+    doc.text("KEMASLAHATAN UMAT", 150, 37, { align: "center" });
+
+    // Judul SURAT TUGAS - ukuran dikurangi
+    doc.setFontSize(16);
+    doc.setFont("times", "bold");
+    doc.text("SURAT TUGAS", 105, 50, { align: "center" });
+
+    // Teks langsung tanpa nomor surat
+    doc.setFontSize(12);
+    doc.setFont("times", "normal");
     doc.text(
-      `Periode: ${bulanOptions.find((b) => b.value === bulan)?.label} ${tahun}`,
+      "Yayasan Badan Wakaf Sultan Agung (YBW-SA) memberi tugas lembur kepada,",
       20,
       65
     );
 
-    // Tabel lembur -> style samakan dengan history
+    // Tabel penugasan - jarak dikurangi
     autoTable(doc, {
-      startY: 75,
-      head: [
-        [
-          "NO",
-          "NIK",
-          "Nama",
-          "Unit",
-          "Tanggal",
-          "Waktu Masuk",
-          "Waktu Pulang",
-          "Lembur",
-        ],
-      ],
-      body: lemburData.map((row, idx) => [
+      startY: 70,
+      head: [["No.", "Nama", "Jabatan", "Tugas"]],
+      body: filteredData.map((row, idx) => [
         idx + 1,
-        row.no_ktp,
         [row.gelar_depan, row.nama, row.gelar_belakang]
           .filter(Boolean)
           .join(" "),
-        row?.nama_unit || "-",
-        formatTanggal(row?.tanggal),
-        row?.waktu_masuk || "-",
-        row?.waktu_pulang || "-",
-        formatOvertime(row?.menit_overtime),
+        row?.jabatan || "Staf",
+        `Lembur ${formatTanggal(row?.tanggal)}`,
       ]),
-      theme: "grid", // samakan seperti history
       headStyles: {
-        fillColor: [22, 160, 133], // hijau emerald (history)
+        fillColor: [0, 0, 0],
+        textColor: [255, 255, 255],
         halign: "center",
         fontStyle: "bold",
-        fontSize: 10,
-        textColor: [255, 255, 255],
+        fontSize: 11,
       },
       bodyStyles: {
-        fontSize: 9,
+        fontSize: 10,
+        halign: "left",
+      },
+      styles: {
+        cellPadding: 3,
+        font: "times",
+      },
+      margin: { left: 20, right: 20 },
+      tableWidth: "auto",
+    });
+
+    // Keterangan waktu
+    const finalY = doc.lastAutoTable.finalY + 10;
+    doc.setFontSize(11);
+    doc.setFont("times", "normal");
+    doc.text(
+      "Untuk melaksanakan tugas kerja lembur pada hari Senin tanggal 29 September 2025",
+      20,
+      finalY
+    );
+    doc.text("Demikian untuk menjadikan periksa", 20, finalY + 6);
+
+    // Tanggal dan tempat - di tengah halaman A4
+    doc.text("Semarang", 105, finalY + 20, { align: "center" });
+
+    // Tanda tangan
+    const signatureY = finalY + 35;
+    doc.setFontSize(10);
+
+    // Mengetahui - digeser ke kiri
+    doc.setFont("times", "normal");
+    doc.text("Mengetahui", 60, signatureY, { align: "center" });
+    doc.text("Pengurus Yayasan Badan Wakaf Sultan Agung", 60, signatureY + 5, {
+      align: "center",
+    });
+    doc.text("Sekretaris", 60, signatureY + 10, { align: "center" });
+    // Nama dengan bold dan underline
+    doc.setFont("times", "bold");
+    doc.text(
+      "Dr. Muhammad Ja'far Shodiq, SE., S.Si., M.Si., Ak. CA.",
+      60,
+      signatureY + 25,
+      { align: "center" }
+    );
+    // Garis bawah untuk nama
+    const name1Width = doc.getTextWidth(
+      "Dr. Muhammad Ja'far Shodiq, SE., S.Si., M.Si., Ak. CA."
+    );
+    doc.setLineWidth(0.5);
+    doc.line(
+      60 - name1Width / 2,
+      signatureY + 27,
+      60 + name1Width / 2,
+      signatureY + 27
+    );
+
+    // Kepala Sekretariat - tambah space
+    doc.setFont("times", "normal");
+    doc.text("Sekretariat YBW-SA", 150, signatureY, { align: "center" });
+    doc.text("Kepala", 150, signatureY + 10, { align: "center" });
+
+    // Nama dengan bold dan underline
+    doc.setFont("times", "bold");
+    doc.text("Ifan Rikhza Auladi, S.Pd., M.Ed", 150, signatureY + 25, {
+      align: "center",
+    });
+    // Garis bawah untuk nama
+    const name2Width = doc.getTextWidth("Ifan Rikhza Auladi, S.Pd., M.Ed");
+    doc.line(
+      150 - name2Width / 2,
+      signatureY + 27,
+      150 + name2Width / 2,
+      signatureY + 27
+    );
+
+    // Tembusan - digeser ke bawah
+    const tembusanY = signatureY + 50;
+    doc.setFont("times", "normal");
+    doc.text("Tembusan Yth.:", 20, tembusanY);
+    doc.text("Kepala Bagian Keuangan dan Akuntansi YBW-SA", 20, tembusanY + 5);
+
+    // Footer - dipindah ke paling bawah
+    const footerY = tembusanY + 60;
+    doc.setFontSize(8);
+
+    // Visi - 3 baris
+    doc.text("Visi", 20, footerY);
+    doc.text(
+      "Lembaga wakaf terkemuka yang produktif dan inovatif sebagai sarana",
+      20,
+      footerY + 3
+    );
+    doc.text(
+      "syiar islam melalui pendidikan, kesehatan dan ekonomi untuk membentuk",
+      20,
+      footerY + 6
+    );
+    doc.text(
+      "generasi khaira ummah serta menjawab tantangan global dalam kerangka rahmatan lil alamin",
+      20,
+      footerY + 9
+    );
+
+    // Alamat - 3 baris
+    doc.text("Alamat", 140, footerY);
+    doc.text("Jl.Raya Kaligawe Km.4 Semarang 50112", 140, footerY + 3);
+    doc.text("PO Box 1054/SM Indonesia", 140, footerY + 6);
+    doc.text("Telp (024) 6583584 Fax. (024) 6582455", 140, footerY + 9);
+
+    // Simpan PDF
+    doc.save(
+      `surat-tugas-lembur-${
+        bulanOptions.find((b) => b.value === bulan)?.label
+      }-${tahun}.pdf`
+    );
+  };
+
+  // Fungsi untuk generate DAFTAR LEMBUR dengan perhitungan gaji
+  const handleDownloadDaftarLembur = () => {
+    const filteredData = lemburData.filter((_, index) =>
+      selectedLembur.includes(index)
+    );
+    if (!filteredData || filteredData.length === 0) {
+      Swal.fire({
+        icon: "warning",
+        title: "Peringatan",
+        text: "Pilih minimal satu pegawai untuk diunduh!",
+        confirmButtonColor: "#10b981",
+      });
+      return;
+    }
+
+    const doc = new jsPDF("l", "mm", "a4"); // landscape A4
+
+    // Header - rata kiri, Times New Roman 12, sejajar dengan tabel
+    doc.setFontSize(12);
+    doc.setFont("times", "normal");
+    doc.text("Lampiran Surat Nomor:", 20, 20);
+    doc.setFont("times", "bold");
+    doc.text("DAFTAR LEMBUR", 20, 30);
+    doc.text("YAYASAN BADAN WAKAF SULTAN AGUNG", 20, 35);
+
+    // Hitung total lembur
+    const totalLembur = filteredData.reduce((sum, row) => {
+      const durasiJam = Math.floor((row?.menit_overtime || 0) / 60);
+      const tanggal = new Date(row?.tanggal);
+      const hariLibur = tanggal.getDay() === 0 || tanggal.getDay() === 6;
+      const tarifPerJam = hariLibur ? 60000 : 30000;
+      return sum + durasiJam * tarifPerJam;
+    }, 0);
+
+    // Tabel daftar lembur dengan footer
+    autoTable(doc, {
+      startY: 45,
+      head: [
+        [
+          "No.",
+          "NIK",
+          "Nama",
+          "Bidang/Bagian",
+          "Jabatan",
+          "Waktu",
+          "Durasi (Jam)",
+          "Lembur Dihitung",
+          "Rp/jam",
+          "Total",
+          "TTD",
+        ],
+      ],
+      body: filteredData.map((row, idx) => {
+        const durasiJam = Math.floor((row?.menit_overtime || 0) / 60);
+
+        // Tentukan apakah hari libur atau tidak
+        const tanggal = new Date(row?.tanggal);
+        const hariLibur = tanggal.getDay() === 0 || tanggal.getDay() === 6; // Minggu atau Sabtu
+        const tarifPerJam = hariLibur ? 60000 : 30000; // 60k untuk libur, 30k untuk aktif
+        const total = durasiJam * tarifPerJam;
+
+        return [
+          idx + 1,
+          row.no_ktp,
+          [row.gelar_depan, row.nama, row.gelar_belakang]
+            .filter(Boolean)
+            .join(" "),
+          row?.nama_unit || "-",
+          row?.jabatan || "Staf",
+          `${row?.waktu_masuk || "17"} - ${row?.waktu_pulang || "19"}`,
+          durasiJam,
+          durasiJam,
+          tarifPerJam.toLocaleString("id-ID"),
+          total.toLocaleString("id-ID"),
+          idx + 1,
+        ];
+      }),
+      foot: [
+        [
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "Jumlah",
+          `Rp ${totalLembur.toLocaleString("id-ID")}`,
+          "",
+        ],
+      ],
+      headStyles: {
+        fillColor: [0, 0, 0],
+        textColor: [255, 255, 255],
+        halign: "center",
+        fontStyle: "bold",
+        fontSize: 8,
+      },
+      bodyStyles: {
+        fontSize: 7,
+        halign: "center",
+      },
+      footStyles: {
+        fontSize: 8,
+        halign: "center",
+        fontStyle: "bold",
+        fillColor: [240, 240, 240],
         textColor: [0, 0, 0],
       },
       styles: {
@@ -399,9 +670,152 @@ export default function RekapPresensiBulanan() {
       tableWidth: "auto",
     });
 
+    // Tanggal dan tempat
+    const finalY = doc.lastAutoTable.finalY + 5;
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "normal");
+    doc.text("Semarang", 120, finalY + 10, { align: "center" });
+    doc.text("Yayasan Badan Wakaf Sultan Agung", 120, finalY + 18, {
+      align: "center",
+    });
+
+    // Tanda tangan - 4 kolom dengan border vertikal
+    const signatureY = finalY + 30;
+    const colWidth = 70;
+    const startX = 10;
+
+    // Border luar
+    doc.setLineWidth(0.5);
+    doc.rect(startX, signatureY, colWidth * 4, 50);
+
+    // Garis vertikal pemisah kolom
+    doc.line(startX + colWidth, signatureY, startX + colWidth, signatureY + 50);
+    doc.line(
+      startX + colWidth * 2,
+      signatureY,
+      startX + colWidth * 2,
+      signatureY + 50
+    );
+    doc.line(
+      startX + colWidth * 3,
+      signatureY,
+      startX + colWidth * 3,
+      signatureY + 50
+    );
+
+    // Disetujui Oleh
+    doc.setFontSize(7);
+    doc.setFont("helvetica", "normal");
+    doc.text("Disetujui Oleh", startX + colWidth / 2, signatureY + 8, {
+      align: "center",
+    });
+    doc.text("Sekretaris YBW-SA", startX + colWidth / 2, signatureY + 22, {
+      align: "center",
+    });
+    doc.setFont("helvetica", "bold");
+    doc.text(
+      "Dr. Mohammad Ja'far Shodiq, SE, S.H., M.Si., Ak., CA.",
+      startX + colWidth / 2,
+      signatureY + 42,
+      { align: "center" }
+    );
+
+    // Diketahui Oleh
+    doc.setFont("helvetica", "normal");
+    doc.text(
+      "Diketahui Oleh",
+      startX + colWidth + colWidth / 2,
+      signatureY + 8,
+      { align: "center" }
+    );
+    doc.text(
+      "Kepala Sekretariat YBW-SA",
+      startX + colWidth + colWidth / 2,
+      signatureY + 22,
+      { align: "center" }
+    );
+    doc.setFont("helvetica", "bold");
+    doc.text(
+      "Ifan Rikhza Auladi, S.Pd., M.Ed.",
+      startX + colWidth + colWidth / 2,
+      signatureY + 42,
+      { align: "center" }
+    );
+
+    // Diperiksa Oleh
+    doc.setFont("helvetica", "normal");
+    doc.text(
+      "Diperiksa Oleh",
+      startX + colWidth * 2 + colWidth / 2,
+      signatureY + 8,
+      { align: "center" }
+    );
+    doc.text(
+      "Kabag. SDI Sekretariat YBW-SA",
+      startX + colWidth * 2 + colWidth / 2,
+      signatureY + 22,
+      { align: "center" }
+    );
+    doc.setFont("helvetica", "bold");
+    doc.text(
+      "Ahmad Rudi Yulianto",
+      startX + colWidth * 2 + colWidth / 2,
+      signatureY + 42,
+      { align: "center" }
+    );
+
+    // Dibuat Oleh
+    doc.setFont("helvetica", "normal");
+    doc.text(
+      "Dibuat Oleh",
+      startX + colWidth * 3 + colWidth / 2,
+      signatureY + 8,
+      { align: "center" }
+    );
+    doc.text(
+      "Staf SDI Sekretariat YBW-SA",
+      startX + colWidth * 3 + colWidth / 2,
+      signatureY + 22,
+      { align: "center" }
+    );
+    doc.setFont("helvetica", "bold");
+    doc.text(
+      "Samsul Alam",
+      startX + colWidth * 3 + colWidth / 2,
+      signatureY + 42,
+      { align: "center" }
+    );
+
+    // Garis bawah untuk nama (underline effect)
+    doc.setLineWidth(0.3);
+    doc.line(
+      startX + 5,
+      signatureY + 44,
+      startX + colWidth - 5,
+      signatureY + 44
+    );
+    doc.line(
+      startX + colWidth + 5,
+      signatureY + 44,
+      startX + colWidth * 2 - 5,
+      signatureY + 44
+    );
+    doc.line(
+      startX + colWidth * 2 + 5,
+      signatureY + 44,
+      startX + colWidth * 3 - 5,
+      signatureY + 44
+    );
+    doc.line(
+      startX + colWidth * 3 + 5,
+      signatureY + 44,
+      startX + colWidth * 4 - 5,
+      signatureY + 44
+    );
+
     // Simpan PDF
     doc.save(
-      `laporan-lembur-${
+      `daftar-lembur-${
         bulanOptions.find((b) => b.value === bulan)?.label
       }-${tahun}.pdf`
     );
@@ -995,7 +1409,7 @@ export default function RekapPresensiBulanan() {
             <div className="space-y-6">
               <div className="flex flex-col md:flex-row gap-4 items-end mb-6">
                 <div className="flex-1">
-                  <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                  <label className="flex text-sm font-semibold text-gray-700 mb-2 items-center gap-2">
                     <span className="material-icons text-base">
                       calendar_month
                     </span>
@@ -1014,7 +1428,7 @@ export default function RekapPresensiBulanan() {
                   </select>
                 </div>
                 <div className="flex-1">
-                  <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                  <label className="flex text-sm font-semibold text-gray-700 mb-2 items-center gap-2">
                     <span className="material-icons text-base">event</span>
                     Tahun
                   </label>
@@ -1048,13 +1462,32 @@ export default function RekapPresensiBulanan() {
                     )}
                   </button>
                   {lemburData.length > 0 && (
-                    <button
-                      className="px-6 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm transition flex items-center gap-2"
-                      onClick={handleDownloadPDFLembur}
-                    >
-                      <span className="material-icons text-base">download</span>
-                      Download PDF
-                    </button>
+                    <>
+                      <div className="text-sm text-gray-600 mb-2">
+                        Dipilih: {selectedLembur.length} dari{" "}
+                        {lemburData.length} pegawai
+                      </div>
+                      <button
+                        className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm transition flex items-center gap-2 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                        onClick={handleDownloadSuratTugasLembur}
+                        disabled={selectedLembur.length === 0}
+                      >
+                        <span className="material-icons text-base">
+                          description
+                        </span>
+                        Surat Tugas
+                      </button>
+                      <button
+                        className="px-6 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm transition flex items-center gap-2 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                        onClick={handleDownloadDaftarLembur}
+                        disabled={selectedLembur.length === 0}
+                      >
+                        <span className="material-icons text-base">
+                          download
+                        </span>
+                        Daftar Lembur
+                      </button>
+                    </>
                   )}
                 </div>
               </div>
@@ -1065,10 +1498,52 @@ export default function RekapPresensiBulanan() {
                 </div>
               ) : (
                 <div>
+                  {/* Info Tarif Lembur */}
+                  {lemburData.length > 0 && (
+                    <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="material-icons text-blue-600">
+                          info
+                        </span>
+                        <span className="font-semibold text-blue-800">
+                          Informasi Tarif Lembur
+                        </span>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                        <div className="flex items-center gap-2">
+                          <span className="w-3 h-3 bg-green-500 rounded-full"></span>
+                          <span className="text-gray-700">
+                            Hari Aktif (Senin-Jumat):{" "}
+                            <strong>Rp 30.000/jam</strong>
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="w-3 h-3 bg-orange-500 rounded-full"></span>
+                          <span className="text-gray-700">
+                            Hari Libur (Sabtu-Minggu):{" "}
+                            <strong>Rp 60.000/jam</strong>
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                   <div className="overflow-x-auto">
                     <table className="min-w-[130%] text-xs border border-gray-200 overflow-hidden shadow-sm">
                       <thead className="sticky top-0 z-10 bg-white border-b-2 border-emerald-100">
                         <tr>
+                          <th className="px-2 py-4 text-center font-extrabold text-emerald-700 tracking-wide uppercase w-12 text-base">
+                            <input
+                              type="checkbox"
+                              checked={
+                                lemburData &&
+                                lemburData.length > 0 &&
+                                selectedLembur.length === lemburData.length &&
+                                selectedLembur.length > 0
+                              }
+                              onChange={handleSelectAllLembur}
+                              className="w-4 h-4 text-emerald-600 bg-gray-100 border-gray-300 rounded focus:ring-emerald-500 focus:ring-2"
+                            />
+                          </th>
                           <th className="px-4 py-4 text-center font-extrabold text-emerald-700 tracking-wide uppercase w-12 text-base">
                             <span className="material-icons text-base">
                               format_list_numbered
@@ -1095,17 +1570,39 @@ export default function RekapPresensiBulanan() {
                           <th className="px-2 py-3 text-center font-extrabold text-emerald-700 tracking-wide text-base uppercase w-40">
                             Lembur
                           </th>
+                          <th className="px-2 py-3 text-center font-extrabold text-emerald-700 tracking-wide text-base uppercase w-32">
+                            Tarif/Jam
+                          </th>
+                          <th className="px-2 py-3 text-center font-extrabold text-emerald-700 tracking-wide text-base uppercase w-32">
+                            Total
+                          </th>
                         </tr>
                       </thead>
                       <tbody>
                         {lemburData?.length > 0 ? (
                           lemburData?.map((row, idx) => (
                             <tr
-                              key={row.id}
+                              key={`${row.id}-${idx}`}
                               className={
                                 idx % 2 === 0 ? "bg-white" : "bg-gray-50"
                               }
                             >
+                              <td className="px-2 py-4 text-center align-middle border-b border-gray-100">
+                                <input
+                                  type="checkbox"
+                                  checked={selectedLembur.includes(idx)}
+                                  onChange={() => {
+                                    console.log(
+                                      "Checkbox clicked for row:",
+                                      idx,
+                                      "ID:",
+                                      row.id
+                                    );
+                                    handleLemburCheckbox(idx);
+                                  }}
+                                  className="w-4 h-4 text-emerald-600 bg-gray-100 border-gray-300 rounded focus:ring-emerald-500 focus:ring-2"
+                                />
+                              </td>
                               <td className="px-4 py-4 text-center align-middle border-b border-gray-100 font-semibold text-sm">
                                 {idx + 1}
                               </td>
@@ -1132,6 +1629,32 @@ export default function RekapPresensiBulanan() {
                               <td className="px-4 py-4 align-middle border-b border-gray-100 font-bold text-emerald-700 text-sm">
                                 {formatOvertime(row?.menit_overtime)}
                               </td>
+                              <td className="px-4 py-4 align-middle border-b border-gray-100 font-bold text-emerald-700 text-sm">
+                                {(() => {
+                                  const tanggal = new Date(row?.tanggal);
+                                  const hariLibur =
+                                    tanggal.getDay() === 0 ||
+                                    tanggal.getDay() === 6;
+                                  const tarifPerJam = hariLibur ? 60000 : 30000;
+                                  return `Rp ${tarifPerJam.toLocaleString(
+                                    "id-ID"
+                                  )}`;
+                                })()}
+                              </td>
+                              <td className="px-4 py-4 align-middle border-b border-gray-100 font-bold text-green-600 text-sm">
+                                {(() => {
+                                  const durasiJam = Math.floor(
+                                    (row?.menit_overtime || 0) / 60
+                                  );
+                                  const tanggal = new Date(row?.tanggal);
+                                  const hariLibur =
+                                    tanggal.getDay() === 0 ||
+                                    tanggal.getDay() === 6;
+                                  const tarifPerJam = hariLibur ? 60000 : 30000;
+                                  const total = durasiJam * tarifPerJam;
+                                  return `Rp ${total.toLocaleString("id-ID")}`;
+                                })()}
+                              </td>
                             </tr>
                           ))
                         ) : (
@@ -1157,6 +1680,143 @@ export default function RekapPresensiBulanan() {
                       </tbody>
                     </table>
 
+                    {/* Summary Cards */}
+                    {lemburData?.length > 0 && (
+                      <div className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        {/* Total Pegawai */}
+                        <div className="bg-white border border-gray-200 shadow-sm p-4">
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <p className="text-sm font-medium text-gray-600">
+                                Total Pegawai
+                              </p>
+                              <p className="text-2xl font-bold text-emerald-600">
+                                {lemburData.length}
+                              </p>
+                            </div>
+                            <div className="p-3 bg-emerald-100">
+                              <span className="material-icons text-emerald-600 text-xl">
+                                people
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Total Jam Lembur */}
+                        <div className="bg-white border border-gray-200 shadow-sm p-4">
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <p className="text-sm font-medium text-gray-600">
+                                Total Jam Lembur
+                              </p>
+                              <p className="text-2xl font-bold text-blue-600">
+                                {(() => {
+                                  const totalJam = lemburData.reduce(
+                                    (sum, row) => {
+                                      return (
+                                        sum +
+                                        Math.floor(
+                                          (row?.menit_overtime || 0) / 60
+                                        )
+                                      );
+                                    },
+                                    0
+                                  );
+                                  return `${totalJam} Jam`;
+                                })()}
+                              </p>
+                            </div>
+                            <div className="p-3 bg-blue-100">
+                              <span className="material-icons text-blue-600 text-xl">
+                                schedule
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Total Gaji Lembur */}
+                        <div className="bg-white border border-gray-200 shadow-sm p-4">
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <p className="text-sm font-medium text-gray-600">
+                                Total Gaji Lembur
+                              </p>
+                              <p className="text-2xl font-bold text-green-600">
+                                {(() => {
+                                  const totalLembur = lemburData.reduce(
+                                    (sum, row) => {
+                                      const durasiJam = Math.floor(
+                                        (row?.menit_overtime || 0) / 60
+                                      );
+                                      const tanggal = new Date(row?.tanggal);
+                                      const hariLibur =
+                                        tanggal.getDay() === 0 ||
+                                        tanggal.getDay() === 6;
+                                      const tarifPerJam = hariLibur
+                                        ? 60000
+                                        : 30000;
+                                      return sum + durasiJam * tarifPerJam;
+                                    },
+                                    0
+                                  );
+                                  return `Rp ${totalLembur.toLocaleString(
+                                    "id-ID"
+                                  )}`;
+                                })()}
+                              </p>
+                            </div>
+                            <div className="p-3 bg-green-100">
+                              <span className="material-icons text-green-600 text-xl">
+                                attach_money
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Rata-rata per Pegawai */}
+                        <div className="bg-white border border-gray-200 shadow-sm p-4">
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <p className="text-sm font-medium text-gray-600">
+                                Rata-rata per Pegawai
+                              </p>
+                              <p className="text-2xl font-bold text-purple-600">
+                                {(() => {
+                                  const totalLembur = lemburData.reduce(
+                                    (sum, row) => {
+                                      const durasiJam = Math.floor(
+                                        (row?.menit_overtime || 0) / 60
+                                      );
+                                      const tanggal = new Date(row?.tanggal);
+                                      const hariLibur =
+                                        tanggal.getDay() === 0 ||
+                                        tanggal.getDay() === 6;
+                                      const tarifPerJam = hariLibur
+                                        ? 60000
+                                        : 30000;
+                                      return sum + durasiJam * tarifPerJam;
+                                    },
+                                    0
+                                  );
+                                  const rataRata = Math.round(
+                                    totalLembur / lemburData.length
+                                  );
+                                  return `Rp ${rataRata.toLocaleString(
+                                    "id-ID"
+                                  )}`;
+                                })()}
+                              </p>
+                            </div>
+                            <div className="p-3 bg-purple-100">
+                              <span className="material-icons text-purple-600 text-xl">
+                                trending_up
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
                     {/* Pagination
                     {pegawaiPagination && pegawaiPagination.last_page > 1 && (
                       <div className="flex flex-wrap gap-1 justify-center mt-6">
@@ -1177,11 +1837,33 @@ export default function RekapPresensiBulanan() {
                   onChange={(e) => setFilterUnit(e.target.value)}
                 >
                   <option value="">Semua Unit</option>
-                  {units.map((u) => (
-                    <option key={u.id} value={u.id}>
-                      {u.name}
-                    </option>
-                  ))}
+                  {units.map((unit) => {
+                    const level = parseInt(unit?.level) || 0;
+                    const indent = "\u00A0".repeat(level * 4);
+
+                    // Icon berdasarkan level
+                    let icon = "";
+                    if (level === 0) {
+                      icon = "🏢"; // Building untuk level 0 (root)
+                    } else if (level === 1) {
+                      icon = "📁"; // Folder untuk level 1
+                    } else if (level === 2) {
+                      icon = "📂"; // Open folder untuk level 2
+                    } else if (level === 3) {
+                      icon = "📄"; // Document untuk level 3
+                    } else if (level === 4) {
+                      icon = "📋"; // Clipboard untuk level 4
+                    } else {
+                      icon = "🔗"; // Link untuk level 5+
+                    }
+
+                    return (
+                      <option key={unit.id} value={unit.id}>
+                        {indent}
+                        {icon} {unit?.nama}
+                      </option>
+                    );
+                  })}
                 </select>
               )}
               {/* Setting Lauk Pauk Section */}
@@ -1659,7 +2341,7 @@ export default function RekapPresensiBulanan() {
                 </div>
                 <div className="flex flex-col md:flex-row gap-4 items-end mb-6">
                   <div className="flex-1">
-                    <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                    <label className="flex text-sm font-semibold text-gray-700 mb-2 items-center gap-2">
                       <span className="material-icons text-base">
                         calendar_month
                       </span>
@@ -1678,7 +2360,7 @@ export default function RekapPresensiBulanan() {
                     </select>
                   </div>
                   <div className="flex-1">
-                    <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                    <label className="flex text-sm font-semibold text-gray-700 mb-2 items-center gap-2">
                       <span className="material-icons text-base">event</span>
                       Tahun
                     </label>
