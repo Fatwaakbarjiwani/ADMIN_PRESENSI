@@ -420,20 +420,19 @@ export default function ManajemenAdmin() {
                         const level = parseInt(unit?.level) || 0;
                         const indent = "\u00A0".repeat(level * 4);
 
-                        // Icon berdasarkan level
                         let icon = "";
                         if (level === 0) {
-                          icon = "🏢"; // Building untuk level 0 (root)
+                          icon = "🏢"; 
                         } else if (level === 1) {
-                          icon = "📁"; // Folder untuk level 1
+                          icon = "📁"; 
                         } else if (level === 2) {
-                          icon = "📂"; // Open folder untuk level 2
+                          icon = "📂"; 
                         } else if (level === 3) {
-                          icon = "📄"; // Document untuk level 3
+                          icon = "📄"; 
                         } else if (level === 4) {
-                          icon = "📋"; // Clipboard untuk level 4
+                          icon = "📋"; 
                         } else {
-                          icon = "🔗"; // Link untuk level 5+
+                          icon = "🔗"; 
                         }
 
                         return (

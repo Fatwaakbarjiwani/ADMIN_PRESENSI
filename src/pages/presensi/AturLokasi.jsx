@@ -636,7 +636,7 @@ export default function AturLokasi() {
               </div>
             )}
 
-            <div className="absolute top-6 right-6 z-[1000] w-96">
+            <div className="absolute top-16 right-6 z-[1000] w-96">
               <div className="bg-white rounded-2xl shadow-2xl border-2 border-emerald-500 overflow-hidden">
                 <div className="bg-gradient-to-r from-emerald-500 to-emerald-600 px-4 py-3 flex items-center justify-between">
                   <div className="flex items-center gap-2 text-white">
