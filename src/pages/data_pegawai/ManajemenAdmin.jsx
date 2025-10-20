@@ -422,17 +422,17 @@ export default function ManajemenAdmin() {
 
                         let icon = "";
                         if (level === 0) {
-                          icon = "🏢"; 
+                          icon = "🏢";
                         } else if (level === 1) {
-                          icon = "📁"; 
+                          icon = "📁";
                         } else if (level === 2) {
-                          icon = "📂"; 
+                          icon = "📂";
                         } else if (level === 3) {
-                          icon = "📄"; 
+                          icon = "📄";
                         } else if (level === 4) {
-                          icon = "📋"; 
+                          icon = "📋";
                         } else {
-                          icon = "🔗"; 
+                          icon = "🧾";
                         }
 
                         return (
@@ -573,7 +573,7 @@ export default function ManajemenAdmin() {
                       } else if (level === 4) {
                         icon = "📋"; // Clipboard untuk level 4
                       } else {
-                        icon = "🔗"; // Link untuk level 5+
+                        icon = "🧾"; // Receipt untuk level 5+
                       }
 
                       return (

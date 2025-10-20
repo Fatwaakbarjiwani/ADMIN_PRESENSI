@@ -305,7 +305,7 @@ export default function TambahDinas() {
                         } else if (level === 4) {
                           icon = "📋"; // Clipboard untuk level 4
                         } else {
-                          icon = "🔗"; // Link untuk level 5+
+                          icon = "🧾"; // Link untuk level 5+
                         }
 
                         return (
