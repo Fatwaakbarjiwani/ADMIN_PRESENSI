@@ -424,7 +424,7 @@ export default function RekapPresensiBulanan() {
         [row.gelar_depan, row.nama, row.gelar_belakang]
           .filter(Boolean)
           .join(" "),
-        row?.jabatan || "Staf",
+        row?.jabatan || "-",
         `Lembur ${formatTanggal(row?.tanggal)}`,
       ]),
       headStyles: {
@@ -620,7 +620,7 @@ export default function RekapPresensiBulanan() {
             .filter(Boolean)
             .join(" "),
           row?.nama_unit || "-",
-          row?.jabatan || "Staf",
+          row?.jabatan || "-",
           `${row?.waktu_masuk || "17"} - ${row?.waktu_pulang || "19"}`,
           durasiJam,
           durasiJam,
