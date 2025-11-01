@@ -293,7 +293,7 @@ export default function DataIzin() {
     return (
       <div className="w-full min-h-screen font-sans bg-gray-50">
         <div className="px-4 sticky z-40 top-0 py-4 border-b-2 border-emerald-200 bg-white flex items-center gap-4">
-          <div className="bg-emerald-600 p-2">
+          <div className="bg-emerald-600 p-2 flex items-center justify-center">
             <span className="material-icons text-white text-lg">description</span>
           </div>
           <div>

@@ -105,7 +105,7 @@ export default function DetailRekapBulananPegawai() {
         >
           <span className="material-icons text-gray-600">arrow_back</span>
         </button>
-        <div className="bg-emerald-600 p-2">
+        <div className="bg-emerald-600 p-2 flex items-center justify-center">
           <span className="material-icons text-white">assessment</span>
         </div>
         <div>

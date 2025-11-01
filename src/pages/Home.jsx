@@ -79,6 +79,7 @@ export default function Home() {
   const now = new Date();
   const [bulan, setBulan] = useState(now.getMonth() + 1); // getMonth() 0-based
   const [tahun, setTahun] = useState(now.getFullYear());
+  const [showHeaderInfo, setShowHeaderInfo] = useState(true);
 
   // Fetch dashboard berdasarkan bulan & tahun
   useEffect(() => {
@@ -271,11 +272,11 @@ export default function Home() {
       {/* Header */}
       <div className="px-4 sticky z-40 top-0 py-4 border-b-2 border-emerald-200 bg-white">
         <div className="flex items-center gap-4 mb-3">
-          <div className="bg-emerald-600 p-2">
+          <div className="bg-emerald-600 p-2 flex items-center justify-center">
             <span className="material-icons text-white text-lg">dashboard</span>
           </div>
           <div>
-            <div className="text-2xl font-black text-emerald-800 tracking-tight uppercase">
+            <div className="text-2xl font-black text-emerald-600 tracking-tight uppercase">
               Dashboard
             </div>
             <div className="text-emerald-600 text-sm font-medium">
@@ -319,10 +320,20 @@ export default function Home() {
                 })}
               </select>
             </div>
+            {/* Toggle Button */}
+            <button
+              className="text-emerald-600 hover:text-white flex items-center justify-center hover:bg-emerald-600 focus:outline-none transition-all duration-200 bg-emerald-50 border border-emerald-200"
+              onClick={() => setShowHeaderInfo((v) => !v)}
+              title={showHeaderInfo ? "Sembunyikan Info" : "Tampilkan Info"}
+            >
+              <span className="material-icons">
+                {showHeaderInfo ? "expand_less" : "expand_more"}
+              </span>
+            </button>
           </div>
         </div>
         {/* Info Scope & Periode */}
-        {dashboard && (
+        {dashboard && showHeaderInfo && (
           <div className="flex flex-wrap gap-4 text-sm">
             <div className="flex items-center gap-2 bg-emerald-50 px-4 py-3 border-2 border-emerald-200 shadow-sm">
               <span className="material-icons text-emerald-600 text-lg">
@@ -564,18 +575,18 @@ export default function Home() {
             {summaryData.map((item) => (
               <div
                 key={item.label}
-                className="bg-white border-2 border-emerald-200 shadow-lg p-6 flex flex-col items-start transition-all duration-300 hover:shadow-xl hover:border-emerald-300"
+                className="bg-white border-2 border-emerald-200 shadow-lg p-2 flex flex-col items-start transition-all duration-300 hover:shadow-xl hover:border-emerald-300"
               >
                 <div className="flex items-center justify-between w-full mb-3">
-                  <div className="p-3 bg-emerald-100 border-2 border-emerald-200">
+                  <div className="p-2 bg-emerald-100 border-2 border-emerald-200">
                     <span
-                      className="material-icons text-2xl"
+                      className="material-icons text-xl"
                       style={{ color: item.color }}
                     >
                       {item.icon}
                     </span>
                   </div>
-                  <span className="text-3xl font-black text-emerald-800 leading-none">
+                  <span className="text-2xl font-black text-emerald-800 leading-none">
                     {item.value}
                   </span>
                 </div>
