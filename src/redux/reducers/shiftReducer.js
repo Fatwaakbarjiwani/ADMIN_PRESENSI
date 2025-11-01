@@ -9,6 +9,7 @@ const initialState = {
   pengajuan: [],
   pengajuanPagination: { last_page: 1, current_page: 1, links: [] },
   pengajuanLoading: false,
+  unit_id: null,
 };
 
 const shiftSlice = createSlice({
@@ -35,6 +36,9 @@ const shiftSlice = createSlice({
     setPengajuanLoading: (state, action) => {
       state.pengajuanLoading = action.payload;
     },
+    setUnitId: (state, action) => {
+      state.unit_id = action.payload;
+    },
   },
 });
 
@@ -45,5 +49,6 @@ export const {
   setPegawai,
   setPengajuan,
   setPengajuanLoading,
+  setUnitId,
 } = shiftSlice.actions;
 export default shiftSlice.reducer;

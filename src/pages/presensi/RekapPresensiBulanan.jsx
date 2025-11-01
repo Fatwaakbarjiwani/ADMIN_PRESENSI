@@ -773,7 +773,7 @@ export default function RekapPresensiBulanan() {
       { align: "center" }
     );
     doc.text(
-      "Staf SDI Sekretariat YBW-SA",
+      "SDI Sekretariat YBW-SA",
       startX + colWidth * 3 + colWidth / 2,
       signatureY + 22,
       { align: "center" }
@@ -980,21 +980,20 @@ export default function RekapPresensiBulanan() {
 
   return (
     <div className="w-full min-h-screen font-sans bg-gray-50">
-      {/* Header */}
-      <div className="px-4 sticky z-40 top-0 py-4 border-b border-gray-200 bg-white flex items-center gap-4">
-        <span className="material-icons text-green-200 bg-primary p-2 opacity-80">
-          assessment
-        </span>
+      <div className="px-4 sticky z-40 top-0 py-4 border-b-2 border-emerald-200 bg-white flex items-center gap-4">
+        <div className="bg-emerald-600 p-2">
+          <span className="material-icons text-white text-lg">event</span>
+        </div>
         <div>
-          <div className="text-2xl font-extrabold text-emerald-700 tracking-tight drop-shadow-sm uppercase">
+          <div className="text-2xl font-black text-emerald-600 tracking-tight uppercase">
             Rekap Presensi Bulanan
           </div>
-          <div className="text-gray-600 text-base font-medium">
+          <div className="text-emerald-600 text-sm font-medium">
             Pantau history & rekap presensi per unit
           </div>
         </div>
       </div>
-      <div className="mx-auto p-4 max-w-5xl flex flex-col gap-8 px-2 md:px-0">
+      <div className="mx-auto p-6 max-w-7xl flex flex-col gap-6">
         <div className="border border-gray-300 bg-white p-4">
           <div className="grid grid-cols-5 gap-2 mb-6">
             {!isSuperAdmin ? (
@@ -1059,72 +1058,98 @@ export default function RekapPresensiBulanan() {
           </div>
           {tab === "history" &&
             (loading ? (
-              <div className="text-center py-12 text-emerald-600 font-bold flex items-center justify-center gap-2">
+              <div className="text-center py-12 text-primary/70 font-bold flex items-center justify-center gap-2">
                 <span className="material-icons animate-spin">refresh</span>
                 Memuat data history presensi...
               </div>
             ) : (
               <>
-                <div className="mb-4 flex justify-between items-center">
-                  <div>
-                    <div className="flex items-center gap-2 text-emerald-700">
-                      <span className="material-icons">description</span>
-                      <span className="font-semibold">
-                        Total Data: {data.length} records
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2 text-emerald-700">
-                      <label className="font-semibold">Dari:</label>
-                      <input
-                        type="date"
-                        value={fromDate}
-                        onChange={(e) => setFromDate(e.target.value)}
-                        className="border px-2 py-1 rounded"
-                      />
+                {/* Header card */}
+                <div className="bg-white border-2 border-emerald-200 shadow-lg mb-4">
+                  <div className="bg-emerald-600 px-4 py-3 border-b-2 border-emerald-700">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="bg-white p-2">
+                          <span className="material-icons text-lg text-emerald-600">
+                            history
+                          </span>
+                        </div>
+                        <div>
+                          <h3 className="text-lg font-black text-white uppercase tracking-wide">
+                            History Presensi
+                          </h3>
+                          <p className="text-white/80 text-xs font-medium">
+                            Data presensi harian pegawai
+                          </p>
+                        </div>
+                      </div>
+                      <button
+                        className="px-4 py-2 bg-white text-emerald-700 font-bold text-xs border-2 border-white/20 hover:bg-white/10 transition flex items-center gap-2"
+                        onClick={handleDownloadHistoryPDF}
+                        title="Download PDF"
+                      >
+                        <span className="material-icons text-base">
+                          download
+                        </span>
+                        Download PDF
+                      </button>
                     </div>
                   </div>
-                  <button
-                    className="px-4 py-2 bg-emerald-600 text-white font-bold text-sm hover:bg-emerald-700 transition flex items-center gap-2"
-                    onClick={handleDownloadHistoryPDF}
-                  >
-                    <span className="material-icons text-base">download</span>
-                    Download PDF
-                  </button>
+                  <div className="p-4 flex flex-wrap gap-4 items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <div className="flex items-center gap-2 text-emerald-700">
+                        <span className="material-icons">description</span>
+                        <span className="font-semibold">
+                          Total Data: {data.length} records
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2 text-emerald-700">
+                        <label className="font-semibold">Dari:</label>
+                        <input
+                          type="date"
+                          value={fromDate}
+                          onChange={(e) => setFromDate(e.target.value)}
+                          className="border-2 border-emerald-300 px-3 py-2 text-sm font-medium focus:border-emerald-500 focus:outline-none bg-white"
+                        />
+                      </div>
+                    </div>
+                  </div>
                 </div>
+
                 <div className="overflow-x-auto">
-                  <table className="min-w-[200%] text-xs border border-gray-200 overflow-hidden shadow-sm">
-                    <thead className="sticky top-0 z-10 bg-white border-b-2 border-emerald-100">
+                  <table className="min-w-[200%] text-xs border-2 border-emerald-200 overflow-hidden shadow-lg">
+                    <thead className="sticky top-0 z-10 bg-emerald-50 border-b-2 border-emerald-200">
                       <tr>
-                        <th className="px-4 py-4 text-center font-extrabold text-emerald-700 tracking-wide uppercase w-12 text-base">
+                        <th className="px-3 py-2 text-center font-black text-emerald-800 text-xs uppercase tracking-wider border-r border-emerald-200 w-12">
                           <span className="material-icons text-base">
                             format_list_numbered
                           </span>
                         </th>
-                        <th className="px-4 py-4 text-left font-extrabold text-emerald-700 tracking-wide uppercase w-32 text-base">
+                        <th className="px-3 py-2 text-left font-black text-emerald-800 text-xs uppercase tracking-wider border-r border-emerald-200 w-32">
                           No KTP
                         </th>
-                        <th className="px-4 py-4 text-left font-extrabold text-emerald-700 tracking-wide uppercase w-56 text-base">
+                        <th className="px-3 py-2 text-left font-black text-emerald-800 text-xs uppercase tracking-wider border-r border-emerald-200 w-56">
                           Nama
                         </th>
-                        <th className="px-4 py-4 text-left font-extrabold text-emerald-700 tracking-wide uppercase w-32 text-base">
+                        <th className="px-3 py-2 text-left font-black text-emerald-800 text-xs uppercase tracking-wider border-r border-emerald-200 w-32">
                           Status Masuk
                         </th>
-                        <th className="px-4 py-4 text-left font-extrabold text-emerald-700 tracking-wide uppercase w-32 text-base">
+                        <th className="px-3 py-2 text-left font-black text-emerald-800 text-xs uppercase tracking-wider border-r border-emerald-200 w-32">
                           Status Pulang
                         </th>
-                        <th className="px-4 py-4 text-left font-extrabold text-emerald-700 tracking-wide uppercase w-32 text-base">
+                        <th className="px-3 py-2 text-left font-black text-emerald-800 text-xs uppercase tracking-wider border-r border-emerald-200 w-32">
                           Status Presensi
                         </th>
-                        <th className="px-4 py-4 text-left font-extrabold text-emerald-700 tracking-wide uppercase w-40 text-base">
+                        <th className="px-3 py-2 text-left font-black text-emerald-800 text-xs uppercase tracking-wider border-r border-emerald-200 w-40">
                           Waktu Masuk
                         </th>
-                        <th className="px-4 py-4 text-left font-extrabold text-emerald-700 tracking-wide uppercase w-40 text-base">
+                        <th className="px-3 py-2 text-left font-black text-emerald-800 text-xs uppercase tracking-wider border-r border-emerald-200 w-40">
                           Waktu Pulang
                         </th>
-                        <th className="px-4 py-4 text-left font-extrabold text-emerald-700 tracking-wide uppercase w-40 text-base">
+                        <th className="px-3 py-2 text-left font-black text-emerald-800 text-xs uppercase tracking-wider border-r border-emerald-200 w-40">
                           Keterangan Masuk
                         </th>
-                        <th className="px-4 py-4 text-left font-extrabold text-emerald-700 tracking-wide uppercase w-40 text-base">
+                        <th className="px-3 py-2 text-left font-black text-emerald-800 text-xs uppercase tracking-wider w-40">
                           Keterangan Pulang
                         </th>
                       </tr>
@@ -1134,47 +1159,46 @@ export default function RekapPresensiBulanan() {
                         data.map((row, idx) => (
                           <tr
                             key={row.id}
-                            className={
-                              "transition hover:bg-emerald-50 " +
-                              (idx % 2 === 0 ? "bg-white" : "bg-gray-50")
-                            }
+                            className={`transition hover:bg-emerald-50 border-b border-emerald-100 ${
+                              idx % 2 === 0 ? "bg-white" : "bg-emerald-25"
+                            }`}
                           >
-                            <td className="px-4 py-4 text-center align-middle border-b border-gray-100 font-semibold text-sm">
+                            <td className="px-3 py-2 text-center align-middle font-semibold border-r border-emerald-100">
                               {idx + 1}
                             </td>
-                            <td className="px-4 py-4 align-middle border-b border-gray-100 text-sm">
+                            <td className="px-3 py-2 align-middle border-r border-emerald-100">
                               {row.no_ktp}
                             </td>
-                            <td className="px-4 py-4 align-middle border-b border-gray-100 font-bold text-emerald-800 text-sm">
+                            <td className="px-3 py-2 align-middle font-bold text-emerald-800 border-r border-emerald-100">
                               {row.nama}
                             </td>
-                            <td className="px-4 py-4 align-middle border-b border-gray-100 font-bold text-emerald-800 text-sm">
+                            <td className="px-3 py-2 align-middle font-bold text-emerald-800 border-r border-emerald-100">
                               {row.status_masuk}
                             </td>
-                            <td className="px-4 py-4 align-middle border-b border-gray-100 font-bold text-emerald-800 text-sm">
+                            <td className="px-3 py-2 align-middle font-bold text-emerald-800 border-r border-emerald-100">
                               {row.status_pulang}
                             </td>
-                            <td className="px-4 py-4 align-middle border-b border-gray-100 font-bold text-emerald-800 text-sm">
+                            <td className="px-3 py-2 align-middle font-bold text-emerald-800 border-r border-emerald-100">
                               {row.status_presensi}
                             </td>
-                            <td className="px-4 py-4 align-middle border-b border-gray-100 text-sm">
+                            <td className="px-3 py-2 align-middle border-r border-emerald-100">
                               {row.waktu_masuk
                                 ? new Date(row.waktu_masuk).toLocaleString(
                                     "id-ID"
                                   )
                                 : "-"}
                             </td>
-                            <td className="px-4 py-4 align-middle border-b border-gray-100 text-sm">
+                            <td className="px-3 py-2 align-middle border-r border-emerald-100">
                               {row.waktu_pulang
                                 ? new Date(row.waktu_pulang).toLocaleString(
                                     "id-ID"
                                   )
                                 : "-"}
                             </td>
-                            <td className="px-4 py-4 align-middle border-b border-gray-100 text-sm">
+                            <td className="px-3 py-2 align-middle border-r border-emerald-100">
                               {row.keterangan_masuk || "-"}
                             </td>
-                            <td className="px-4 py-4 align-middle border-b border-gray-100 text-sm">
+                            <td className="px-3 py-2 align-middle">
                               {row.keterangan_pulang || "-"}
                             </td>
                           </tr>
@@ -1206,43 +1230,45 @@ export default function RekapPresensiBulanan() {
             ))}
           {tab === "rekap" && (
             <>
-              <div className="flex items-end justify-between gap-4 mb-6">
-                <div className="flex items-center gap-2">
+              <div className="bg-white border-2 border-emerald-200 shadow-lg p-4 mb-6">
+                <div className="flex items-end justify-between gap-4">
                   <div className="flex items-center gap-2">
-                    <span className="material-icons text-emerald-600">
-                      calendar_today
-                    </span>
-                    <label className="text-sm font-semibold text-gray-700">
-                      Tahun:
-                    </label>
-                    <input
-                      type="number"
-                      className="border border-gray-300 px-3 py-2 text-sm w-24"
-                      value={tahun}
-                      onChange={(e) => setTahun(e.target.value)}
-                      min="2000"
-                      max={new Date().getFullYear()}
-                    />
+                    <div className="flex items-center gap-2">
+                      <span className="material-icons text-emerald-600">
+                        calendar_today
+                      </span>
+                      <label className="text-sm font-semibold text-gray-700">
+                        Tahun:
+                      </label>
+                      <input
+                        type="number"
+                        className="border border-gray-300 px-3 py-2 text-sm w-24"
+                        value={tahun}
+                        onChange={(e) => setTahun(e.target.value)}
+                        min="2000"
+                        max={new Date().getFullYear()}
+                      />
+                    </div>
+                    <div className="flex items-center gap-2 text-emerald-700">
+                      <span className="material-icons">people</span>
+                      <span className="font-semibold">
+                        Total Pegawai: {pegawai?.length || 0}
+                      </span>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2 text-emerald-700">
-                    <span className="material-icons">people</span>
-                    <span className="font-semibold">
-                      Total Pegawai: {pegawai?.length || 0}
+                  <div>
+                    <span className="text-gray-400">
+                      <span className="text-xs">search :</span>
                     </span>
-                  </div>
-                </div>
-                <div>
-                  <span className="text-gray-400">
-                    <span className="text-xs">search :</span>
-                  </span>
-                  <div className="relative bg-white flex items-center">
-                    <input
-                      type="text"
-                      placeholder="Cari Nama/NIK/Unit"
-                      className="p-2 w-full rounded border border-gray-200 outline-none text-sm"
-                      value={searchValue}
-                      onChange={handleSearch}
-                    />
+                    <div className="relative bg-white flex items-center">
+                      <input
+                        type="text"
+                        placeholder="Cari Nama/NIK/Unit"
+                        className="p-2 w-full rounded border-2 border-emerald-300 focus:border-emerald-500 outline-none text-sm"
+                        value={searchValue}
+                        onChange={handleSearch}
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
@@ -1253,27 +1279,27 @@ export default function RekapPresensiBulanan() {
                 </div>
               ) : (
                 <div className="overflow-x-auto">
-                  <table className="min-w-[120%] text-xs border border-gray-200 overflow-hidden shadow-sm">
-                    <thead className="sticky top-0 z-10 bg-white border-b-2 border-emerald-100">
+                  <table className="min-w-[120%] text-xs border-2 border-emerald-200 overflow-hidden shadow-lg">
+                    <thead className="sticky top-0 z-10 bg-emerald-50 border-b-2 border-emerald-200">
                       <tr>
-                        <th className="px-4 py-4 text-center font-extrabold text-emerald-700 tracking-wide uppercase w-12 text-base">
+                        <th className="px-3 py-2 text-center font-black text-emerald-700 text-xs uppercase tracking-wider w-12">
                           <span className="material-icons text-base">
                             format_list_numbered
                           </span>
                         </th>
-                        <th className="px-4 py-4 text-left font-extrabold text-emerald-700 tracking-wide uppercase w-32 text-base">
+                        <th className="px-3 py-2 text-left font-black text-emerald-700 text-xs uppercase tracking-wider w-32">
                           NIK
                         </th>
-                        <th className="px-4 py-4 text-left font-extrabold text-emerald-700 tracking-wide uppercase w-56 text-base">
+                        <th className="px-3 py-2 text-left font-black text-emerald-700 text-xs uppercase tracking-wider w-56">
                           Nama
                         </th>
-                        <th className="px-4 py-4 text-left font-extrabold text-emerald-700 tracking-wide uppercase w-40 text-base">
+                        <th className="px-3 py-2 text-left font-black text-emerald-700 text-xs uppercase tracking-wider w-40">
                           Unit
                         </th>
-                        <th className="px-4 py-4 text-left font-extrabold text-emerald-700 tracking-wide uppercase w-40 text-base">
+                        <th className="px-3 py-2 text-left font-black text-emerald-700 text-xs uppercase tracking-wider w-40">
                           Shift
                         </th>
-                        <th className="px-2 py-3 text-center font-extrabold text-emerald-700 tracking-wide text-base uppercase w-40">
+                        <th className="px-3 py-2 text-center font-black text-emerald-700 text-xs uppercase tracking-wider w-40">
                           <div className="flex flex-col leading-tight">
                             <span>REKAP BULANAN</span>
                             <span className="text-xs font-normal text-gray-400 normal-case">
@@ -1281,7 +1307,7 @@ export default function RekapPresensiBulanan() {
                             </span>
                           </div>
                         </th>
-                        <th className="px-2 py-3 text-center font-extrabold text-emerald-700 tracking-wide text-base uppercase w-40">
+                        <th className="px-3 py-2 text-center font-black text-emerald-700 text-xs uppercase tracking-wider w-40">
                           <div className="flex flex-col leading-tight">
                             <span>PRESENSI</span>
                             <span className="text-xs font-normal text-gray-400 normal-case">
@@ -1289,7 +1315,7 @@ export default function RekapPresensiBulanan() {
                             </span>
                           </div>
                         </th>
-                        <th className="px-2 py-3 text-center font-extrabold text-emerald-700 tracking-wide text-base uppercase w-40">
+                        <th className="px-3 py-2 text-center font-black text-emerald-700 text-xs uppercase tracking-wider w-40">
                           <div className="flex flex-col leading-tight">
                             <span>KEHADIRAN</span>
                             <span className="text-xs font-normal text-gray-400 normal-case">
@@ -1304,30 +1330,30 @@ export default function RekapPresensiBulanan() {
                         pegawai.map((row, idx) => (
                           <tr
                             key={row.id}
-                            className={
+                            className={`transition hover:bg-primary/10 border-b border-gray-100 ${
                               idx % 2 === 0 ? "bg-white" : "bg-gray-50"
-                            }
+                            }`}
                           >
-                            <td className="px-4 py-4 text-center align-middle border-b border-gray-100 font-semibold text-sm">
+                            <td className="px-3 py-2 text-center align-middle font-semibold">
                               {idx +
                                 1 +
                                 (pegawaiPagination.current_page - 1) * 20}
                             </td>
-                            <td className="px-4 py-4 align-middle border-b border-gray-100 text-sm">
+                            <td className="px-3 py-2 align-middle">
                               {row.no_ktp}
                             </td>
-                            <td className="px-4 py-4 align-middle border-b border-gray-100 font-bold text-emerald-800 text-sm">
+                            <td className="px-3 py-2 align-middle font-bold text-emerald-800">
                               {row.nama}
                             </td>
-                            <td className="px-4 py-4 align-middle border-b border-gray-100 font-bold text-emerald-700 text-sm">
+                            <td className="px-3 py-2 align-middle font-bold text-emerald-700">
                               {row?.nama_unit || "-"}
                             </td>
-                            <td className="px-4 py-4 align-middle border-b border-gray-100 font-bold text-emerald-700 text-sm">
+                            <td className="px-3 py-2 align-middle font-bold text-emerald-700">
                               {row?.nama_shift || "-"}
                             </td>
-                            <td className="px-4 py-4 text-center align-middle border-b border-gray-100">
+                            <td className="px-3 py-2 text-center align-middle">
                               <button
-                                className="p-2 hover:bg-emerald-100 transition"
+                                className="w-8 h-8 flex items-center justify-center text-emerald-600 hover:bg-emerald-100 border border-emerald-200 transition"
                                 title="Lihat Detail Rekap Bulanan"
                                 onClick={() =>
                                   navigate(
@@ -1335,14 +1361,14 @@ export default function RekapPresensiBulanan() {
                                   )
                                 }
                               >
-                                <span className="material-icons text-emerald-600">
+                                <span className="material-icons text-sm">
                                   visibility
                                 </span>
                               </button>
                             </td>
-                            <td className="px-4 py-4 text-center align-middle border-b border-gray-100">
+                            <td className="px-3 py-2 text-center align-middle">
                               <button
-                                className="p-2 hover:bg-blue-100 transition"
+                                className="w-8 h-8 flex items-center justify-center text-blue-600 hover:bg-blue-50 border border-blue-200 transition"
                                 title="Lihat Rekap Presensi"
                                 onClick={() =>
                                   navigate(
@@ -1350,14 +1376,14 @@ export default function RekapPresensiBulanan() {
                                   )
                                 }
                               >
-                                <span className="material-icons text-blue-600">
+                                <span className="material-icons text-sm">
                                   history
                                 </span>
                               </button>
                             </td>
-                            <td className="px-4 py-4 text-center align-middle border-b border-gray-100">
+                            <td className="px-3 py-2 text-center align-middle">
                               <button
-                                className="p-2 hover:bg-orange-100 transition"
+                                className="w-8 h-8 flex items-center justify-center text-orange-600 hover:bg-orange-50 border border-orange-200 transition"
                                 title="Lihat Laporan Kehadiran"
                                 onClick={() =>
                                   navigate(
@@ -1365,7 +1391,7 @@ export default function RekapPresensiBulanan() {
                                   )
                                 }
                               >
-                                <span className="material-icons text-orange-600">
+                                <span className="material-icons text-sm">
                                   assessment
                                 </span>
                               </button>
@@ -1500,25 +1526,25 @@ export default function RekapPresensiBulanan() {
                 <div>
                   {/* Info Tarif Lembur */}
                   {lemburData.length > 0 && (
-                    <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                    <div className="mb-4 p-4 bg-emerald-50 border-2 border-emerald-200">
                       <div className="flex items-center gap-2 mb-2">
-                        <span className="material-icons text-blue-600">
+                        <span className="material-icons text-emerald-600">
                           info
                         </span>
-                        <span className="font-semibold text-blue-800">
+                        <span className="font-semibold text-emerald-800">
                           Informasi Tarif Lembur
                         </span>
                       </div>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                         <div className="flex items-center gap-2">
-                          <span className="w-3 h-3 bg-green-500 rounded-full"></span>
+                          <span className="w-3 h-3 bg-emerald-600"></span>
                           <span className="text-gray-700">
                             Hari Aktif (Senin-Jumat):{" "}
                             <strong>Rp 30.000/jam</strong>
                           </span>
                         </div>
                         <div className="flex items-center gap-2">
-                          <span className="w-3 h-3 bg-orange-500 rounded-full"></span>
+                          <span className="w-3 h-3 bg-orange-500"></span>
                           <span className="text-gray-700">
                             Hari Libur (Sabtu-Minggu):{" "}
                             <strong>Rp 60.000/jam</strong>
@@ -1528,10 +1554,10 @@ export default function RekapPresensiBulanan() {
                     </div>
                   )}
                   <div className="overflow-x-auto">
-                    <table className="min-w-[130%] text-xs border border-gray-200 overflow-hidden shadow-sm">
-                      <thead className="sticky top-0 z-10 bg-white border-b-2 border-emerald-100">
+                    <table className="min-w-[130%] text-xs border-2 border-emerald-200 overflow-hidden shadow-lg">
+                      <thead className="sticky top-0 z-10 bg-emerald-50 border-b-2 border-emerald-200">
                         <tr>
-                          <th className="px-2 py-4 text-center font-extrabold text-emerald-700 tracking-wide uppercase w-12 text-base">
+                          <th className="px-3 py-2 text-center font-black text-emerald-800 text-xs uppercase tracking-wider w-12">
                             <input
                               type="checkbox"
                               checked={
@@ -1541,39 +1567,39 @@ export default function RekapPresensiBulanan() {
                                 selectedLembur.length > 0
                               }
                               onChange={handleSelectAllLembur}
-                              className="w-4 h-4 text-emerald-600 bg-gray-100 border-gray-300 rounded focus:ring-emerald-500 focus:ring-2"
+                              className="w-4 h-4 text-emerald-600 bg-gray-100 border-gray-300 focus:ring-emerald-500 focus:ring-2"
                             />
                           </th>
-                          <th className="px-4 py-4 text-center font-extrabold text-emerald-700 tracking-wide uppercase w-12 text-base">
+                          <th className="px-3 py-2 text-center font-black text-emerald-800 text-xs uppercase tracking-wider w-12">
                             <span className="material-icons text-base">
                               format_list_numbered
                             </span>
                           </th>
-                          <th className="px-4 py-4 text-left font-extrabold text-emerald-700 tracking-wide uppercase w-32 text-base">
+                          <th className="px-3 py-2 text-left font-black text-emerald-800 text-xs uppercase tracking-wider w-32">
                             NIK
                           </th>
-                          <th className="px-4 py-4 text-left font-extrabold text-emerald-700 tracking-wide uppercase w-56 text-base">
+                          <th className="px-3 py-2 text-left font-black text-emerald-800 text-xs uppercase tracking-wider w-56">
                             Nama
                           </th>
-                          <th className="px-4 py-4 text-left font-extrabold text-emerald-700 tracking-wide uppercase w-40 text-base">
+                          <th className="px-3 py-2 text-left font-black text-emerald-800 text-xs uppercase tracking-wider w-40">
                             Unit
                           </th>
-                          <th className="px-4 py-4 text-left font-extrabold text-emerald-700 tracking-wide uppercase w-40 text-base">
+                          <th className="px-3 py-2 text-left font-black text-emerald-800 text-xs uppercase tracking-wider w-40">
                             Tanggal
                           </th>
-                          <th className="px-2 py-3 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-40">
+                          <th className="px-3 py-2 text-left font-black text-emerald-800 text-xs uppercase tracking-wider w-40">
                             Waktu Masuk
                           </th>
-                          <th className="px-2 py-3 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-40">
+                          <th className="px-3 py-2 text-left font-black text-emerald-800 text-xs uppercase tracking-wider w-40">
                             Waktu Pulang
                           </th>
-                          <th className="px-2 py-3 text-center font-extrabold text-emerald-700 tracking-wide text-base uppercase w-40">
+                          <th className="px-3 py-2 text-center font-black text-emerald-800 text-xs uppercase tracking-wider w-40">
                             Lembur
                           </th>
-                          <th className="px-2 py-3 text-center font-extrabold text-emerald-700 tracking-wide text-base uppercase w-32">
+                          <th className="px-3 py-2 text-center font-black text-emerald-800 text-xs uppercase tracking-wider w-32">
                             Tarif/Jam
                           </th>
-                          <th className="px-2 py-3 text-center font-extrabold text-emerald-700 tracking-wide text-base uppercase w-32">
+                          <th className="px-3 py-2 text-center font-black text-emerald-800 text-xs uppercase tracking-wider w-32">
                             Total
                           </th>
                         </tr>
@@ -1583,11 +1609,11 @@ export default function RekapPresensiBulanan() {
                           lemburData?.map((row, idx) => (
                             <tr
                               key={`${row.id}-${idx}`}
-                              className={
-                                idx % 2 === 0 ? "bg-white" : "bg-gray-50"
-                              }
+                              className={`transition hover:bg-emerald-50 border-b border-emerald-100 ${
+                                idx % 2 === 0 ? "bg-white" : "bg-emerald-25"
+                              }`}
                             >
-                              <td className="px-2 py-4 text-center align-middle border-b border-gray-100">
+                              <td className="px-3 py-2 text-center align-middle">
                                 <input
                                   type="checkbox"
                                   checked={selectedLembur.includes(idx)}
@@ -1600,36 +1626,36 @@ export default function RekapPresensiBulanan() {
                                     );
                                     handleLemburCheckbox(idx);
                                   }}
-                                  className="w-4 h-4 text-emerald-600 bg-gray-100 border-gray-300 rounded focus:ring-emerald-500 focus:ring-2"
+                                  className="w-4 h-4 text-emerald-600 bg-gray-100 border-gray-300 focus:ring-emerald-500 focus:ring-2"
                                 />
                               </td>
-                              <td className="px-4 py-4 text-center align-middle border-b border-gray-100 font-semibold text-sm">
+                              <td className="px-3 py-2 text-center align-middle font-semibold">
                                 {idx + 1}
                               </td>
-                              <td className="px-4 py-4 align-middle border-b border-gray-100 text-sm">
+                              <td className="px-3 py-2 align-middle">
                                 {row.no_ktp}
                               </td>
-                              <td className="px-4 py-4 align-middle border-b border-gray-100 font-bold text-emerald-800 text-sm">
+                              <td className="px-3 py-2 align-middle font-bold text-emerald-800">
                                 {[row.gelar_depan, row.nama, row.gelar_belakang]
                                   .filter(Boolean)
                                   .join(" ")}
                               </td>
-                              <td className="px-4 py-4 align-middle border-b border-gray-100 font-bold text-emerald-700 text-sm">
+                              <td className="px-3 py-2 align-middle font-bold text-emerald-700">
                                 {row?.nama_unit || "-"}
                               </td>
-                              <td className="px-4 py-4 align-middle border-b border-gray-100 font-bold text-emerald-700 text-sm">
+                              <td className="px-3 py-2 align-middle font-bold text-emerald-700">
                                 {formatTanggal(row?.tanggal)}
                               </td>
-                              <td className="px-4 py-4 align-middle border-b border-gray-100 font-bold text-emerald-700 text-sm">
+                              <td className="px-3 py-2 align-middle font-bold text-emerald-700">
                                 {row?.waktu_masuk || "-"}
                               </td>
-                              <td className="px-4 py-4 align-middle border-b border-gray-100 font-bold text-emerald-700 text-sm">
+                              <td className="px-3 py-2 align-middle font-bold text-emerald-700">
                                 {row?.waktu_pulang || "-"}
                               </td>
-                              <td className="px-4 py-4 align-middle border-b border-gray-100 font-bold text-emerald-700 text-sm">
+                              <td className="px-3 py-2 align-middle font-bold text-emerald-700">
                                 {formatOvertime(row?.menit_overtime)}
                               </td>
-                              <td className="px-4 py-4 align-middle border-b border-gray-100 font-bold text-emerald-700 text-sm">
+                              <td className="px-3 py-2 align-middle font-bold text-emerald-700">
                                 {(() => {
                                   const tanggal = new Date(row?.tanggal);
                                   const hariLibur =
@@ -1641,7 +1667,7 @@ export default function RekapPresensiBulanan() {
                                   )}`;
                                 })()}
                               </td>
-                              <td className="px-4 py-4 align-middle border-b border-gray-100 font-bold text-green-600 text-sm">
+                              <td className="px-3 py-2 align-middle font-bold text-green-600">
                                 {(() => {
                                   const durasiJam = Math.floor(
                                     (row?.menit_overtime || 0) / 60
@@ -2586,7 +2612,30 @@ export default function RekapPresensiBulanan() {
               </div>
             </div>
           )}
-          {tab === "controlPresensi" && <SettingPresensi />}
+          {tab === "controlPresensi" && (
+            <div className="bg-white border-2 border-emerald-200 shadow-lg">
+              <div className="bg-emerald-600 px-4 py-3 border-b-2 border-emerald-700">
+                <div className="flex items-center gap-3">
+                  <div className="bg-white p-2">
+                    <span className="material-icons text-lg text-emerald-600">
+                      settings
+                    </span>
+                  </div>
+                  <div>
+                    <h2 className="text-lg font-black text-white uppercase tracking-wide">
+                      Kontrol Presensi
+                    </h2>
+                    <p className="text-emerald-100 text-xs font-medium">
+                      Pengaturan status dan kontrol presensi bulanan
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div className="p-4">
+                <SettingPresensi />
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

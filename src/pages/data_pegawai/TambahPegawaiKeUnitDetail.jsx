@@ -91,244 +91,267 @@ export default function TambahPegawaiKeUnitDetail() {
 
   return (
     <div className="w-full min-h-screen font-sans bg-gray-50">
-      <div className="px-4 sticky z-40 top-0 py-4 border-b border-gray-200 bg-white flex items-center gap-4">
+      <div className="px-4 sticky z-40 top-0 py-4 border-b-2 border-emerald-200 bg-white flex items-center gap-4">
         <button
           onClick={() => navigate(-1)}
-          className="p-2 hover:bg-gray-100 rounded-lg transition flex items-center"
+          className="p-2 hover:bg-gray-100 transition flex items-center"
         >
           <span className="material-icons text-gray-600">arrow_back</span>
         </button>
-        <span className="material-icons text-lg text-green-200 bg-primary p-2 rounded opacity-80">
-          person_add
-        </span>
+        <div className="bg-emerald-600 p-2">
+          <span className="material-icons text-white text-lg">person_add</span>
+        </div>
         <div>
-          <div className="text-2xl font-extrabold text-emerald-700 tracking-tight drop-shadow-sm uppercase">
+          <div className="text-2xl font-black text-emerald-600 tracking-tight uppercase">
             Tambah Pegawai ke Unit Detail
           </div>
-          <div className="text-gray-600 text-base font-medium">
+          <div className="text-emerald-600 text-sm font-medium">
             Pilih pegawai dan unit detail, lalu klik tambah
           </div>
         </div>
       </div>
-      <div className="mx-auto p-4 max-w-5xl flex flex-col gap-8 px-2 md:px-0">
-        <div className="border border-gray-200 bg-white p-6 shadow flex flex-col gap-4 mb-4 rounded-xl">
-          <div className="flex flex-col md:flex-row gap-4 items-end mb-2">
-            <div className="flex-1 min-w-[220px]">
-              <label className="text-xs font-semibold text-gray-600 mb-1">
-                Unit Detail
-              </label>
-              <Select
-                className="z-30"
-                options={unitOptions}
-                value={
-                  unitOptions.find((opt) => opt.value === unitDetailId) || null
-                }
-                onChange={(opt) => setUnitDetailId(opt ? opt.value : null)}
-                placeholder="Pilih Unit Detail..."
-                classNamePrefix="select"
-              />
-            </div>
-            <button
-              className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded font-bold text-sm flex items-center gap-2"
-              onClick={handleTambah}
-            >
-              <span className="material-icons text-base">add</span> Tambah ke
-              Unit Detail
-            </button>
-            <div>
-              <span className="text-gray-400">
-                <span className="text-xs">search :</span>
-              </span>
-              <div className="relative bg-white flex items-center">
-                <input
-                  type="text"
-                  placeholder="Cari Nama/NIK/Unit"
-                  className="p-2 w-full rounded border border-gray-200 outline-none text-sm"
-                  value={searchValue}
-                  onChange={handleSearch}
-                />
+      <div className="mx-auto p-6 max-w-7xl flex flex-col gap-6">
+        <div className="bg-white border-2 border-emerald-200 shadow-lg">
+          <div className="bg-emerald-600 px-4 py-3 border-b-2 border-emerald-700">
+            <div className="flex items-center gap-3">
+              <div className="bg-white p-2">
+                <span className="material-icons text-lg text-emerald-600">
+                  group_add
+                </span>
+              </div>
+              <div>
+                <h2 className="text-lg font-black text-white uppercase tracking-wide">
+                  Pilih Pegawai & Unit Detail
+                </h2>
+                <p className="text-emerald-100 text-xs font-medium">
+                  Centang pegawai dan tentukan unit detail tujuan
+                </p>
               </div>
             </div>
           </div>
-          <div className="overflow-x-auto">
-            <table className="min-w-full text-sm bg-white">
-              <thead className="sticky top-0 z-10 bg-white border-b-2 border-emerald-100">
-                <tr>
-                  <th className="px-2 py-3 text-center font-extrabold text-emerald-700 tracking-wide text-base uppercase w-12">
-                    No
-                  </th>
-                  <th className="px-2 py-3 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-56">
-                    Nama Pegawai
-                  </th>
-                  <th className="px-2 py-3 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-32">
-                    NIK
-                  </th>
-                  <th className="px-2 py-3 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-32">
-                    No. HP
-                  </th>
-                  <th className="px-2 py-3 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-32">
-                    Tempat Lahir
-                  </th>
-                  <th className="px-2 py-3 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-32">
-                    Tanggal Lahir
-                  </th>
-                  <th className="px-2 py-3 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-40">
-                    <div className="flex flex-col leading-tight">
-                      <span>Unit</span>
-                      <span className="text-xs font-normal text-gray-400 normal-case">
-                        Detail Unit
-                      </span>
-                    </div>
-                  </th>
-                  <th className="px-2 py-3 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-40">
-                    Shift
-                  </th>
-                  <th className="px-2 py-3 text-center font-extrabold text-emerald-700 tracking-wide text-base uppercase w-16">
-                    <div className="flex flex-col items-center gap-1">
-                      <span className="text-xs">Pilih</span>
-                      <div className="flex items-center gap-1">
-                        <input
-                          type="checkbox"
-                          checked={isAllSelected}
-                          ref={(input) => {
-                            if (input) {
-                              input.indeterminate = isIndeterminate;
-                            }
-                          }}
-                          onChange={handleSelectAll}
-                          className="w-4 h-4 text-emerald-600 bg-gray-100 border-gray-300 rounded focus:ring-emerald-500 focus:ring-2"
-                        />
-                        <span className="text-xs text-gray-500">Semua</span>
-                      </div>
-                    </div>
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {loading ? (
+          <div className="p-4 flex flex-col gap-4">
+            <div className="flex flex-col md:flex-row gap-4 items-end">
+              <div className="flex-1 min-w-[220px]">
+                <label className="text-xs font-bold text-emerald-700 uppercase tracking-wide mb-1">
+                  Unit Detail
+                </label>
+                <Select
+                  className="z-30"
+                  options={unitOptions}
+                  value={
+                    unitOptions.find((opt) => opt.value === unitDetailId) ||
+                    null
+                  }
+                  onChange={(opt) => setUnitDetailId(opt ? opt.value : null)}
+                  placeholder="Pilih Unit Detail..."
+                  classNamePrefix="select"
+                />
+              </div>
+              <button
+                className="px-4 py-2 bg-emerald-600 text-white font-bold text-xs border-2 border-emerald-700 hover:bg-emerald-700 transition flex items-center gap-2"
+                onClick={handleTambah}
+              >
+                <span className="material-icons text-base">add</span> Tambah ke
+                Unit Detail
+              </button>
+              <div>
+                <span className="text-gray-400">
+                  <span className="text-xs">search :</span>
+                </span>
+                <div className="relative bg-white flex items-center">
+                  <input
+                    type="text"
+                    placeholder="Cari Nama/NIK/Unit"
+                    className="px-3 py-2 w-full border-2 border-emerald-300 outline-none text-sm"
+                    value={searchValue}
+                    onChange={handleSearch}
+                  />
+                </div>
+              </div>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="min-w-full text-sm bg-white">
+                <thead className="sticky top-0 z-10 bg-emerald-50 border-b-2 border-emerald-200">
                   <tr>
-                    <td
-                      colSpan={6}
-                      className="text-center py-6 text-emerald-600 font-bold"
-                    >
-                      Memuat data...
-                    </td>
+                    <th className="px-3 py-2 text-center font-black text-emerald-800 text-xs uppercase tracking-wider border-r border-emerald-200 w-12">
+                      No
+                    </th>
+                    <th className="px-3 py-2 text-left font-black text-emerald-800 text-xs uppercase tracking-wider border-r border-emerald-200 w-56">
+                      Nama Pegawai
+                    </th>
+                    <th className="px-3 py-2 text-left font-black text-emerald-800 text-xs uppercase tracking-wider border-r border-emerald-200 w-32">
+                      NIK
+                    </th>
+                    <th className="px-3 py-2 text-left font-black text-emerald-800 text-xs uppercase tracking-wider border-r border-emerald-200 w-32">
+                      No. HP
+                    </th>
+                    <th className="px-3 py-2 text-left font-black text-emerald-800 text-xs uppercase tracking-wider border-r border-emerald-200 w-32">
+                      Tempat Lahir
+                    </th>
+                    <th className="px-3 py-2 text-left font-black text-emerald-800 text-xs uppercase tracking-wider border-r border-emerald-200 w-32">
+                      Tanggal Lahir
+                    </th>
+                    <th className="px-3 py-2 text-left font-black text-emerald-800 text-xs uppercase tracking-wider border-r border-emerald-200 w-40">
+                      <div className="flex flex-col leading-tight">
+                        <span>Unit</span>
+                        <span className="text-xs font-normal text-gray-400 normal-case">
+                          Detail Unit
+                        </span>
+                      </div>
+                    </th>
+                    <th className="px-3 py-2 text-left font-black text-emerald-800 text-xs uppercase tracking-wider border-r border-emerald-200 w-40">
+                      Shift
+                    </th>
+                    <th className="px-3 py-2 text-center font-black text-emerald-800 text-xs uppercase tracking-wider w-16">
+                      <div className="flex flex-col items-center gap-1">
+                        <span className="text-xs">Pilih</span>
+                        <div className="flex items-center gap-1">
+                          <input
+                            type="checkbox"
+                            checked={isAllSelected}
+                            ref={(input) => {
+                              if (input) {
+                                input.indeterminate = isIndeterminate;
+                              }
+                            }}
+                            onChange={handleSelectAll}
+                            className="w-4 h-4 text-emerald-600 bg-gray-100 border-gray-300 focus:ring-emerald-500 focus:ring-2"
+                          />
+                          <span className="text-xs text-gray-500">Semua</span>
+                        </div>
+                      </div>
+                    </th>
                   </tr>
-                ) : pegawaiData?.data?.length > 0 ? (
-                  pegawaiData.data.map((row, idx) => (
-                    <tr
-                      key={row.id}
-                      className={idx % 2 === 0 ? "bg-white" : "bg-gray-50"}
-                    >
-                      <td className="px-2 py-3 text-center align-middle border-b border-gray-100 font-semibold">
-                        {(pegawaiData.per_page || 20) *
-                          ((pegawaiData.current_page || 1) - 1) +
-                          idx +
-                          1}
-                      </td>
-                      <td className="px-2 py-3 align-middle border-b border-gray-100 font-bold text-emerald-800">
-                        {row.nama}
-                      </td>
-                      <td className="px-2 py-3 align-middle border-b border-gray-100">
-                        {row.no_ktp}
-                      </td>
-                      <td className="px-2 py-3 align-middle border-b border-gray-100">
-                        {row.no_hp}
-                      </td>
-                      <td className="px-2 py-3 align-middle border-b border-gray-100">
-                        {row.tmpt_lahir}
-                      </td>
-                      <td className="px-2 py-3 align-middle border-b border-gray-100">
-                        {row.tgl_lahir}
-                      </td>
-                      <td className="px-2 py-3 align-middle border-b border-gray-100 font-bold text-emerald-700">
-                        {row?.nama_unit ? (
-                          <span className="inline-block bg-emerald-100 text-emerald-700 px-2 py-0.5 text-xs font-bold">
-                            {row?.nama_unit}
-                          </span>
-                        ) : (
-                          <span className="inline-block bg-gray-100 text-gray-400 px-2 py-0.5 text-xs">
-                            -
-                          </span>
-                        )}
-                      </td>
-                      <td className="px-2 py-3 align-middle border-b border-gray-100 font-bold text-emerald-700">
-                        {row?.nama_shift ? (
-                          <span className="inline-block bg-emerald-100 text-emerald-700 px-2 py-0.5 text-xs font-bold">
-                            {row.nama_shift}
-                          </span>
-                        ) : (
-                          <span className="inline-block bg-gray-100 text-gray-400 px-2 py-0.5 text-xs">
-                            -
-                          </span>
-                        )}
-                      </td>
-                      <td className="px-2 py-3 text-center align-middle border-b border-gray-100">
-                        <input
-                          type="checkbox"
-                          checked={selectedPegawai.includes(row.id)}
-                          onChange={() => handleTogglePegawai(row.id)}
-                          className="w-4 h-4 text-emerald-600 bg-gray-100 border-gray-300 rounded focus:ring-emerald-500 focus:ring-2"
-                        />
+                </thead>
+                <tbody>
+                  {loading ? (
+                    <tr>
+                      <td
+                        colSpan={6}
+                        className="text-center py-6 text-emerald-600 font-bold"
+                      >
+                        Memuat data...
                       </td>
                     </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan={6} className="text-center text-gray-400 py-4">
-                      Tidak ada data pegawai.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
+                  ) : pegawaiData?.data?.length > 0 ? (
+                    pegawaiData.data.map((row, idx) => (
+                      <tr
+                        key={row.id}
+                        className={idx % 2 === 0 ? "bg-white" : "bg-emerald-25"}
+                      >
+                        <td className="px-3 py-2 text-center align-middle border-b border-emerald-100 font-semibold">
+                          {(pegawaiData.per_page || 20) *
+                            ((pegawaiData.current_page || 1) - 1) +
+                            idx +
+                            1}
+                        </td>
+                        <td className="px-3 py-2 align-middle border-b border-emerald-100 font-bold text-emerald-800">
+                          {row.nama}
+                        </td>
+                        <td className="px-3 py-2 align-middle border-b border-emerald-100">
+                          {row.no_ktp}
+                        </td>
+                        <td className="px-3 py-2 align-middle border-b border-emerald-100">
+                          {row.no_hp}
+                        </td>
+                        <td className="px-3 py-2 align-middle border-b border-emerald-100">
+                          {row.tmpt_lahir}
+                        </td>
+                        <td className="px-3 py-2 align-middle border-b border-emerald-100">
+                          {row.tgl_lahir}
+                        </td>
+                        <td className="px-3 py-2 align-middle border-b border-emerald-100 font-bold text-emerald-700">
+                          {row?.nama_unit ? (
+                            <span className="inline-block bg-emerald-100 text-emerald-800 px-2 py-0.5 text-xs font-bold border border-emerald-300">
+                              {row?.nama_unit}
+                            </span>
+                          ) : (
+                            <span className="inline-block bg-gray-100 text-gray-400 px-2 py-0.5 text-xs">
+                              -
+                            </span>
+                          )}
+                        </td>
+                        <td className="px-3 py-2 align-middle border-b border-emerald-100 font-bold text-emerald-700">
+                          {row?.nama_shift ? (
+                            <span className="inline-block bg-emerald-100 text-emerald-800 px-2 py-0.5 text-xs font-bold border border-emerald-300">
+                              {row.nama_shift}
+                            </span>
+                          ) : (
+                            <span className="inline-block bg-gray-100 text-gray-400 px-2 py-0.5 text-xs">
+                              -
+                            </span>
+                          )}
+                        </td>
+                        <td className="px-3 py-2 text-center align-middle border-b border-emerald-100">
+                          <input
+                            type="checkbox"
+                            checked={selectedPegawai.includes(row.id)}
+                            onChange={() => handleTogglePegawai(row.id)}
+                            className="w-4 h-4 text-emerald-600 bg-gray-100 border-gray-300 focus:ring-emerald-500 focus:ring-2"
+                          />
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td
+                        colSpan={6}
+                        className="text-center text-gray-400 py-4"
+                      >
+                        Tidak ada data pegawai.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+            {/* List nama pegawai yang sudah dichecklist */}
+            {selectedPegawai.length > 0 && (
+              <div className="mt-4">
+                <div className="font-semibold text-sm text-emerald-700 mb-1">
+                  Pegawai terpilih:
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {pegawaiData.data
+                    .filter((row) => selectedPegawai.includes(row.id))
+                    .map((row) => (
+                      <span
+                        key={row.id}
+                        className="inline-block bg-emerald-100 text-emerald-800 px-2 py-1 text-xs font-bold border border-emerald-300"
+                      >
+                        {[row.gelar_depan, row.nama, row.gelar_belakang]
+                          .filter(Boolean)
+                          .join(" ")}
+                      </span>
+                    ))}
+                </div>
+              </div>
+            )}
+            {/* Pagination */}
+            {pegawaiData.links && pegawaiData?.links?.length > 1 && (
+              <div className="flex flex-wrap gap-1 justify-center mt-4">
+                {pegawaiData.links.map((link, i) => (
+                  <button
+                    key={i}
+                    className={`px-3 py-1 text-xs font-bold border transition ${
+                      link.active
+                        ? "bg-emerald-600 text-white border-emerald-600"
+                        : "bg-white text-emerald-700 border-gray-300 hover:bg-gray-100"
+                    }`}
+                    onClick={() => {
+                      if (link.url) {
+                        const url = new URL(link.url);
+                        const p = url.searchParams.get("page");
+                        if (p) setPage(Number(p));
+                      }
+                    }}
+                    disabled={!link.url || link.active}
+                    dangerouslySetInnerHTML={{ __html: link.label }}
+                  />
+                ))}
+              </div>
+            )}
           </div>
-          {/* List nama pegawai yang sudah dichecklist */}
-          {selectedPegawai.length > 0 && (
-            <div className="mt-4">
-              <div className="font-semibold text-sm text-emerald-700 mb-1">
-                Pegawai terpilih:
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {pegawaiData.data
-                  .filter((row) => selectedPegawai.includes(row.id))
-                  .map((row) => (
-                    <span
-                      key={row.id}
-                      className="inline-block bg-emerald-100 text-emerald-700 px-2 py-1 rounded text-xs font-bold"
-                    >
-                      {[row.gelar_depan, row.nama, row.gelar_belakang]
-                        .filter(Boolean)
-                        .join(" ")}
-                    </span>
-                  ))}
-              </div>
-            </div>
-          )}
-          {/* Pagination */}
-          {pegawaiData.links && pegawaiData?.links?.length > 1 && (
-            <div className="flex flex-wrap gap-1 justify-center mt-4">
-              {pegawaiData.links.map((link, i) => (
-                <button
-                  key={i}
-                  className={`px-3 py-1 rounded text-xs font-bold border transition ${
-                    link.active
-                      ? "bg-emerald-600 text-white border-emerald-600"
-                      : "bg-white text-emerald-700 border-gray-300 hover:bg-gray-100"
-                  }`}
-                  onClick={() => {
-                    if (link.url) {
-                      const url = new URL(link.url);
-                      const p = url.searchParams.get("page");
-                      if (p) setPage(Number(p));
-                    }
-                  }}
-                  disabled={!link.url || link.active}
-                  dangerouslySetInnerHTML={{ __html: link.label }}
-                />
-              ))}
-            </div>
-          )}
         </div>
       </div>
     </div>

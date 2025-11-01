@@ -62,6 +62,59 @@ export const fetchPegawai =
       }
     }
   };
+export const fetchPegawai2 =
+  (isSuperAdmin, token, page = 1, searchValue = "", unit_id = null) =>
+  async (dispatch) => {
+    dispatch({ type: FETCH_PEGAWAI_REQUEST });
+    let url = "";
+
+    if (isSuperAdmin) {
+      url = `${
+        import.meta.env.VITE_API_URL
+      }/api/pegawai/by-unit-id-presensi?unit_id=${unit_id}&&page=${page}&&search=${searchValue}`;
+    } else {
+      url = `${
+        import.meta.env.VITE_API_URL
+      }/api/pegawai/by-unit-id-presensi?page=${page}&&search=${searchValue}`;
+    }
+    try {
+      const res = await axios.get(url, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (isSuperAdmin) {
+        dispatch({
+          type: FETCH_PEGAWAI_SUCCESS,
+          payload: {
+            data: res.data.data,
+            pagination: {
+              last_page: res.data.last_page,
+              current_page: res.data.current_page,
+              links: res.data.links,
+            },
+          },
+        });
+      } else {
+        dispatch({
+          type: FETCH_PEGAWAI_SUCCESS,
+          payload: {
+            data: res.data.data,
+            pagination: {
+              last_page: res.data.last_page,
+              current_page: res.data.current_page,
+              links: res.data.links,
+            },
+          },
+        });
+      }
+    } catch (err) {
+      if (err) {
+        dispatch({
+          type: FETCH_PEGAWAI_FAILURE,
+          error: "Gagal mengambil data pegawai",
+        });
+      }
+    }
+  };
 
 // Fetch pegawai untuk kebutuhan tambah pegawai ke unit detail
 export const fetchTambahPegawaiList =

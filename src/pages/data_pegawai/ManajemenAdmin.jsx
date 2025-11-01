@@ -276,28 +276,31 @@ export default function ManajemenAdmin() {
 
   return (
     <div className="w-full min-h-screen font-sans bg-gray-50">
-      <div className="px-4 sticky z-40 top-0 py-4 border-b border-gray-200 bg-white flex items-center gap-4">
-        <span className="material-icons text-emerald-50 text-2xl bg-emerald-600 rounded p-2 shadow">
-          admin_panel_settings
-        </span>
+      <div className="px-4 sticky z-40 top-0 py-4 border-b-2 border-emerald-200 bg-white flex items-center gap-4">
+        <div className="bg-emerald-600 p-2">
+          <span className="material-icons text-white text-lg">
+            admin_panel_settings
+          </span>
+        </div>
         <div>
-          <div className="text-2xl font-extrabold text-emerald-700 tracking-tight drop-shadow-sm uppercase">
+          <div className="text-2xl font-black text-emerald-600 tracking-tight uppercase">
             Manajemen Admin & Unit
           </div>
-          <div className="text-gray-600 text-base font-medium">
+          <div className="text-emerald-600 text-sm font-medium">
             Kelola data admin unit dan unit
           </div>
         </div>
       </div>
-      <div className="mx-auto py-6 max-w-6xl px-4">
+
+      <div className="mx-auto p-6 max-w-7xl flex flex-col gap-6">
         {/* Tab Navigation */}
-        <div className="bg-white border-b border-gray-200 shadow-sm">
+        <div className="bg-white border-2 border-emerald-200 shadow-lg">
           <div className="flex">
             <button
-              className={`px-6 py-4 font-semibold text-sm transition-colors flex items-center gap-2 ${
+              className={`flex-1 px-4 py-2 font-semibold text-sm transition-all duration-200 border-r-2 border-emerald-200 last:border-r-0 flex items-center gap-2 ${
                 activeTab === "admin"
-                  ? "text-emerald-600 border-b-2 border-emerald-600 bg-emerald-50"
-                  : "text-gray-600 hover:text-emerald-600 hover:bg-gray-50"
+                  ? "bg-emerald-600 text-white"
+                  : "bg-white text-emerald-700 hover:bg-emerald-50"
               }`}
               onClick={() => setActiveTab("admin")}
             >
@@ -307,10 +310,10 @@ export default function ManajemenAdmin() {
               Admin Unit
             </button>
             <button
-              className={`px-6 py-4 font-semibold text-sm transition-colors flex items-center gap-2 ${
+              className={`flex-1 px-4 py-2 font-semibold text-sm transition-all duration-200 border-r-2 border-emerald-200 last:border-r-0 flex items-center gap-2 ${
                 activeTab === "unit"
-                  ? "text-emerald-600 border-b-2 border-emerald-600 bg-emerald-50"
-                  : "text-gray-600 hover:text-emerald-600 hover:bg-gray-50"
+                  ? "bg-emerald-600 text-white"
+                  : "bg-white text-emerald-700 hover:bg-emerald-50"
               }`}
               onClick={() => setActiveTab("unit")}
             >
@@ -322,29 +325,36 @@ export default function ManajemenAdmin() {
 
         {/* Admin Tab */}
         {activeTab === "admin" && (
-          <div className="bg-white border border-gray-200 shadow-sm">
-            {/* Section Header */}
-            <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
+          <div className="bg-white border-2 border-emerald-200 shadow-lg">
+            {/* Card Header */}
+            <div className="bg-emerald-600 px-4 py-3 border-b-2 border-emerald-700">
               <div className="flex items-center gap-3">
-                <span className="material-icons text-emerald-600 text-xl">
-                  admin_panel_settings
-                </span>
-                <h2 className="text-lg font-semibold text-gray-800">
-                  Data Admin Unit
-                </h2>
+                <div className="bg-white p-2">
+                  <span className="material-icons text-lg text-emerald-600">
+                    admin_panel_settings
+                  </span>
+                </div>
+                <div>
+                  <h2 className="text-lg font-black text-white uppercase tracking-wide">
+                    Data Admin Unit
+                  </h2>
+                  <p className="text-emerald-100 text-xs font-medium">
+                    Kelola data admin unit
+                  </p>
+                </div>
               </div>
             </div>
 
             {/* Form Section */}
-            <div className="p-6 border-b border-gray-200">
+            <div className="p-4 border-b-2 border-emerald-200">
               <form onSubmit={handleSubmit}>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    <label className="block text-xs font-bold text-emerald-700 uppercase tracking-wide mb-1">
                       Nama Admin
                     </label>
                     <input
-                      className="w-full border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                      className="w-full border-2 border-emerald-300 px-3 py-2 text-sm font-medium focus:border-emerald-500 focus:outline-none transition-colors"
                       placeholder="Masukkan nama admin"
                       value={form.name}
                       onChange={(e) =>
@@ -356,11 +366,11 @@ export default function ManajemenAdmin() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    <label className="block text-xs font-bold text-emerald-700 uppercase tracking-wide mb-1">
                       Email
                     </label>
                     <input
-                      className="w-full border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                      className="w-full border-2 border-emerald-300 px-3 py-2 text-sm font-medium focus:border-emerald-500 focus:outline-none transition-colors"
                       placeholder="Masukkan email"
                       value={form.email}
                       onChange={(e) =>
@@ -372,11 +382,11 @@ export default function ManajemenAdmin() {
                   </div>
 
                   <div className="relative">
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    <label className="block text-xs font-bold text-emerald-700 uppercase tracking-wide mb-1">
                       Password
                     </label>
                     <input
-                      className="w-full border border-gray-300 px-3 py-2 pr-10 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                      className="w-full border-2 border-emerald-300 px-3 py-2 pr-10 text-sm font-medium focus:border-emerald-500 focus:outline-none transition-colors"
                       placeholder="Masukkan password"
                       type={showPassword ? "text" : "password"}
                       value={form.password}
@@ -388,7 +398,7 @@ export default function ManajemenAdmin() {
                     />
                     <button
                       type="button"
-                      className="absolute right-2 top-8 text-gray-400 hover:text-emerald-600"
+                      className="absolute right-2 top-8 text-emerald-400 hover:text-emerald-600"
                       onClick={() => setShowPassword((v) => !v)}
                       title={
                         showPassword
@@ -396,18 +406,18 @@ export default function ManajemenAdmin() {
                           : "Tampilkan Password"
                       }
                     >
-                      <span className="material-icons text-lg">
+                      <span className="material-icons text-sm">
                         {showPassword ? "visibility_off" : "visibility"}
                       </span>
                     </button>
                   </div>
 
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    <label className="block text-xs font-bold text-emerald-700 uppercase tracking-wide mb-1">
                       Unit
                     </label>
                     <select
-                      className="w-full border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                      className="w-full border-2 border-emerald-300 px-3 py-2 text-sm font-medium focus:border-emerald-500 focus:outline-none transition-colors"
                       value={form.unit_id}
                       onChange={(e) =>
                         setForm((f) => ({ ...f, unit_id: e.target.value }))
@@ -449,11 +459,11 @@ export default function ManajemenAdmin() {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-4">
                     <div>
-                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      <label className="block text-xs font-bold text-emerald-700 uppercase tracking-wide mb-1">
                         Status
                       </label>
                       <select
-                        className="border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                        className="border-2 border-emerald-300 px-3 py-2 text-sm font-medium focus:border-emerald-500 focus:outline-none transition-colors"
                         value={form.status}
                         onChange={(e) =>
                           setForm((f) => ({ ...f, status: e.target.value }))
@@ -466,11 +476,11 @@ export default function ManajemenAdmin() {
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2">
                     <button
                       type="submit"
                       disabled={formLoading}
-                      className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2 text-sm font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                      className="px-4 py-2 bg-emerald-600 text-white font-bold text-xs hover:bg-emerald-700 transition-all duration-200 flex items-center gap-1 border-2 border-emerald-700 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {formLoading ? (
                         <>
@@ -505,7 +515,7 @@ export default function ManajemenAdmin() {
                             status: "aktif",
                           })
                         }
-                        className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 text-sm font-semibold transition-colors flex items-center gap-2"
+                        className="px-4 py-2 bg-gray-500 text-white font-bold text-xs hover:bg-gray-600 transition-all duration-200 flex items-center gap-1 border-2 border-gray-600 shadow-lg hover:shadow-xl"
                       >
                         <span className="material-icons text-sm">cancel</span>
                         Batal
@@ -515,9 +525,9 @@ export default function ManajemenAdmin() {
                 </div>
               </form>
               {form.id && (
-                <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200">
-                  <div className="flex items-center gap-2 text-yellow-700 font-medium">
-                    <span className="material-icons text-lg">edit</span>
+                <div className="mt-3 p-2 bg-yellow-50 border border-yellow-200">
+                  <div className="flex items-center gap-1 text-yellow-700 font-bold text-xs">
+                    <span className="material-icons text-sm">edit</span>
                     Edit Admin: {form.name} ({form.email})
                   </div>
                 </div>
@@ -525,33 +535,33 @@ export default function ManajemenAdmin() {
             </div>
 
             {/* Filter Section */}
-            <div className="p-6 border-b border-gray-200 bg-gray-50">
+            <div className="p-4 border-b-2 border-emerald-200 bg-emerald-50">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
-                  <div className="flex items-center gap-2 px-3 py-1 bg-white border border-gray-200">
+                  <div className="flex items-center gap-2 px-3 py-1 bg-white border-2 border-emerald-200">
                     <span className="material-icons text-emerald-600 text-lg">
                       verified_user
                     </span>
-                    <span className="text-sm text-emerald-600 font-medium">
+                    <span className="text-xs font-bold text-emerald-700 uppercase tracking-wide">
                       Super Admin
                     </span>
                   </div>
-                  <div className="flex items-center gap-2 px-3 py-1 bg-white border border-gray-200">
-                    <span className="material-icons text-gray-600 text-lg">
+                  <div className="flex items-center gap-2 px-3 py-1 bg-white border-2 border-emerald-200">
+                    <span className="material-icons text-emerald-600 text-lg">
                       person
                     </span>
-                    <span className="text-sm text-gray-600 font-medium">
+                    <span className="text-xs font-bold text-emerald-700 uppercase tracking-wide">
                       Admin Unit
                     </span>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-3">
-                  <label className="text-sm font-medium text-gray-700">
+                  <label className="text-xs font-bold text-emerald-700 uppercase tracking-wide">
                     Filter Unit:
                   </label>
                   <select
-                    className="border border-gray-300 px-3 py-1 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                    className="border-2 border-emerald-300 px-3 py-1 text-sm font-medium focus:border-emerald-500 focus:outline-none transition-colors"
                     value={filterUnit}
                     onChange={(e) => setFilterUnit(e.target.value)}
                   >
@@ -590,28 +600,28 @@ export default function ManajemenAdmin() {
 
             {/* Table Section */}
             <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead className="bg-gray-50 border-b border-gray-200">
+              <table className="min-w-full">
+                <thead className="bg-emerald-50 border-b-2 border-emerald-200">
                   <tr>
-                    <th className="px-4 py-3 text-center font-semibold text-gray-700 w-12">
+                    <th className="px-3 py-2 text-center font-black text-emerald-800 text-xs uppercase tracking-wider border-r border-emerald-200">
                       No
                     </th>
-                    <th className="px-4 py-3 text-left font-semibold text-gray-700">
+                    <th className="px-3 py-2 text-left font-black text-emerald-800 text-xs uppercase tracking-wider border-r border-emerald-200">
                       Nama
                     </th>
-                    <th className="px-4 py-3 text-left font-semibold text-gray-700">
+                    <th className="px-3 py-2 text-left font-black text-emerald-800 text-xs uppercase tracking-wider border-r border-emerald-200">
                       Email
                     </th>
-                    <th className="px-4 py-3 text-center font-semibold text-gray-700 w-20">
+                    <th className="px-3 py-2 text-center font-black text-emerald-800 text-xs uppercase tracking-wider border-r border-emerald-200">
                       Role
                     </th>
-                    <th className="px-4 py-3 text-left font-semibold text-gray-700">
+                    <th className="px-3 py-2 text-left font-black text-emerald-800 text-xs uppercase tracking-wider border-r border-emerald-200">
                       Unit
                     </th>
-                    <th className="px-4 py-3 text-center font-semibold text-gray-700 w-20">
+                    <th className="px-3 py-2 text-center font-black text-emerald-800 text-xs uppercase tracking-wider border-r border-emerald-200">
                       Status
                     </th>
-                    <th className="px-4 py-3 text-center font-semibold text-gray-700 w-24">
+                    <th className="px-3 py-2 text-center font-black text-emerald-800 text-xs uppercase tracking-wider">
                       Aksi
                     </th>
                   </tr>
@@ -631,63 +641,75 @@ export default function ManajemenAdmin() {
                     ).map((row, idx) => (
                       <tr
                         key={`admin-${row?.id || idx}`}
-                        className="border-b border-gray-200 hover:bg-gray-50 transition-colors"
+                        className={`transition-all duration-200 hover:bg-emerald-50 border-b border-emerald-100 ${
+                          idx % 2 === 0 ? "bg-white" : "bg-emerald-25"
+                        }`}
                       >
-                        <td className="px-4 py-3 text-center text-gray-600 font-medium">
+                        <td className="px-3 py-2 text-center font-bold text-emerald-700 border-r border-emerald-100 text-sm">
                           {idx + 1}
                         </td>
-                        <td className="px-4 py-3 font-semibold text-gray-800">
+                        <td className="px-3 py-2 font-bold text-emerald-800 border-r border-emerald-100 text-sm">
                           {row.name}
                         </td>
-                        <td className="px-4 py-3 text-gray-600">{row.email}</td>
-                        <td className="px-4 py-3 text-center">
+                        <td className="px-3 py-2 text-gray-700 border-r border-emerald-100 text-sm">
+                          {row.email}
+                        </td>
+                        <td className="px-3 py-2 text-center border-r border-emerald-100">
                           {row.role === "super_admin" ? (
                             <span
-                              className="material-icons text-emerald-600 text-xl"
+                              className="material-icons text-emerald-600 text-lg"
                               title="Super Admin"
                             >
                               verified_user
                             </span>
                           ) : (
                             <span
-                              className="material-icons text-gray-600 text-xl"
+                              className="material-icons text-emerald-600 text-lg"
                               title="Admin Unit"
                             >
                               person
                             </span>
                           )}
                         </td>
-                        <td className="px-4 py-3 text-gray-600">
-                          {row.unit?.nama || "-"}
+                        <td className="px-3 py-2 border-r border-emerald-100">
+                          {row.unit?.nama ? (
+                            <span className="inline-flex items-center px-2 py-1 text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                              {row.unit.nama}
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center px-2 py-1 text-xs font-bold bg-gray-100 text-gray-400 border border-gray-300">
+                              -
+                            </span>
+                          )}
                         </td>
-                        <td className="px-4 py-3 text-center">
+                        <td className="px-3 py-2 text-center border-r border-emerald-100">
                           {row.status === "aktif" ? (
-                            <span className="inline-flex items-center px-2 py-1 text-xs font-medium bg-emerald-100 text-emerald-700">
+                            <span className="inline-flex items-center px-2 py-1 text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
                               Aktif
                             </span>
                           ) : (
-                            <span className="inline-flex items-center px-2 py-1 text-xs font-medium bg-red-100 text-red-700">
+                            <span className="inline-flex items-center px-2 py-1 text-xs font-bold bg-red-100 text-red-800 border border-red-300">
                               Nonaktif
                             </span>
                           )}
                         </td>
-                        <td className="px-4 py-3 text-center">
-                          <div className="flex justify-center gap-2">
+                        <td className="px-3 py-2 text-center">
+                          <div className="flex justify-center gap-1">
                             <button
                               onClick={() => handleEdit(row)}
-                              className="p-1 text-emerald-600 hover:text-emerald-800 hover:bg-emerald-50 transition-colors"
+                              className="w-8 h-8 flex items-center justify-center text-emerald-600 hover:text-emerald-800 hover:bg-emerald-50 transition-all duration-200 border border-emerald-200 hover:border-emerald-300"
                               title="Edit Admin"
                             >
-                              <span className="material-icons text-lg">
+                              <span className="material-icons text-sm">
                                 edit
                               </span>
                             </button>
                             <button
                               onClick={() => handleDelete(row.id)}
-                              className="p-1 text-red-600 hover:text-red-800 hover:bg-red-50 transition-colors"
+                              className="w-8 h-8 flex items-center justify-center text-red-600 hover:text-red-800 hover:bg-red-50 transition-all duration-200 border border-red-200 hover:border-red-300"
                               title="Hapus Admin"
                             >
-                              <span className="material-icons text-lg">
+                              <span className="material-icons text-sm">
                                 delete
                               </span>
                             </button>
@@ -697,16 +719,16 @@ export default function ManajemenAdmin() {
                     ))
                   ) : (
                     <tr>
-                      <td
-                        colSpan={7}
-                        className="text-center text-gray-400 py-8"
-                      >
-                        <div className="flex flex-col items-center gap-2">
-                          <span className="material-icons text-4xl text-gray-300">
+                      <td colSpan={7} className="text-center py-12">
+                        <div className="flex flex-col items-center gap-4">
+                          <span className="material-icons text-6xl text-gray-300">
                             admin_panel_settings
                           </span>
-                          <div className="font-semibold text-gray-600">
-                            Tidak ada data admin.
+                          <div className="text-gray-500 font-bold text-lg">
+                            Tidak ada data admin
+                          </div>
+                          <div className="text-gray-400 text-sm">
+                            Belum ada data admin yang tersedia
                           </div>
                         </div>
                       </td>
@@ -720,21 +742,28 @@ export default function ManajemenAdmin() {
 
         {/* Unit Tab */}
         {activeTab === "unit" && (
-          <div className="bg-white border border-gray-200 shadow-sm">
-            {/* Section Header */}
-            <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
+          <div className="bg-white border-2 border-emerald-200 shadow-lg">
+            {/* Card Header */}
+            <div className="bg-emerald-600 px-4 py-3 border-b-2 border-emerald-700">
               <div className="flex items-center gap-3">
-                <span className="material-icons text-emerald-600 text-xl">
-                  business
-                </span>
-                <h2 className="text-lg font-semibold text-gray-800">
-                  Data Unit
-                </h2>
+                <div className="bg-white p-2">
+                  <span className="material-icons text-lg text-emerald-600">
+                    business
+                  </span>
+                </div>
+                <div>
+                  <h2 className="text-lg font-black text-white uppercase tracking-wide">
+                    Data Unit
+                  </h2>
+                  <p className="text-emerald-100 text-xs font-medium">
+                    Kelola data unit organisasi
+                  </p>
+                </div>
               </div>
             </div>
 
             {/* Content */}
-            <div className="p-6">
+            <div className="p-4">
               {/* <form
               className="flex flex-wrap gap-4 mb-6 items-end"
               onSubmit={handleUnitSubmit}
@@ -800,19 +829,19 @@ export default function ManajemenAdmin() {
               </div>
             )} */}
               <div className="overflow-x-auto">
-                <table className="min-w-full text-sm bg-white">
-                  <thead className="sticky top-0 z-10 bg-white border-b-2 border-emerald-100">
+                <table className="min-w-full">
+                  <thead className="bg-emerald-50 border-b-2 border-emerald-200">
                     <tr>
-                      <th className="px-4 py-4 text-center font-extrabold text-emerald-700 tracking-wide text-base uppercase w-12">
+                      <th className="px-3 py-2 text-center font-black text-emerald-800 text-xs uppercase tracking-wider border-r border-emerald-200">
                         No
                       </th>
-                      <th className="px-4 py-4 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase">
+                      <th className="px-3 py-2 text-left font-black text-emerald-800 text-xs uppercase tracking-wider border-r border-emerald-200">
                         Nama Unit
                       </th>
-                      <th className="px-4 py-4 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase">
+                      <th className="px-3 py-2 text-left font-black text-emerald-800 text-xs uppercase tracking-wider">
                         Detail Unit
                       </th>
-                      {/* <th className="px-4 py-4 text-center font-extrabold text-emerald-700 tracking-wide text-base uppercase w-24">
+                      {/* <th className="px-3 py-2 text-center font-black text-emerald-800 text-xs uppercase tracking-wider w-24">
                       Aksi
                     </th> */}
                     </tr>
@@ -822,31 +851,30 @@ export default function ManajemenAdmin() {
                       units.map((row, idx) => (
                         <tr
                           key={idx}
-                          className={
-                            "transition hover:bg-emerald-50 " +
-                            (idx % 2 === 0 ? "bg-white" : "bg-gray-50")
-                          }
+                          className={`transition-all duration-200 hover:bg-emerald-50 border-b border-emerald-100 ${
+                            idx % 2 === 0 ? "bg-white" : "bg-emerald-25"
+                          }`}
                         >
-                          <td className="px-4 py-4 text-center align-middle border-b border-gray-100 font-semibold text-base">
+                          <td className="px-3 py-2 text-center font-bold text-emerald-700 border-r border-emerald-100 text-sm">
                             {idx + 1}
                           </td>
-                          <td className="px-4 py-4 align-middle border-b border-gray-100 font-bold text-emerald-800 text-base">
+                          <td className="px-3 py-2 font-bold text-emerald-800 border-r border-emerald-100 text-sm">
                             {row?.nama}
                           </td>
-                          <td className="px-4 py-4 align-middle border-b border-gray-100 text-base">
+                          <td className="px-3 py-2 text-sm">
                             {row?.children?.length > 0 ? (
                               <div className="flex flex-wrap gap-1">
                                 {row?.children?.map((detail) => (
                                   <span
                                     key={detail?.id || Math.random()}
-                                    className="inline-block bg-emerald-100 text-emerald-800 text-xs px-2 py-1 rounded"
+                                    className="inline-flex items-center px-2 py-1 text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300"
                                   >
                                     {detail?.nama || "Unknown"}
                                   </span>
                                 ))}
                               </div>
                             ) : (
-                              <span className="text-gray-400">
+                              <span className="inline-flex items-center px-2 py-1 text-xs font-bold bg-gray-100 text-gray-400 border border-gray-300">
                                 Tidak ada detail
                               </span>
                             )}
@@ -879,16 +907,16 @@ export default function ManajemenAdmin() {
                       ))
                     ) : (
                       <tr>
-                        <td
-                          colSpan={4}
-                          className="text-center text-gray-400 py-8"
-                        >
-                          <div className="flex flex-col items-center gap-2">
-                            <span className="material-icons text-4xl text-gray-300">
+                        <td colSpan={3} className="text-center py-12">
+                          <div className="flex flex-col items-center gap-4">
+                            <span className="material-icons text-6xl text-gray-300">
                               business
                             </span>
-                            <div className="font-semibold text-gray-600">
-                              Tidak ada data unit.
+                            <div className="text-gray-500 font-bold text-lg">
+                              Tidak ada data unit
+                            </div>
+                            <div className="text-gray-400 text-sm">
+                              Belum ada data unit yang tersedia
                             </div>
                           </div>
                         </td>

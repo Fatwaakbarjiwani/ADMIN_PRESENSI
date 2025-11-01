@@ -325,252 +325,279 @@ export default function DaftarLibur() {
   return (
     <div className="w-full min-h-screen font-sans bg-gray-50">
       {/* Header */}
-      <div className="px-4 sticky z-40 top-0 py-4 border-b border-gray-200 bg-white flex items-center gap-4">
-        <span className="material-icons text-lg text-green-200 bg-primary p-2 rounded opacity-80">
-          event_busy
-        </span>
+      <div className="px-4 sticky z-40 top-0 py-4 border-b-2 border-emerald-200 bg-white flex items-center gap-4">
+        <div className="bg-emerald-600 p-2">
+          <span className="material-icons text-white text-lg">event_busy</span>
+        </div>
         <div>
-          <div className="text-2xl font-extrabold text-emerald-700 tracking-tight drop-shadow-sm uppercase">
+          <div className="text-2xl font-black text-emerald-600 tracking-tight uppercase">
             Manajemen Hari Libur
           </div>
-          <div className="text-gray-600 text-base font-medium">
+          <div className="text-emerald-600 text-sm font-medium">
             Kelola hari libur per unit detail
           </div>
         </div>
       </div>
-      <div className="mx-auto p-4 max-w-5xl flex flex-col gap-8 px-2 md:px-0">
+      <div className="mx-auto p-6 max-w-7xl flex flex-col gap-6">
         {/* Multi-date picker section */}
-        <div className="border border-gray-200 bg-white p-6 shadow flex flex-col gap-4 mb-4">
-          <div className="font-bold text-emerald-700 text-lg mb-2 flex items-center gap-2">
-            <span className="material-icons text-emerald-600 text-2xl">
-              date_range
-            </span>
-            Pilih Tanggal Libur{" "}
-            <span className="text-sm font-thin align-text-bottom">
-              (bisa lebih dari satu)
-            </span>
+        <div className="bg-white border-2 border-emerald-200 shadow-lg mb-4">
+          <div className="bg-emerald-600 px-4 py-3 border-b-2 border-emerald-700">
+            <div className="flex items-center gap-3">
+              <div className="bg-white p-2">
+                <span className="material-icons text-lg text-emerald-600">
+                  date_range
+                </span>
+              </div>
+              <div>
+                <h2 className="text-lg font-black text-white uppercase tracking-wide">
+                  Pilih Tanggal Libur
+                </h2>
+                <p className="text-emerald-100 text-xs font-medium">
+                  Bisa pilih lebih dari satu tanggal
+                </p>
+              </div>
+            </div>
           </div>
-          <DatePicker
-            multiple
-            value={selectedDates}
-            onChange={(dates) =>
-              setSelectedDates(dates.map((d) => d.format("YYYY-MM-DD")))
-            }
-            format="YYYY-MM-DD"
-            style={{ padding: "20px", width: "100%" }}
-            placeholder="Pilih tanggal-tanggal libur..."
-          />
-          {/* Render baris input untuk setiap tanggal yang dipilih */}
-          {inputRows.length > 0 && (
-            <div className="mt-4 flex flex-col gap-3">
-              {inputRows.map((row, idx) => (
-                <div
-                  key={row.tanggal}
-                  className="flex flex-wrap gap-2 items-end bg-emerald-50 border border-emerald-100 rounded p-3 shadow-sm"
-                >
-                  <div className="flex flex-col min-w-[120px]">
-                    <label className="text-xs font-semibold text-gray-600 mb-1">
-                      Tanggal
-                    </label>
-                    <input
-                      value={row.tanggal}
-                      readOnly
-                      className="border border-gray-300 px-3 py-2 text-sm rounded bg-gray-100"
-                    />
+          <div className="p-4 flex flex-col gap-4">
+            <DatePicker
+              multiple
+              value={selectedDates}
+              onChange={(dates) =>
+                setSelectedDates(dates.map((d) => d.format("YYYY-MM-DD")))
+              }
+              format="YYYY-MM-DD"
+              style={{ padding: "20px", width: "100%" }}
+              placeholder="Pilih tanggal-tanggal libur..."
+            />
+            {inputRows.length > 0 && (
+              <div className="mt-2 flex flex-col gap-3">
+                {inputRows.map((row, idx) => (
+                  <div
+                    key={row.tanggal}
+                    className="flex flex-wrap gap-2 items-end bg-emerald-50 border-2 border-emerald-200 p-3 shadow-sm"
+                  >
+                    <div className="flex flex-col min-w-[120px]">
+                      <label className="text-xs font-bold text-emerald-700 uppercase tracking-wide mb-1">
+                        Tanggal
+                      </label>
+                      <input
+                        value={row.tanggal}
+                        readOnly
+                        className="border-2 border-emerald-300 px-3 py-2 text-sm bg-emerald-25"
+                      />
+                    </div>
+                    <div className="flex flex-col min-w-[180px]">
+                      <label className="text-xs font-bold text-emerald-700 uppercase tracking-wide mb-1">
+                        Keterangan
+                      </label>
+                      <input
+                        className="border-2 border-emerald-300 px-3 py-2 text-sm"
+                        placeholder="Keterangan (misal: Hari Kemerdekaan)"
+                        value={row.keterangan}
+                        onChange={(e) => handleKeterangan(e.target.value, idx)}
+                        required
+                      />
+                    </div>
+                    <div className="flex flex-col min-w-[220px] flex-1">
+                      <label className="text-xs font-bold text-emerald-700 uppercase tracking-wide mb-1">
+                        Unit Detail
+                      </label>
+                      <Select
+                        isMulti
+                        options={unitOptions}
+                        value={
+                          row.unit_detail_ids.length === unitDetails.length
+                            ? unitOptions
+                            : unitOptions.filter((opt) =>
+                                opt.value === "ALL"
+                                  ? row.unit_detail_ids.length ===
+                                    unitDetails.length
+                                  : row.unit_detail_ids.includes(opt.value)
+                              )
+                        }
+                        onChange={(selected) => handleSelectUnit(selected, idx)}
+                        className="basic-multi-select"
+                        classNamePrefix="select"
+                        placeholder="Pilih Unit Detail..."
+                      />
+                    </div>
+                    <div className="flex flex-col justify-end min-w-[100px]">
+                      <button
+                        type="button"
+                        className="px-4 py-2 bg-emerald-600 text-white font-bold text-xs border-2 border-emerald-700 hover:bg-emerald-700 transition shadow-lg"
+                        onClick={() => handleTambahBaris(row, idx)}
+                        title="Tambah Hari Libur"
+                      >
+                        Tambah
+                      </button>
+                    </div>
                   </div>
-                  <div className="flex flex-col min-w-[180px]">
-                    <label className="text-xs font-semibold text-gray-600 mb-1">
-                      Keterangan
-                    </label>
-                    <input
-                      className="border border-gray-300 px-3 py-2 text-sm rounded"
-                      placeholder="Keterangan (misal: Hari Kemerdekaan)"
-                      value={row.keterangan}
-                      onChange={(e) => handleKeterangan(e.target.value, idx)}
-                      required
-                    />
-                  </div>
-                  <div className="flex flex-col min-w-[220px] flex-1">
-                    <label className="text-xs font-semibold text-gray-600 mb-1">
-                      Unit Detail
-                    </label>
-                    <Select
-                      isMulti
-                      options={unitOptions}
-                      value={
-                        row.unit_detail_ids.length === unitDetails.length
-                          ? unitOptions
-                          : unitOptions.filter((opt) =>
-                              opt.value === "ALL"
-                                ? row.unit_detail_ids.length ===
-                                  unitDetails.length
-                                : row.unit_detail_ids.includes(opt.value)
-                            )
-                      }
-                      onChange={(selected) => handleSelectUnit(selected, idx)}
-                      className="basic-multi-select"
-                      classNamePrefix="select"
-                      placeholder="Pilih Unit Detail..."
-                    />
-                  </div>
-                  <div className="flex flex-col justify-end min-w-[100px]">
-                    <button
-                      type="button"
-                      className="px-4 py-2 font-bold text-sm bg-emerald-600 hover:bg-emerald-700 text-white rounded shadow"
-                      onClick={() => handleTambahBaris(row, idx)}
-                      title="Tambah Hari Libur"
-                    >
-                      Tambah
-                    </button>
-                  </div>
+                ))}
+              </div>
+            )}
+            {editRow && (
+              <div className="mt-2 flex flex-wrap gap-2 items-end bg-yellow-50 border-2 border-yellow-200 p-3 shadow-sm">
+                <div className="flex flex-col min-w-[120px]">
+                  <label className="text-xs font-bold text-emerald-700 uppercase tracking-wide mb-1">
+                    Tanggal
+                  </label>
+                  <input
+                    value={editRow.tanggal}
+                    readOnly
+                    className="border-2 border-emerald-300 px-3 py-2 text-sm bg-emerald-25"
+                  />
                 </div>
-              ))}
-            </div>
-          )}
-          {/* Edit baris jika ada */}
-          {editRow && (
-            <div className="mt-4 flex flex-wrap gap-2 items-end bg-yellow-50 border border-yellow-200 rounded p-3 shadow-sm">
-              <div className="flex flex-col min-w-[120px]">
-                <label className="text-xs font-semibold text-gray-600 mb-1">
-                  Tanggal
-                </label>
-                <input
-                  value={editRow.tanggal}
-                  readOnly
-                  className="border border-gray-300 px-3 py-2 text-sm rounded bg-gray-100"
-                />
-              </div>
-              <div className="flex flex-col min-w-[180px]">
-                <label className="text-xs font-semibold text-gray-600 mb-1">
-                  Keterangan
-                </label>
-                <input
-                  className="border border-gray-300 px-3 py-2 text-sm rounded"
-                  placeholder="Keterangan (misal: Hari Kemerdekaan)"
-                  value={editRow.keterangan}
-                  onChange={(e) =>
-                    setEditRow((row) => ({
-                      ...row,
-                      keterangan: e.target.value,
-                    }))
-                  }
-                  required
-                />
-              </div>
-              <div className="flex flex-col min-w-[220px] flex-1">
-                <label className="text-xs font-semibold text-gray-600 mb-1">
-                  Unit Detail
-                </label>
-                <Select
-                  isMulti
-                  options={unitOptions}
-                  value={
-                    editRow.unit_detail_ids.length === unitDetails.length
-                      ? unitOptions
-                      : unitOptions.filter((opt) =>
-                          opt.value === "ALL"
-                            ? editRow.unit_detail_ids.length ===
-                              unitDetails.length
-                            : editRow.unit_detail_ids.includes(opt.value)
-                        )
-                  }
-                  onChange={handleEditSelectUnit}
-                  className="basic-multi-select"
-                  classNamePrefix="select"
-                  placeholder="Pilih Unit Detail..."
-                />
-              </div>
-              <div className="flex flex-col justify-end min-w-[100px] gap-2">
-                <button
-                  type="button"
-                  className="px-4 py-2 font-bold text-sm bg-yellow-500 hover:bg-yellow-600 text-white rounded shadow"
-                  onClick={handleUpdateEdit}
-                  title="Update Hari Libur"
-                >
-                  Update
-                </button>
-                <button
-                  type="button"
-                  className="px-4 py-2 font-bold text-sm bg-gray-300 hover:bg-gray-400 text-gray-700 rounded shadow"
-                  onClick={() => setEditRow(null)}
-                  title="Batal Edit"
-                >
-                  Batal
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
-        {/* Filter Bulan/Tahun */}
-        <div className="flex gap-2 items-center bg-white p-3 rounded shadow border border-gray-200">
-          <label className="text-xs font-semibold text-gray-600">Bulan:</label>
-          <select
-            className="border border-gray-300 px-2 py-1 text-sm rounded"
-            value={bulan}
-            onChange={(e) => setBulan(e.target.value)}
-          >
-            {namaBulan.map((nama, i) => (
-              <option key={i + 1} value={String(i + 1).padStart(2, "0")}>
-                {nama}
-              </option>
-            ))}
-          </select>
-          <label className="text-xs font-semibold text-gray-600 ml-2">
-            Tahun:
-          </label>
-          <input
-            type="number"
-            className="border border-gray-300 px-2 py-1 text-sm w-20 rounded"
-            value={tahun}
-            onChange={(e) => setTahun(e.target.value)}
-            min="2000"
-            max="2100"
-          />
-        </div>
-        {/* Tabel Hari Libur */}
-        <div className="border border-gray-200 bg-white p-6 shadow flex flex-col gap-4">
-          <div className="flex justify-between items-center">
-            <div className="font-bold text-emerald-600 mb-2 text-xl flex items-center gap-2">
-              <span className="material-icons text-emerald-600 text-2xl">
-                event_busy
-              </span>
-              Daftar Hari Libur
-            </div>
-            {selectedRows.length > 0 && (
-              <div className="mb-2 flex justify-end">
-                <button
-                  className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded font-bold text-sm flex items-center gap-2"
-                  onClick={handleBulkDelete}
-                >
-                  <span className="material-icons text-base">delete</span> Hapus
-                  Terpilih
-                </button>
+                <div className="flex flex-col min-w-[180px]">
+                  <label className="text-xs font-bold text-emerald-700 uppercase tracking-wide mb-1">
+                    Keterangan
+                  </label>
+                  <input
+                    className="border-2 border-emerald-300 px-3 py-2 text-sm"
+                    placeholder="Keterangan (misal: Hari Kemerdekaan)"
+                    value={editRow.keterangan}
+                    onChange={(e) =>
+                      setEditRow((row) => ({
+                        ...row,
+                        keterangan: e.target.value,
+                      }))
+                    }
+                    required
+                  />
+                </div>
+                <div className="flex flex-col min-w-[220px] flex-1">
+                  <label className="text-xs font-bold text-emerald-700 uppercase tracking-wide mb-1">
+                    Unit Detail
+                  </label>
+                  <Select
+                    isMulti
+                    options={unitOptions}
+                    value={
+                      editRow.unit_detail_ids.length === unitDetails.length
+                        ? unitOptions
+                        : unitOptions.filter((opt) =>
+                            opt.value === "ALL"
+                              ? editRow.unit_detail_ids.length ===
+                                unitDetails.length
+                              : editRow.unit_detail_ids.includes(opt.value)
+                          )
+                    }
+                    onChange={handleEditSelectUnit}
+                    className="basic-multi-select"
+                    classNamePrefix="select"
+                    placeholder="Pilih Unit Detail..."
+                  />
+                </div>
+                <div className="flex flex-col justify-end min-w-[100px] gap-2">
+                  <button
+                    type="button"
+                    className="px-4 py-2 bg-yellow-500 text-white font-bold text-xs border-2 border-yellow-600 hover:bg-yellow-600 transition shadow"
+                    onClick={handleUpdateEdit}
+                    title="Update Hari Libur"
+                  >
+                    Update
+                  </button>
+                  <button
+                    type="button"
+                    className="px-4 py-2 bg-gray-300 text-gray-700 font-bold text-xs border-2 border-gray-400 hover:bg-gray-400 transition shadow"
+                    onClick={() => setEditRow(null)}
+                    title="Batal Edit"
+                  >
+                    Batal
+                  </button>
+                </div>
               </div>
             )}
           </div>
-          <div className="overflow-x-auto">
+        </div>
+        {/* Filter Bulan/Tahun */}
+        <div className="bg-white border-2 border-emerald-200 shadow-lg mb-4">
+          <div className="bg-emerald-50 px-4 py-3 border-b-2 border-emerald-200 flex items-center gap-2">
+            <span className="material-icons text-emerald-600 text-lg">
+              filter_list
+            </span>
+            <span className="text-emerald-800 font-black text-sm uppercase tracking-wide">
+              Filter Periode
+            </span>
+          </div>
+          <div className="p-4 flex gap-3 items-center">
+            <label className="text-xs font-bold text-emerald-700 uppercase tracking-wide">
+              Bulan:
+            </label>
+            <select
+              className="border-2 border-emerald-300 px-2 py-1 text-sm"
+              value={bulan}
+              onChange={(e) => setBulan(e.target.value)}
+            >
+              {namaBulan.map((nama, i) => (
+                <option key={i + 1} value={String(i + 1).padStart(2, "0")}>
+                  {nama}
+                </option>
+              ))}
+            </select>
+            <label className="text-xs font-bold text-emerald-700 uppercase tracking-wide ml-2">
+              Tahun:
+            </label>
+            <input
+              type="number"
+              className="border-2 border-emerald-300 px-2 py-1 text-sm w-20"
+              value={tahun}
+              onChange={(e) => setTahun(e.target.value)}
+              min="2000"
+              max="2100"
+            />
+          </div>
+        </div>
+        {/* Tabel Hari Libur */}
+        <div className="bg-white border-2 border-emerald-200 shadow-lg">
+          <div className="bg-emerald-600 px-4 py-3 border-b-2 border-emerald-700 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="bg-white p-2">
+                <span className="material-icons text-lg text-emerald-600">
+                  event_busy
+                </span>
+              </div>
+              <div>
+                <h2 className="text-lg font-black text-white uppercase tracking-wide">
+                  Daftar Hari Libur
+                </h2>
+                <p className="text-emerald-100 text-xs font-medium">
+                  Data hari libur berdasarkan periode terpilih
+                </p>
+              </div>
+            </div>
+            {selectedRows.length > 0 && (
+              <button
+                className="px-4 py-2 bg-red-600 text-white font-bold text-xs border-2 border-red-700 hover:bg-red-700 transition flex items-center gap-2"
+                onClick={handleBulkDelete}
+              >
+                <span className="material-icons text-base">delete</span>
+                Hapus Terpilih
+              </button>
+            )}
+          </div>
+          <div className="p-4 overflow-x-auto">
             <table className="min-w-full text-sm bg-white">
-              <thead className="sticky top-0 z-10 bg-white border-b-2 border-emerald-100">
+              <thead className="sticky top-0 z-10 bg-emerald-50 border-b-2 border-emerald-200">
                 <tr>
-                  <th className="px-2 py-3 text-center font-extrabold text-emerald-700 tracking-wide text-base uppercase w-12">
+                  <th className="px-3 py-2 text-center font-black text-emerald-800 text-xs uppercase tracking-wider border-r border-emerald-200 w-12">
                     No
                   </th>
-                  <th className="px-2 py-3 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-32">
+                  <th className="px-3 py-2 text-left font-black text-emerald-800 text-xs uppercase tracking-wider border-r border-emerald-200 w-32">
                     Tanggal
                   </th>
-                  <th className="px-2 py-3 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-56">
+                  <th className="px-3 py-2 text-left font-black text-emerald-800 text-xs uppercase tracking-wider border-r border-emerald-200 w-56">
                     Keterangan
                   </th>
-                  <th className="px-2 py-3 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-32">
+                  <th className="px-3 py-2 text-left font-black text-emerald-800 text-xs uppercase tracking-wider border-r border-emerald-200 w-32">
                     Unit
                   </th>
-                  <th className="px-2 py-3 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-32">
+                  <th className="px-3 py-2 text-left font-black text-emerald-800 text-xs uppercase tracking-wider border-r border-emerald-200 w-40">
                     Unit Detail
                   </th>
-                  <th className="px-2 py-3 text-center font-extrabold text-emerald-700 tracking-wide text-base uppercase w-24">
+                  <th className="px-3 py-2 text-center font-black text-emerald-800 text-xs uppercase tracking-wider border-r border-emerald-200 w-24">
                     Aksi
                   </th>
-                  <th className="px-2 py-3 text-center w-8">
+                  <th className="px-3 py-2 text-center w-8">
                     <input
                       type="checkbox"
                       checked={
@@ -597,44 +624,46 @@ export default function DaftarLibur() {
                   hariLibur.map((row, idx) => (
                     <tr
                       key={row.id}
-                      className={idx % 2 === 0 ? "bg-white" : "bg-gray-50"}
+                      className={idx % 2 === 0 ? "bg-white" : "bg-emerald-25"}
                     >
-                      <td className="px-2 py-3 text-center align-middle border-b border-gray-100 font-semibold">
+                      <td className="px-3 py-2 text-center align-middle border-b border-emerald-100 font-semibold">
                         {idx + 1}
                       </td>
-                      <td className="px-2 py-3 align-middle border-b border-gray-100">
+                      <td className="px-3 py-2 align-middle border-b border-emerald-100">
                         {formatTanggal(row.tanggal)}
                       </td>
-                      <td className="px-2 py-3 align-middle border-b border-gray-100">
+                      <td className="px-3 py-2 align-middle border-b border-emerald-100">
                         {row.keterangan}
                       </td>
-                      <td className="px-2 py-3 align-middle border-b border-gray-100">
+                      <td className="px-3 py-2 align-middle border-b border-emerald-100">
                         {row.unit_name}
                       </td>
-                      <td className="px-2 py-3 align-middle border-b border-gray-100">
-                        <span className="inline-block bg-emerald-100 text-emerald-700 text-xs px-2 py-1 rounded font-semibold">
+                      <td className="px-3 py-2 align-middle border-b border-emerald-100">
+                        <span className="inline-block bg-emerald-100 text-emerald-800 text-xs px-2 py-1 border border-emerald-300 font-bold">
                           {row.unit_detail_name}
                         </span>
                       </td>
-                      <td className="px-2 py-3 text-center align-middle border-b border-gray-100 flex gap-1 justify-center">
-                        <button
-                          className="w-8 h-8 flex items-center justify-center text-yellow-600 hover:text-yellow-800 rounded transition"
-                          onClick={() => handleEdit(row)}
-                          title="Edit Hari Libur"
-                        >
-                          <span className="material-icons text-base">edit</span>
-                        </button>
-                        <button
-                          className="w-8 h-8 flex items-center justify-center text-red-600 hover:text-red-800 rounded transition"
-                          onClick={() => handleDelete(row)}
-                          title="Hapus Hari Libur"
-                        >
-                          <span className="material-icons text-base">
-                            delete
-                          </span>
-                        </button>
+                      <td className="px-3 py-2 text-center align-middle border-b border-emerald-100">
+                        <div className="flex gap-1 justify-center">
+                          <button
+                            className="w-8 h-8 flex items-center justify-center text-yellow-600 hover:text-yellow-800 hover:bg-yellow-50 transition border border-yellow-200 hover:border-yellow-300"
+                            onClick={() => handleEdit(row)}
+                            title="Edit Hari Libur"
+                          >
+                            <span className="material-icons text-sm">edit</span>
+                          </button>
+                          <button
+                            className="w-8 h-8 flex items-center justify-center text-red-600 hover:text-red-800 hover:bg-red-50 transition border border-red-200 hover:border-red-300"
+                            onClick={() => handleDelete(row)}
+                            title="Hapus Hari Libur"
+                          >
+                            <span className="material-icons text-sm">
+                              delete
+                            </span>
+                          </button>
+                        </div>
                       </td>
-                      <td className="px-2 py-3 text-center align-middle border-b border-gray-100 w-8">
+                      <td className="px-3 py-2 text-center align-middle border-b border-emerald-100 w-8">
                         <input
                           type="checkbox"
                           checked={selectedRows.some(
@@ -650,14 +679,16 @@ export default function DaftarLibur() {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={7} className="text-center text-gray-400 py-8">
-                      <span className="material-icons text-5xl mb-2 text-emerald-100">
-                        event_busy
-                      </span>
-                      <div className="font-bold text-emerald-600 text-lg">
+                    <td colSpan={7} className="text-center py-8">
+                      <div className="w-16 h-16 mx-auto bg-emerald-100 border-2 border-emerald-200 flex items-center justify-center mb-2">
+                        <span className="material-icons text-emerald-400 text-2xl">
+                          event_busy
+                        </span>
+                      </div>
+                      <div className="text-emerald-800 font-black text-xl">
                         Tidak ada data hari libur.
                       </div>
-                      <div className="text-gray-500 text-sm">
+                      <div className="text-emerald-600 text-center max-w-xs text-sm mx-auto">
                         Silakan tambah hari libur baru melalui form di atas.
                       </div>
                     </td>

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { fetchPegawai } from "../../redux/actions/pegawaiAction";
+import { fetchPegawai2 } from "../../redux/actions/pegawaiAction";
 import { fetchAllUnit } from "../../redux/actions/unitDetailAction";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
@@ -34,13 +34,14 @@ export default function TambahDinas() {
   // Fetch data saat komponen mount & saat page/search/unit berubah
   useEffect(() => {
     if (token) {
-      dispatch(fetchPegawai(isSuperAdmin, token, page, searchPegawai));
+      dispatch(
+        fetchPegawai2(isSuperAdmin, token, page, searchPegawai, selectedUnit)
+      );
       if (isSuperAdmin) {
         dispatch(fetchAllUnit());
       }
     }
-    // eslint-disable-next-line
-  }, [token, user, dispatch, isSuperAdmin, page, searchPegawai]);
+  }, [token, user, dispatch, isSuperAdmin, page, searchPegawai, selectedUnit]);
 
   // Handle form submit
   const handleSubmit = async (e) => {
@@ -92,7 +93,7 @@ export default function TambahDinas() {
   };
 
   const handlePageChange = (page) => {
-    dispatch(fetchPegawai(isSuperAdmin, token, page));
+    dispatch(fetchPegawai2(isSuperAdmin, token, page, "", selectedUnit));
   };
 
   // Reset form
@@ -187,44 +188,53 @@ export default function TambahDinas() {
   return (
     <div className="w-full min-h-screen font-sans bg-gray-50">
       {/* Header */}
-      <div className="px-4 sticky z-40 top-0 py-4 border-b border-gray-200 bg-white flex items-center gap-4">
+      <div className="px-4 sticky z-40 top-0 py-4 border-b-2 border-emerald-200 bg-white flex items-center gap-4">
         <button
           onClick={() => navigate(-1)}
-          className="p-2 hover:bg-gray-100 rounded-lg transition"
+          className="p-2 hover:bg-gray-100 transition"
         >
           <span className="material-icons text-gray-600">arrow_back</span>
         </button>
-        <span className="material-icons text-green-200 bg-primary p-2 rounded opacity-80">
-          business_center
-        </span>
+        <div className="bg-emerald-600 p-2">
+          <span className="material-icons text-white">business_center</span>
+        </div>
         <div>
-          <div className="text-2xl font-extrabold text-emerald-700 tracking-tight drop-shadow-sm uppercase">
+          <div className="text-2xl font-black text-emerald-800 tracking-tight uppercase">
             Tambah Dinas
           </div>
-          <div className="text-gray-600 text-base font-medium">
+          <div className="text-emerald-600 text-sm font-medium">
             Tambah data dinas pegawai baru
           </div>
         </div>
       </div>
 
-      <div className="mx-auto p-4 max-w-5xl flex flex-col gap-4 px-2 md:px-0">
+      <div className="mx-auto p-6 max-w-7xl flex flex-col gap-6">
         {/* Form Card */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
-            <h3 className="text-lg font-bold text-gray-800">
-              Form Tambah Dinas
-            </h3>
-            <p className="text-sm text-gray-600 mt-1">
-              Isi form di bawah untuk menambahkan data dinas baru
-            </p>
+        <div className="bg-white border-2 border-emerald-200 shadow-lg overflow-hidden">
+          <div className="bg-emerald-600 px-4 py-3 border-b-2 border-emerald-700">
+            <div className="flex items-center gap-3">
+              <div className="bg-white p-2">
+                <span className="material-icons text-emerald-600">
+                  edit_calendar
+                </span>
+              </div>
+              <div>
+                <h3 className="text-lg font-black text-white uppercase tracking-wide">
+                  Form Tambah Dinas
+                </h3>
+                <p className="text-emerald-100 text-xs font-medium">
+                  Isi form untuk menambahkan data dinas baru
+                </p>
+              </div>
+            </div>
           </div>
 
-          <div className="p-6">
+          <div className="p-4">
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Date Range */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label className="block text-xs font-bold text-emerald-700 uppercase tracking-wide mb-2">
                     Tanggal Mulai *
                   </label>
                   <input
@@ -232,12 +242,12 @@ export default function TambahDinas() {
                     name="tanggal_mulai"
                     value={formData.tanggal_mulai}
                     onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                    className="w-full px-3 py-2 border-2 border-emerald-300 focus:border-emerald-500 focus:outline-none"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label className="block text-xs font-bold text-emerald-700 uppercase tracking-wide mb-2">
                     Tanggal Selesai *
                   </label>
                   <input
@@ -246,7 +256,7 @@ export default function TambahDinas() {
                     value={formData.tanggal_selesai}
                     onChange={handleInputChange}
                     min={formData.tanggal_mulai}
-                    className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                    className="w-full px-3 py-2 border-2 border-emerald-300 focus:border-emerald-500 focus:outline-none"
                     required
                   />
                 </div>
@@ -254,7 +264,7 @@ export default function TambahDinas() {
 
               {/* Keterangan */}
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                <label className="block text-xs font-bold text-emerald-700 uppercase tracking-wide mb-2">
                   Keterangan *
                 </label>
                 <textarea
@@ -262,7 +272,7 @@ export default function TambahDinas() {
                   value={formData.keterangan}
                   onChange={handleInputChange}
                   rows={4}
-                  className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                  className="w-full px-3 py-2 border-2 border-emerald-300 focus:border-emerald-500 focus:outline-none"
                   placeholder="Masukkan keterangan dinas..."
                   required
                 />
@@ -271,11 +281,11 @@ export default function TambahDinas() {
               {/* Unit Dropdown untuk SuperAdmin */}
               {isSuperAdmin && (
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label className="block text-xs font-bold text-emerald-700 uppercase tracking-wide mb-2">
                     Pilih Unit
                   </label>
                   <select
-                    className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                    className="w-full px-3 py-2 border-2 border-emerald-300 focus:border-emerald-500 focus:outline-none"
                     value={selectedUnit}
                     onChange={(e) => {
                       setSelectedUnit(e.target.value);
@@ -335,17 +345,17 @@ export default function TambahDinas() {
                       setSearchPegawai(e.target.value);
                       setPage(1);
                     }}
-                    className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                    className="w-full px-3 py-2 border-2 border-emerald-300 focus:border-emerald-500 focus:outline-none"
                   />
                 </div>
 
                 {/* Selected Pegawai Summary */}
                 {formData.pegawai_ids.length > 0 && (
-                  <div className="mb-4 p-3 bg-emerald-50 rounded border border-emerald-200">
-                    <p className="text-sm text-emerald-700 font-semibold mb-2">
+                  <div className="mb-4 p-3 bg-emerald-50 border-2 border-emerald-200">
+                    <p className="text-sm text-emerald-800 font-bold mb-2">
                       Pegawai yang dipilih ({formData.pegawai_ids.length}):
                     </p>
-                    <div className="text-sm text-emerald-600">
+                    <div className="text-sm text-emerald-700">
                       {getSelectedPegawaiNames().join(", ")}
                     </div>
                   </div>
@@ -360,34 +370,39 @@ export default function TambahDinas() {
                     <div>Memuat data pegawai...</div>
                   </div>
                 ) : (
-                  <div className="border border-gray-200 rounded overflow-hidden">
-                    <div className="overflow-x-auto">
-                      <table className="min-w-full text-sm">
-                        <thead className="bg-emerald-600 text-white">
+                  <div className="bg-white border-2 border-emerald-200 shadow-lg">
+                    <div className="px-4 py-3 bg-emerald-50 border-b-2 border-emerald-200 flex items-center gap-2">
+                      <span className="material-icons text-emerald-600">
+                        group
+                      </span>
+                      <span className="text-emerald-800 font-black text-sm uppercase tracking-wide">
+                        Daftar Pegawai
+                      </span>
+                    </div>
+                    <div className="p-4 overflow-x-auto">
+                      <table className="min-w-full text-sm bg-white">
+                        <thead className="bg-emerald-50 border-b-2 border-emerald-200">
                           <tr>
-                            <th className="px-3 py-2 text-left font-semibold w-12">
+                            <th className="px-3 py-2 text-center font-black text-emerald-800 text-xs uppercase tracking-wider border-r border-emerald-200 w-12">
                               <input
                                 type="checkbox"
                                 checked={allSelected}
                                 onChange={(e) =>
                                   handleSelectAll(e.target.checked)
                                 }
-                                className="rounded"
+                                className="w-4 h-4 text-emerald-600 bg-gray-100 border-gray-300 focus:ring-emerald-500 focus:ring-2"
                               />
                             </th>
-                            <th className="px-3 py-2 text-left font-semibold">
+                            <th className="px-3 py-2 text-left font-black text-emerald-800 text-xs uppercase tracking-wider border-r border-emerald-200">
                               Nama
                             </th>
-                            <th className="px-3 py-2 text-left font-semibold">
+                            <th className="px-3 py-2 text-left font-black text-emerald-800 text-xs uppercase tracking-wider border-r border-emerald-200">
                               NIK
                             </th>
-                            {/* <th className="px-3 py-2 text-left font-semibold">
-                              Unit
-                            </th> */}
-                            <th className="px-3 py-2 text-left font-semibold">
+                            <th className="px-3 py-2 text-left font-black text-emerald-800 text-xs uppercase tracking-wider border-r border-emerald-200">
                               Unit Detail
                             </th>
-                            <th className="px-3 py-2 text-left font-semibold">
+                            <th className="px-3 py-2 text-left font-black text-emerald-800 text-xs uppercase tracking-wider">
                               Shift
                             </th>
                           </tr>
@@ -397,18 +412,18 @@ export default function TambahDinas() {
                             pegawaiList.map((p, idx) => (
                               <tr
                                 key={p.id}
-                                className={`border-b border-gray-100 hover:bg-gray-50 ${
-                                  idx % 2 === 0 ? "bg-white" : "bg-gray-50"
+                                className={`border-b border-emerald-100 hover:bg-emerald-50 ${
+                                  idx % 2 === 0 ? "bg-white" : "bg-emerald-25"
                                 }`}
                               >
-                                <td className="px-3 py-2">
+                                <td className="px-3 py-2 text-center">
                                   <input
                                     type="checkbox"
                                     checked={formData.pegawai_ids.includes(
                                       p.id
                                     )}
                                     onChange={() => handlePegawaiToggle(p.id)}
-                                    className="rounded"
+                                    className="w-4 h-4 text-emerald-600 bg-gray-100 border-gray-300 focus:ring-emerald-500 focus:ring-2"
                                   />
                                 </td>
                                 <td className="px-3 py-2">
@@ -444,7 +459,7 @@ export default function TambahDinas() {
 
                     {/* Pagination */}
                     {pagination.last_page > 1 && (
-                      <div className="flex flex-wrap gap-1 justify-center mt-4">
+                      <div className="flex flex-wrap gap-1 justify-center p-4 pt-0">
                         {pagination.links.map((link, i) => (
                           <button
                             key={i}
@@ -471,25 +486,25 @@ export default function TambahDinas() {
               </div>
 
               {/* Action Buttons */}
-              <div className="flex justify-end gap-3 pt-6 border-t border-gray-200">
+              <div className="flex justify-end gap-3 pt-6 border-t border-emerald-100">
                 <button
                   type="button"
                   onClick={() => navigate("/dinas")}
-                  className="px-6 py-2 bg-gray-300 text-gray-700 font-semibold rounded hover:bg-gray-400 transition"
+                  className="px-6 py-2 bg-gray-300 text-gray-700 font-semibold hover:bg-gray-400 transition"
                 >
                   Batal
                 </button>
                 <button
                   type="button"
                   onClick={resetForm}
-                  className="px-6 py-2 bg-yellow-500 text-white font-semibold rounded hover:bg-yellow-600 transition"
+                  className="px-6 py-2 bg-yellow-500 text-white font-semibold hover:bg-yellow-600 transition"
                 >
                   Reset
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting || formData.pegawai_ids.length === 0}
-                  className="px-6 py-2 bg-emerald-600 text-white font-semibold rounded hover:bg-emerald-700 transition disabled:opacity-50"
+                  className="px-6 py-2 bg-emerald-600 text-white font-bold border-2 border-emerald-700 hover:bg-emerald-700 transition disabled:opacity-50"
                 >
                   {isSubmitting ? "Menyimpan..." : "Simpan"}
                 </button>

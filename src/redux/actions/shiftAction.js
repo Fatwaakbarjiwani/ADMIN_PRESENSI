@@ -30,35 +30,44 @@ export const fetchShifts = () => async (dispatch, getState) => {
 };
 
 // Tambah shift
-export const createShift = (name, onSuccess) => async (dispatch, getState) => {
-  const { token } = getState().auth;
-  try {
-    await axios.post(
-      `${import.meta.env.VITE_API_URL}/api/shift/create`,
-      { name },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+export const createShift =
+  (name, onSuccess, role, unit_id) => async (dispatch, getState) => {
+    const { token } = getState().auth;
+    let data;
+    try {
+      if (role === "super_admin") {
+        data = { name, unit_id };
+      } else {
+        data = { name };
       }
-    );
-    dispatch(fetchShifts());
-    Swal.fire({
-      icon: "success",
-      title: "Shift berhasil ditambah",
-      timer: 1200,
-      showConfirmButton: false,
-    });
-    if (onSuccess) onSuccess();
-  } catch (error) {
-    dispatch(setError(error.response?.data?.message || "Gagal menambah shift"));
-    Swal.fire({
-      icon: "error",
-      title: "Gagal menambah shift",
-      text: error.response?.data?.message || "Gagal menambah shift",
-    });
-  }
-};
+      await axios.post(
+        `${import.meta.env.VITE_API_URL}/api/shift/create`,
+        data,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      dispatch(fetchShifts());
+      Swal.fire({
+        icon: "success",
+        title: "Shift berhasil ditambah",
+        timer: 1200,
+        showConfirmButton: false,
+      });
+      if (onSuccess) onSuccess();
+    } catch (error) {
+      dispatch(
+        setError(error.response?.data?.message || "Gagal menambah shift")
+      );
+      Swal.fire({
+        icon: "error",
+        title: "Gagal menambah shift",
+        text: error.response?.data?.message || "Gagal menambah shift",
+      });
+    }
+  };
 
 // Hapus shift
 export const deleteShift = (id, onSuccess) => async (dispatch, getState) => {
@@ -216,6 +225,55 @@ export const fetchPegawai =
         import.meta.env.VITE_API_URL
       }/api/pegawai/by-unit-id-presensi?page=${page}&&search=${search}`;
     }
+    try {
+      const res = await axios.get(url, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (user?.role === "super_admin") {
+        dispatch(
+          setPegawai({
+            data: res?.data?.data,
+            pagination: {
+              last_page: res.data.last_page,
+              current_page: res.data.current_page,
+              links: res.data.links,
+            },
+          })
+        );
+      } else {
+        dispatch(
+          setPegawai({
+            data: res.data.data,
+            pagination: {
+              last_page: res.data.last_page,
+              current_page: res.data.current_page,
+              links: res.data.links,
+            },
+          })
+        );
+      }
+      dispatch(setLoading(false));
+    } catch {
+      dispatch(
+        setPegawai({
+          data: [],
+          pagination: { last_page: 1, current_page: 1, links: [] },
+        })
+      );
+      dispatch(setLoading(false));
+    }
+  };
+export const fetchPegawai2 =
+  (page = 1, search = "") =>
+  async (dispatch, getState) => {
+    dispatch(setLoading(true));
+    const { token, user } = getState().auth;
+    const unit_id = getState().shift.unit_id;
+
+    let url = `${
+      import.meta.env.VITE_API_URL
+    }/api/pegawai/by-unit-id-presensi?unit_id=${unit_id}
+    &page=${page}&&search=${search}`;
     try {
       const res = await axios.get(url, {
         headers: { Authorization: `Bearer ${token}` },

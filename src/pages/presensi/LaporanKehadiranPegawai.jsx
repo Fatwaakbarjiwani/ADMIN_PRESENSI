@@ -220,278 +220,302 @@ export default function LaporanKehadiranPegawai() {
   return (
     <div className="w-full min-h-screen font-sans bg-gray-50">
       {/* Header */}
-      <div className="px-4 sticky z-40 top-0 py-4 border-b border-gray-200 bg-white flex items-center gap-4">
+      <div className="px-4 sticky z-40 top-0 py-4 border-b-2 border-emerald-200 bg-white flex items-center gap-4">
         <button
           onClick={() => navigate(-1)}
           className="p-2 hover:bg-gray-100 rounded-lg transition flex items-center"
         >
           <span className="material-icons text-gray-600">arrow_back</span>
         </button>
-        <span className="material-icons text-green-200 bg-primary p-2 opacity-80">
-          assessment
-        </span>
+        <div className="bg-emerald-600 p-2">
+          <span className="material-icons text-white">assessment</span>
+        </div>
         <div>
-          <div className="text-2xl font-extrabold text-emerald-700 tracking-tight drop-shadow-sm uppercase">
+          <div className="text-2xl font-black text-emerald-600 tracking-tight uppercase">
             Laporan Kehadiran Pegawai
           </div>
-          <div className="text-gray-600 text-base font-medium">
+          <div className="text-emerald-600 text-sm font-medium">
             Detail laporan kehadiran pegawai per periode
           </div>
         </div>
       </div>
 
-      <div className="mx-auto p-4 max-w-5xl flex flex-col gap-8 px-2 md:px-0">
-        <div className="border border-gray-300 bg-white p-6">
-          {/* Filter Section */}
-          <div className="flex flex-col md:flex-row gap-4 items-end mb-6">
-            <div className="flex-1">
-              <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
-                <span className="material-icons text-base">calendar_month</span>
-                Bulan
-              </label>
-              <select
-                className="w-full px-3 py-2 border border-gray-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-                value={bulan}
-                onChange={(e) => setBulan(Number(e.target.value))}
-              >
-                {bulanOptions.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="flex-1">
-              <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
-                <span className="material-icons text-base">event</span>
-                Tahun
-              </label>
-              <input
-                type="number"
-                className="w-full px-3 py-2 border border-gray-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-                value={tahun}
-                onChange={(e) => setTahun(Number(e.target.value))}
-                min="2000"
-                max={new Date().getFullYear() + 1}
-              />
-            </div>
-            <div className="flex gap-2">
-              <button
-                className="px-6 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm transition flex items-center gap-2"
-                onClick={() => fetchLaporanKehadiran(bulan, tahun)}
-                disabled={loading}
-              >
-                {loading ? (
-                  <>
-                    <span className="material-icons animate-spin">refresh</span>
-                    Loading...
-                  </>
-                ) : (
-                  <>
-                    <span className="material-icons text-base">search</span>
-                    Cari Data
-                  </>
-                )}
-              </button>
-              {data && data.data.length > 0 && (
-                <button
-                  className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm transition flex items-center gap-2"
-                  onClick={handleDownloadPDF}
-                >
-                  <span className="material-icons text-base">download</span>
-                  Download PDF
-                </button>
-              )}
+      <div className="mx-auto p-6 max-w-7xl flex flex-col gap-6">
+        <div className="bg-white border-2 border-emerald-200 shadow-lg">
+          <div className="bg-emerald-600 px-4 py-3 border-b-2 border-emerald-700">
+            <div className="flex items-center gap-3">
+              <div className="bg-white p-2">
+                <span className="material-icons text-emerald-600">
+                  summarize
+                </span>
+              </div>
+              <div>
+                <h3 className="text-lg font-black text-white uppercase tracking-wide">
+                  Filter & Data Laporan
+                </h3>
+                <p className="text-emerald-100 text-xs font-medium">
+                  Pilih periode lalu tampilkan atau unduh laporan
+                </p>
+              </div>
             </div>
           </div>
+          <div className="p-4">
+            {/* Filter Section */}
+            <div className="flex flex-col md:flex-row gap-4 items-end mb-4">
+              <div className="flex-1">
+                <label className="block text-xs font-bold text-emerald-700 uppercase tracking-wide mb-2 flex items-center gap-2">
+                  <span className="material-icons text-sm">calendar_month</span>
+                  Bulan
+                </label>
+                <select
+                  className="w-full px-3 py-2 border-2 border-emerald-300 focus:border-emerald-500 focus:outline-none"
+                  value={bulan}
+                  onChange={(e) => setBulan(Number(e.target.value))}
+                >
+                  {bulanOptions.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="flex-1">
+                <label className="block text-xs font-bold text-emerald-700 uppercase tracking-wide mb-2 flex items-center gap-2">
+                  <span className="material-icons text-sm">event</span>
+                  Tahun
+                </label>
+                <input
+                  type="number"
+                  className="w-full px-3 py-2 border-2 border-emerald-300 focus:border-emerald-500 focus:outline-none"
+                  value={tahun}
+                  onChange={(e) => setTahun(Number(e.target.value))}
+                  min="2000"
+                  max={new Date().getFullYear() + 1}
+                />
+              </div>
+              <div className="flex gap-2">
+                <button
+                  className="px-4 py-2 bg-emerald-600 text-white font-bold text-xs border-2 border-emerald-700 hover:bg-emerald-700 transition flex items-center gap-2"
+                  onClick={() => fetchLaporanKehadiran(bulan, tahun)}
+                  disabled={loading}
+                >
+                  {loading ? (
+                    <>
+                      <span className="material-icons animate-spin">
+                        refresh
+                      </span>
+                      Loading...
+                    </>
+                  ) : (
+                    <>
+                      <span className="material-icons text-sm">search</span>
+                      Cari Data
+                    </>
+                  )}
+                </button>
+                {data && data.data.length > 0 && (
+                  <button
+                    className="px-4 py-2 bg-blue-600 text-white font-bold text-xs border-2 border-blue-700 hover:bg-blue-700 transition flex items-center gap-2"
+                    onClick={handleDownloadPDF}
+                  >
+                    <span className="material-icons text-sm">download</span>
+                    Download PDF
+                  </button>
+                )}
+              </div>
+            </div>
 
-          {/* Informasi Pegawai */}
-          {data && (
-            <div className="bg-emerald-50 border border-emerald-200 p-4 mb-6 rounded-lg">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div>
-                  <div className="text-sm text-gray-600 mb-1">Nama Pegawai</div>
-                  <div className="font-bold text-emerald-800">
-                    {data.pegawai.nama}
+            {/* Informasi Pegawai */}
+            {data && (
+              <div className="bg-emerald-50 border-2 border-emerald-200 p-4 mb-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                  <div>
+                    <div className="text-sm text-gray-600 mb-1">
+                      Nama Pegawai
+                    </div>
+                    <div className="font-black text-emerald-800">
+                      {data.pegawai.nama}
+                    </div>
                   </div>
-                </div>
-                <div>
-                  <div className="text-sm text-gray-600 mb-1">NIK</div>
-                  <div className="font-semibold text-gray-800">
-                    {data.pegawai.no_ktp}
+                  <div>
+                    <div className="text-sm text-gray-600 mb-1">NIK</div>
+                    <div className="font-semibold text-gray-900">
+                      {data.pegawai.no_ktp}
+                    </div>
                   </div>
-                </div>
-                <div>
-                  <div className="text-sm text-gray-600 mb-1">Unit Kerja</div>
-                  <div className="font-semibold text-gray-800">
-                    {data.pegawai.unit_kerja || "-"}
+                  <div>
+                    <div className="text-sm text-gray-600 mb-1">Unit Kerja</div>
+                    <div className="font-semibold text-gray-900">
+                      {data.pegawai.unit_kerja || "-"}
+                    </div>
                   </div>
-                </div>
-                <div>
-                  <div className="text-sm text-gray-600 mb-1">Jabatan</div>
-                  <div className="font-semibold text-gray-800">
-                    {data.pegawai.jabatan || "-"}
+                  <div>
+                    <div className="text-sm text-gray-600 mb-1">Jabatan</div>
+                    <div className="font-semibold text-gray-900">
+                      {data.pegawai.jabatan || "-"}
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {/* Tabel Data */}
-          {loading ? (
-            <div className="text-center py-12 text-emerald-600 font-bold flex items-center justify-center gap-2">
-              <span className="material-icons animate-spin">refresh</span>
-              Memuat data laporan kehadiran...
-            </div>
-          ) : !data ? (
-            <div className="text-center text-gray-400 py-8">
-              <div className="flex flex-col items-center gap-2">
-                <span className="material-icons text-4xl text-gray-300">
-                  search
-                </span>
-                <span className="font-semibold">
-                  Pilih periode untuk melihat data
-                </span>
-                <span className="text-sm">
-                  Klik tombol &quot;Cari Data&quot; untuk menampilkan laporan
-                  kehadiran
-                </span>
+            {/* Tabel Data */}
+            {loading ? (
+              <div className="text-center py-12 text-emerald-600 font-bold flex items-center justify-center gap-2">
+                <span className="material-icons animate-spin">refresh</span>
+                Memuat data laporan kehadiran...
               </div>
-            </div>
-          ) : data && data.data.length > 0 ? (
-            <>
-              <div className="mb-4 flex justify-between items-center">
-                <div className="flex items-center gap-2 text-emerald-700">
-                  <span className="material-icons">description</span>
+            ) : !data ? (
+              <div className="text-center text-gray-400 py-8">
+                <div className="flex flex-col items-center gap-2">
+                  <span className="material-icons text-4xl text-gray-300">
+                    search
+                  </span>
                   <span className="font-semibold">
-                    Total Data: {data.data.length} records
+                    Pilih periode untuk melihat data
+                  </span>
+                  <span className="text-sm">
+                    Klik tombol &quot;Cari Data&quot; untuk menampilkan laporan
+                    kehadiran
                   </span>
                 </div>
               </div>
-              <div className="overflow-x-auto border border-gray-200 rounded-lg shadow-sm">
-                <table className="min-w-[150%] text-xs">
-                  <thead className="bg-emerald-600 text-white">
-                    <tr>
-                      <th className="px-3 py-3 text-center font-bold text-sm border-r border-emerald-500 w-32">
-                        TGL. ABSENSI
-                      </th>
-                      <th className="px-3 py-3 text-center font-bold text-sm border-r border-emerald-500 w-20">
-                        JAM KERJA (MASUK)
-                      </th>
-                      <th className="px-3 py-3 text-center font-bold text-sm border-r border-emerald-500 w-20">
-                        JAM KERJA (PULANG)
-                      </th>
-                      <th className="px-3 py-3 text-center font-bold text-sm border-r border-emerald-500 w-24">
-                        JAM MASUK
-                      </th>
-                      <th className="px-3 py-3 text-center font-bold text-sm border-r border-emerald-500 w-24">
-                        JAM KELUAR
-                      </th>
-                      <th className="px-3 py-3 text-center font-bold text-sm border-r border-emerald-500 w-24">
-                        JML MENIT DATANG (CEPAT)
-                      </th>
-                      <th className="px-3 py-3 text-center font-bold text-sm border-r border-emerald-500 w-24">
-                        JML MENIT DATANG (TELAT)
-                      </th>
-                      <th className="px-3 py-3 text-center font-bold text-sm border-r border-emerald-500 w-24">
-                        JML MENIT PULANG (CEPAT)
-                      </th>
-                      <th className="px-3 py-3 text-center font-bold text-sm border-r border-emerald-500 w-24">
-                        JML MENIT PULANG (LEMBUR)
-                      </th>
-                      <th className="px-3 py-3 text-center font-bold text-sm border-r border-emerald-500 w-28">
-                        JML JAM KERJA
-                      </th>
-                      <th className="px-3 py-3 text-center font-bold text-sm w-32">
-                        ALASAN
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {data.data.map((row, idx) => (
-                      <tr
-                        key={idx}
-                        className={
-                          "transition hover:bg-emerald-50 border-b border-gray-100 " +
-                          (idx % 2 === 0 ? "bg-white" : "bg-gray-50")
-                        }
-                      >
-                        <td className="px-3 py-3 text-center align-middle text-sm border-r border-gray-200">
-                          {row.tgl_absensi}
-                        </td>
-                        <td className="px-3 py-3 text-center align-middle text-sm border-r border-gray-200">
-                          {row.jam_kerja.masuk}
-                        </td>
-                        <td className="px-3 py-3 text-center align-middle text-sm border-r border-gray-200">
-                          {row.jam_kerja.pulang}
-                        </td>
-                        <td className="px-3 py-3 text-center align-middle text-sm border-r border-gray-200">
-                          {row.jam_masuk}
-                        </td>
-                        <td className="px-3 py-3 text-center align-middle text-sm border-r border-gray-200">
-                          {row.jam_keluar}
-                        </td>
-                        <td className="px-3 py-3 text-center align-middle text-sm border-r border-gray-200">
-                          {row.jumlah_menit_datang.menit_datang_cepat > 0 ? (
-                            <span className="text-emerald-600 font-semibold">
-                              {row.jumlah_menit_datang.menit_datang_cepat}
-                            </span>
-                          ) : (
-                            <span className="text-gray-500">-</span>
-                          )}
-                        </td>
-                        <td className="px-3 py-3 text-center align-middle text-sm border-r border-gray-200">
-                          {row.jumlah_menit_datang.menit_telat > 0 ? (
-                            <span className="text-red-600 font-semibold">
-                              {row.jumlah_menit_datang.menit_telat}
-                            </span>
-                          ) : (
-                            <span className="text-gray-500">-</span>
-                          )}
-                        </td>
-                        <td className="px-3 py-3 text-center align-middle text-sm border-r border-gray-200">
-                          {row.jumlah_menit_pulang.menit_pulang_cepat > 0 ? (
-                            <span className="text-orange-600 font-semibold">
-                              {row.jumlah_menit_pulang.menit_pulang_cepat}
-                            </span>
-                          ) : (
-                            <span className="text-gray-500">-</span>
-                          )}
-                        </td>
-                        <td className="px-3 py-3 text-center align-middle text-sm border-r border-gray-200">
-                          {row.jumlah_menit_pulang.menit_lembur > 0 ? (
-                            <span className="text-green-600 font-semibold">
-                              {row.jumlah_menit_pulang.menit_lembur}
-                            </span>
-                          ) : (
-                            <span className="text-gray-500">-</span>
-                          )}
-                        </td>
-                        <td className="px-3 py-3 text-center align-middle font-bold text-emerald-800 text-sm border-r border-gray-200">
-                          {row.jam_kerja_total}
-                        </td>
-                        <td className="px-3 py-3 text-center align-middle text-sm">
-                          {row.alasan || "-"}
-                        </td>
+            ) : data && data.data.length > 0 ? (
+              <>
+                <div className="mb-3 flex justify-between items-center">
+                  <div className="flex items-center gap-2 text-emerald-700">
+                    <span className="material-icons">description</span>
+                    <span className="font-semibold">
+                      Total Data: {data.data.length} records
+                    </span>
+                  </div>
+                </div>
+                <div className="overflow-x-auto border-2 border-emerald-200 shadow-lg">
+                  <table className="min-w-[150%] text-xs bg-white">
+                    <thead className="bg-emerald-50 border-b-2 border-emerald-200">
+                      <tr>
+                        <th className="px-3 py-2 text-center font-black text-emerald-800 uppercase tracking-wider border-r border-emerald-200 w-32">
+                          TGL. ABSENSI
+                        </th>
+                        <th className="px-3 py-2 text-center font-black text-emerald-800 uppercase tracking-wider border-r border-emerald-200 w-20">
+                          JAM KERJA (MASUK)
+                        </th>
+                        <th className="px-3 py-2 text-center font-black text-emerald-800 uppercase tracking-wider border-r border-emerald-200 w-20">
+                          JAM KERJA (PULANG)
+                        </th>
+                        <th className="px-3 py-2 text-center font-black text-emerald-800 uppercase tracking-wider border-r border-emerald-200 w-24">
+                          JAM MASUK
+                        </th>
+                        <th className="px-3 py-2 text-center font-black text-emerald-800 uppercase tracking-wider border-r border-emerald-200 w-24">
+                          JAM KELUAR
+                        </th>
+                        <th className="px-3 py-2 text-center font-black text-emerald-800 uppercase tracking-wider border-r border-emerald-200 w-24">
+                          JML MENIT DATANG (CEPAT)
+                        </th>
+                        <th className="px-3 py-2 text-center font-black text-emerald-800 uppercase tracking-wider border-r border-emerald-200 w-24">
+                          JML MENIT DATANG (TELAT)
+                        </th>
+                        <th className="px-3 py-2 text-center font-black text-emerald-800 uppercase tracking-wider border-r border-emerald-200 w-24">
+                          JML MENIT PULANG (CEPAT)
+                        </th>
+                        <th className="px-3 py-2 text-center font-black text-emerald-800 uppercase tracking-wider border-r border-emerald-200 w-24">
+                          JML MENIT PULANG (LEMBUR)
+                        </th>
+                        <th className="px-3 py-2 text-center font-black text-emerald-800 uppercase tracking-wider border-r border-emerald-200 w-28">
+                          JML JAM KERJA
+                        </th>
+                        <th className="px-3 py-2 text-center font-black text-emerald-800 uppercase tracking-wider w-32">
+                          ALASAN
+                        </th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                      {data.data.map((row, idx) => (
+                        <tr
+                          key={idx}
+                          className={`transition hover:bg-emerald-50 border-b border-emerald-100 ${
+                            idx % 2 === 0 ? "bg-white" : "bg-emerald-25"
+                          }`}
+                        >
+                          <td className="px-3 py-2 text-center align-middle text-sm border-r border-emerald-100">
+                            {row.tgl_absensi}
+                          </td>
+                          <td className="px-3 py-2 text-center align-middle text-sm border-r border-emerald-100">
+                            {row.jam_kerja.masuk}
+                          </td>
+                          <td className="px-3 py-2 text-center align-middle text-sm border-r border-emerald-100">
+                            {row.jam_kerja.pulang}
+                          </td>
+                          <td className="px-3 py-2 text-center align-middle text-sm border-r border-emerald-100">
+                            {row.jam_masuk}
+                          </td>
+                          <td className="px-3 py-2 text-center align-middle text-sm border-r border-emerald-100">
+                            {row.jam_keluar}
+                          </td>
+                          <td className="px-3 py-2 text-center align-middle text-sm border-r border-emerald-100">
+                            {row.jumlah_menit_datang.menit_datang_cepat > 0 ? (
+                              <span className="text-emerald-600 font-semibold">
+                                {row.jumlah_menit_datang.menit_datang_cepat}
+                              </span>
+                            ) : (
+                              <span className="text-gray-500">-</span>
+                            )}
+                          </td>
+                          <td className="px-3 py-2 text-center align-middle text-sm border-r border-emerald-100">
+                            {row.jumlah_menit_datang.menit_telat > 0 ? (
+                              <span className="text-red-600 font-semibold">
+                                {row.jumlah_menit_datang.menit_telat}
+                              </span>
+                            ) : (
+                              <span className="text-gray-500">-</span>
+                            )}
+                          </td>
+                          <td className="px-3 py-2 text-center align-middle text-sm border-r border-emerald-100">
+                            {row.jumlah_menit_pulang.menit_pulang_cepat > 0 ? (
+                              <span className="text-orange-600 font-semibold">
+                                {row.jumlah_menit_pulang.menit_pulang_cepat}
+                              </span>
+                            ) : (
+                              <span className="text-gray-500">-</span>
+                            )}
+                          </td>
+                          <td className="px-3 py-2 text-center align-middle text-sm border-r border-emerald-100">
+                            {row.jumlah_menit_pulang.menit_lembur > 0 ? (
+                              <span className="text-green-600 font-semibold">
+                                {row.jumlah_menit_pulang.menit_lembur}
+                              </span>
+                            ) : (
+                              <span className="text-gray-500">-</span>
+                            )}
+                          </td>
+                          <td className="px-3 py-2 text-center align-middle font-bold text-emerald-800 text-sm border-r border-emerald-100">
+                            {row.jam_kerja_total}
+                          </td>
+                          <td className="px-3 py-2 text-center align-middle text-sm">
+                            {row.alasan || "-"}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </>
+            ) : data && data.data.length === 0 ? (
+              <div className="text-center text-gray-400 py-8">
+                <div className="flex flex-col items-center gap-2">
+                  <span className="material-icons text-4xl text-gray-300">
+                    inbox
+                  </span>
+                  <span className="font-semibold">
+                    Tidak ada data ditemukan
+                  </span>
+                  <span className="text-sm">
+                    Data laporan kehadiran kosong untuk periode ini
+                  </span>
+                </div>
               </div>
-            </>
-          ) : data && data.data.length === 0 ? (
-            <div className="text-center text-gray-400 py-8">
-              <div className="flex flex-col items-center gap-2">
-                <span className="material-icons text-4xl text-gray-300">
-                  inbox
-                </span>
-                <span className="font-semibold">Tidak ada data ditemukan</span>
-                <span className="text-sm">
-                  Data laporan kehadiran kosong untuk periode ini
-                </span>
-              </div>
-            </div>
-          ) : null}
+            ) : null}
+          </div>
         </div>
       </div>
     </div>

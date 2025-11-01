@@ -481,7 +481,7 @@ export default function AturLokasi() {
     }, 100);
 
     return () => clearTimeout(timer);
-  }, [editId, polygonCoords]);
+  }, [editId, polygonCoords, selectedPolygonIndex]);
 
   // Update polygon visual when selectedPolygonIndex changes
   useEffect(() => {
@@ -565,15 +565,17 @@ export default function AturLokasi() {
   return (
     <div className="w-full min-h-screen font-sans bg-gray-50">
       {/* Header */}
-      <div className="px-4 sticky z-50 top-0 py-4 border-b border-gray-200 bg-white flex items-center gap-4">
-        <span className="material-icons text-lg text-green-200 bg-primary p-2 rounded opacity-80">
-          add_location_alt
-        </span>
+      <div className="px-4 sticky z-40 top-0 py-4 border-b-2 border-emerald-200 bg-white flex items-center gap-4">
+        <div className="bg-emerald-600 p-2">
+          <span className="material-icons text-white text-lg">
+            add_location_alt
+          </span>
+        </div>
         <div>
-          <div className="text-2xl font-extrabold text-emerald-700 tracking-tight drop-shadow-sm uppercase">
+          <div className="text-2xl font-black text-emerald-600 tracking-tight uppercase">
             Atur Lokasi Unit Detail
           </div>
-          <div className="text-gray-600 text-base font-medium">
+          <div className="text-emerald-600 text-sm font-medium">
             Kelola area lokasi presensi per unit detail
           </div>
         </div>
@@ -582,112 +584,139 @@ export default function AturLokasi() {
       <main className="flex-1">
         {!editId ? (
           <section className="bg-white min-h-screen">
-            <div className="max-w-5xl mx-auto px-2 py-8">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-semibold text-gray-800 flex items-center gap-2">
-                  <span className="material-icons text-emerald-600">
-                    apartment
-                  </span>
-                  Pilih Unit Detail untuk Edit Lokasi
-                </h2>
-                <span className="text-sm text-gray-500">
-                  {filteredUnits.length} dari {unitDetails.length} unit
-                </span>
-              </div>
-
-              {/* Search Bar */}
-              <div className="mb-6">
-                <div className="relative max-w-md">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <span className="material-icons text-gray-400 text-lg">
-                      search
-                    </span>
-                  </div>
-                  <input
-                    type="text"
-                    placeholder="Cari unit berdasarkan nama atau level..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-sm"
-                  />
-                  {searchTerm && (
-                    <button
-                      onClick={() => setSearchTerm("")}
-                      className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                    >
-                      <span className="material-icons text-gray-400 hover:text-gray-600 text-lg">
-                        clear
+            <div className="mx-auto p-6 max-w-7xl flex flex-col gap-6">
+              {/* Main Content Card */}
+              <div className="bg-white border-2 border-emerald-200 shadow-lg">
+                {/* Card Header */}
+                <div className="bg-emerald-600 px-4 py-3 border-b-2 border-emerald-700">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="bg-white p-2">
+                        <span className="material-icons text-lg text-emerald-600">
+                          apartment
+                        </span>
+                      </div>
+                      <div>
+                        <h2 className="text-lg font-black text-white uppercase tracking-wide">
+                          Pilih Unit Detail
+                        </h2>
+                        <p className="text-emerald-100 text-xs font-medium">
+                          Edit lokasi presensi per unit detail
+                        </p>
+                      </div>
+                    </div>
+                    <div className="bg-white px-3 py-1 border-2 border-emerald-200">
+                      <span className="text-xs font-bold text-emerald-700 uppercase tracking-wide">
+                        {filteredUnits.length} dari {unitDetails.length} unit
                       </span>
-                    </button>
-                  )}
+                    </div>
+                  </div>
                 </div>
-              </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredUnits.length > 0 ? (
-                  filteredUnits.map((unit) => (
-                    <div
-                      key={unit.id}
-                      className="relative bg-white border-2 border-gray-200 rounded-xl shadow-sm p-6 transition-all duration-200 cursor-pointer group hover:border-emerald-300 hover:shadow-lg"
-                      onClick={() => {
-                        if (!editLoading) {
-                          handleStartEdit(unit.id);
-                        }
-                      }}
-                    >
-                      <div className="flex items-start justify-between gap-4">
-                        <div className="flex-1">
-                          {/* Building Info */}
-                          <div className="flex items-start gap-3">
-                            <div className="flex items-center justify-center w-12 h-12 bg-emerald-100 rounded-lg flex-shrink-0">
-                              <span className="material-icons text-emerald-600 text-xl">
-                                business
-                              </span>
+                {/* Search Bar */}
+                <div className="p-4 border-b-2 border-emerald-200 bg-emerald-50">
+                  <div className="flex items-center gap-3">
+                    <label className="text-xs font-bold text-emerald-700 uppercase tracking-wide">
+                      Cari Unit:
+                    </label>
+                    <div className="relative flex-1 max-w-md">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <span className="material-icons text-emerald-400 text-sm">
+                          search
+                        </span>
+                      </div>
+                      <input
+                        type="text"
+                        placeholder="Cari unit berdasarkan nama atau level..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="block w-full pl-10 pr-10 py-2 border-2 border-emerald-300 text-sm font-medium focus:border-emerald-500 focus:outline-none transition-colors bg-white placeholder-gray-500"
+                      />
+                      {searchTerm && (
+                        <button
+                          onClick={() => setSearchTerm("")}
+                          className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                        >
+                          <span className="material-icons text-emerald-400 hover:text-emerald-600 text-sm">
+                            clear
+                          </span>
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Unit Cards Grid */}
+                <div className="p-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {filteredUnits.length > 0 ? (
+                      filteredUnits.map((unit) => (
+                        <div
+                          key={unit.id}
+                          className="relative bg-white border-2 border-emerald-200 shadow-lg p-4 transition-all duration-200 cursor-pointer group hover:border-emerald-400 hover:shadow-xl"
+                          onClick={() => {
+                            if (!editLoading) {
+                              handleStartEdit(unit.id);
+                            }
+                          }}
+                        >
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="flex-1">
+                              {/* Building Info */}
+                              <div className="flex items-start gap-3">
+                                <div className="flex items-center justify-center w-10 h-10 bg-emerald-100 border-2 border-emerald-200 flex-shrink-0">
+                                  <span className="material-icons text-emerald-600 text-lg">
+                                    business
+                                  </span>
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <h3 className="font-bold text-emerald-800 text-sm leading-tight mb-1">
+                                    {unit.nama || "Nama tidak tersedia"}
+                                  </h3>
+                                  <div className="flex items-center gap-2">
+                                    <span className="inline-flex items-center px-2 py-1 text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                                      Level {unit.level}
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
                             </div>
-                            <div className="flex-1 min-w-0">
-                              <h3 className="font-bold text-gray-800 text-lg leading-tight mb-1">
-                                {unit.nama || "Nama tidak tersedia"}
-                              </h3>
-                              <div className="flex items-center gap-2">
-                                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700">
-                                  Level {unit.level}
+
+                            {/* Action Button */}
+                            <div className="flex-shrink-0">
+                              <div className="w-8 h-8 flex items-center justify-center bg-emerald-100 text-emerald-600 group-hover:bg-emerald-200 group-hover:text-emerald-700 border border-emerald-200 group-hover:border-emerald-300 transition-all duration-200">
+                                <span className="material-icons text-sm">
+                                  edit
                                 </span>
                               </div>
                             </div>
                           </div>
                         </div>
-
-                        {/* Action Button */}
-                        <div className="flex-shrink-0">
-                          <div className="w-10 h-10 flex items-center justify-center bg-gray-100 text-gray-400 group-hover:bg-emerald-100 group-hover:text-emerald-600 rounded-lg transition-colors">
-                            <span className="material-icons text-xl">edit</span>
-                          </div>
+                      ))
+                    ) : (
+                      <div className="col-span-full flex flex-col items-center justify-center py-12 text-center">
+                        <div className="w-16 h-16 bg-emerald-100 border-2 border-emerald-200 flex items-center justify-center mb-4">
+                          <span className="material-icons text-emerald-400 text-2xl">
+                            search_off
+                          </span>
                         </div>
+                        <h3 className="text-lg font-bold text-emerald-800 mb-2">
+                          Tidak ada unit ditemukan
+                        </h3>
+                        <p className="text-gray-600 text-sm mb-4">
+                          Tidak ada unit yang cocok dengan pencarian &ldquo;
+                          {searchTerm}&rdquo;
+                        </p>
+                        <button
+                          onClick={() => setSearchTerm("")}
+                          className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs border-2 border-emerald-700 shadow-lg hover:shadow-xl transition-all duration-200"
+                        >
+                          Hapus Filter
+                        </button>
                       </div>
-                    </div>
-                  ))
-                ) : (
-                  <div className="col-span-full flex flex-col items-center justify-center py-12 text-center">
-                    <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-                      <span className="material-icons text-gray-400 text-2xl">
-                        search_off
-                      </span>
-                    </div>
-                    <h3 className="text-lg font-semibold text-gray-700 mb-2">
-                      Tidak ada unit ditemukan
-                    </h3>
-                    <p className="text-gray-500 text-sm mb-4">
-                      Tidak ada unit yang cocok dengan pencarian &ldquo;
-                      {searchTerm}&rdquo;
-                    </p>
-                    <button
-                      onClick={() => setSearchTerm("")}
-                      className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg text-sm font-medium transition-colors"
-                    >
-                      Hapus Filter
-                    </button>
+                    )}
                   </div>
-                )}
+                </div>
               </div>
             </div>
           </section>
@@ -713,22 +742,26 @@ export default function AturLokasi() {
             )}
 
             <div className="absolute top-16 right-6 z-[1000] w-96">
-              <div className="bg-white rounded-2xl shadow-2xl border-2 border-emerald-500 overflow-hidden">
-                <div className="bg-gradient-to-r from-emerald-500 to-emerald-600 px-4 py-3 flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-white">
-                    <div className="w-6 h-6 bg-white/20 rounded-lg flex items-center justify-center">
-                      <span className="material-icons text-white text-sm">
+              <div className="bg-white border-2 border-emerald-200 shadow-2xl overflow-hidden">
+                <div className="bg-emerald-600 px-4 py-3 border-b-2 border-emerald-700 flex items-center justify-between">
+                  <div className="flex items-center gap-3 text-white">
+                    <div className="bg-white p-2">
+                      <span className="material-icons text-emerald-600 text-sm">
                         edit_location
                       </span>
                     </div>
                     <div>
-                      <h3 className="font-bold text-xs">EDIT LOKASI</h3>
-                      <p className="text-xs opacity-90">Gambar polygon area</p>
+                      <h3 className="font-black text-xs uppercase tracking-wide">
+                        EDIT LOKASI
+                      </h3>
+                      <p className="text-emerald-100 text-xs font-medium">
+                        Gambar polygon area
+                      </p>
                     </div>
                   </div>
                   <div className="flex items-center gap-1">
                     <button
-                      className="text-white hover:bg-white/20 rounded-lg p-1 transition-colors"
+                      className="text-white hover:bg-white/20 p-1 transition-all duration-200 border border-white/20 hover:border-white/40"
                       onClick={() => setIsPanelCollapsed(!isPanelCollapsed)}
                       title={
                         isPanelCollapsed
@@ -745,7 +778,7 @@ export default function AturLokasi() {
                       </span>
                     </button>
                     <button
-                      className="text-white hover:bg-white/20 rounded-lg p-1 transition-colors"
+                      className="text-white hover:bg-white/20 p-1 transition-all duration-200 border border-white/20 hover:border-white/40"
                       onClick={() => {
                         setEditId(null);
                         setPolygonCoords([]);
@@ -766,7 +799,7 @@ export default function AturLokasi() {
                             <span className="material-icons text-emerald-600 text-sm">
                               layers
                             </span>
-                            <h4 className="font-semibold text-gray-800 text-sm">
+                            <h4 className="font-bold text-emerald-800 text-xs uppercase tracking-wide">
                               Polygon ({polygonCoords.length}/3)
                             </h4>
                           </div>
@@ -811,21 +844,24 @@ export default function AturLokasi() {
                               return (
                                 <div
                                   key={index}
-                                  className={`${color.bg} p-2 rounded-lg border-l-3 flex items-center justify-between`}
-                                  style={{ borderLeftColor: color.color }}
+                                  className={`${color.bg} p-2 border-2 border-l-4 flex items-center justify-between`}
+                                  style={{
+                                    borderLeftColor: color.color,
+                                    borderColor: color.color + "40",
+                                  }}
                                 >
                                   <div className="flex items-center gap-2">
                                     <div
-                                      className="w-3 h-3 rounded-full"
+                                      className="w-3 h-3 border border-gray-300"
                                       style={{ backgroundColor: color.color }}
                                     ></div>
                                     <div>
-                                      <div className="font-semibold text-gray-800 text-xs">
+                                      <div className="font-bold text-emerald-800 text-xs">
                                         {index === 0
                                           ? "Lokasi Utama"
                                           : `Lokasi ${index + 1}`}
                                       </div>
-                                      <div className="text-xs text-gray-600">
+                                      <div className="text-xs text-emerald-600 font-medium">
                                         {color.name}
                                       </div>
                                     </div>
@@ -833,10 +869,10 @@ export default function AturLokasi() {
                                   <div className="flex items-center gap-1">
                                     <button
                                       onClick={() => navigateToPolygon(index)}
-                                      className={`text-gray-500 hover:text-emerald-600 hover:bg-emerald-100 rounded p-1 transition-colors ${
+                                      className={`w-6 h-6 flex items-center justify-center border transition-all duration-200 ${
                                         selectedPolygonIndex === index
-                                          ? "text-emerald-600 bg-emerald-100"
-                                          : ""
+                                          ? "text-emerald-600 bg-emerald-100 border-emerald-300"
+                                          : "text-gray-500 hover:text-emerald-600 hover:bg-emerald-50 border-gray-200 hover:border-emerald-200"
                                       }`}
                                       title="Lihat lokasi ini"
                                     >
@@ -846,7 +882,7 @@ export default function AturLokasi() {
                                     </button>
                                     <button
                                       onClick={() => handleDeletePolygon(index)}
-                                      className="text-red-500 hover:text-red-700 hover:bg-red-100 rounded p-1 transition-colors"
+                                      className="w-6 h-6 flex items-center justify-center text-red-500 hover:text-red-700 hover:bg-red-50 border border-red-200 hover:border-red-300 transition-all duration-200"
                                       title="Hapus polygon"
                                     >
                                       <span className="material-icons text-xs">
@@ -860,12 +896,12 @@ export default function AturLokasi() {
                           </div>
 
                           {polygonCoords.length < 3 && (
-                            <div className="mt-3 p-2 bg-blue-50 border border-blue-200 rounded-lg">
-                              <div className="flex items-center gap-1 text-blue-700">
+                            <div className="mt-3 p-2 bg-emerald-50 border-2 border-emerald-200">
+                              <div className="flex items-center gap-1 text-emerald-700">
                                 <span className="material-icons text-xs">
                                   info
                                 </span>
-                                <span className="text-xs">
+                                <span className="text-xs font-bold">
                                   Gunakan tool di pojok kiri peta (maks 3)
                                 </span>
                               </div>
@@ -873,16 +909,16 @@ export default function AturLokasi() {
                           )}
                         </div>
                       ) : (
-                        <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                        <div className="p-3 bg-yellow-50 border-2 border-yellow-200">
                           <div className="flex items-center gap-2 text-yellow-700">
                             <span className="material-icons text-yellow-600 text-sm">
                               warning
                             </span>
                             <div>
-                              <div className="font-semibold text-xs">
+                              <div className="font-bold text-xs">
                                 Belum ada polygon
                               </div>
-                              <div className="text-xs">
+                              <div className="text-xs font-medium">
                                 Gunakan tool di pojok kiri peta
                               </div>
                             </div>
@@ -893,22 +929,26 @@ export default function AturLokasi() {
 
                     <div className="flex gap-2">
                       <button
-                        className="flex-1 px-4 py-2 bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white font-bold rounded-lg flex items-center justify-center gap-2 transition-all shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                        className="flex-1 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs border-2 border-emerald-700 shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center gap-1 disabled:opacity-50 disabled:cursor-not-allowed"
                         onClick={handleEdit}
                         disabled={editLoading || polygonCoords.length === 0}
                       >
-                        <span className="material-icons text-sm">save</span>
-                        <span>{editLoading ? "Saving..." : "Simpan"}</span>
+                        {editLoading ? (
+                          <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        ) : (
+                          <span className="material-icons text-sm">save</span>
+                        )}
+                        <span>{editLoading ? "Menyimpan..." : "Simpan"}</span>
                       </button>
 
                       <button
-                        className="flex-1 px-4 py-2 bg-gradient-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700 text-white font-bold rounded-lg flex items-center justify-center gap-2 transition-all shadow-md hover:shadow-lg text-sm"
+                        className="flex-1 px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white font-bold text-xs border-2 border-gray-600 shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center gap-1"
                         onClick={() => {
                           setEditId(null);
                           setPolygonCoords([]);
                         }}
                       >
-                        <span className="material-icons text-sm">cancel</span>
+                        <span className="material-icons text-sm">close</span>
                         <span>Batal</span>
                       </button>
                     </div>

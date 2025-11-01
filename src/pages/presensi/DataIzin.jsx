@@ -292,98 +292,121 @@ export default function DataIzin() {
   if (!isSuperAdmin) {
     return (
       <div className="w-full min-h-screen font-sans bg-gray-50">
-        <div className="px-4 sticky z-40 top-0 py-4 border-b border-gray-200 bg-white flex items-center gap-4">
-          <span className="material-icons text-lg text-green-200 bg-primary p-2 rounded opacity-80">
-            description
-          </span>
+        <div className="px-4 sticky z-40 top-0 py-4 border-b-2 border-emerald-200 bg-white flex items-center gap-4">
+          <div className="bg-emerald-600 p-2">
+            <span className="material-icons text-white text-lg">description</span>
+          </div>
           <div>
-            <div className="text-2xl font-extrabold text-emerald-700 tracking-tight drop-shadow-sm uppercase">
-              Manajemen Pengajuan Izin/Cuti
+            <div className="text-2xl font-black text-emerald-600 tracking-tight uppercase">
+              Manajemen Pengajuan Izin/Cuti/Sakit
             </div>
-            <div className="text-gray-600 text-base font-medium">
-              Approve/Tolak pengajuan izin sakit & cuti karyawan
+            <div className="text-emerald-600 text-sm font-medium">
+              Kelola data pengajuan izin/cuti/sakit
             </div>
           </div>
         </div>
-        <div className="mx-auto p-4 max-w-5xl flex flex-col gap-8 px-2 md:px-0">
-          {/* Tab Navigation - Modern Style */}
-          <div className="flex border-b border-gray-200 bg-white shadow-sm">
-            {["izin", "cuti", "sakit"].map((j) => (
-              <button
-                key={j}
-                className={`px-6 py-3 font-semibold text-sm transition-colors ${
-                  pengajuanTab === j
-                    ? "text-emerald-600 border-b-2 border-emerald-600 bg-emerald-50"
-                    : "text-gray-600 hover:text-emerald-600 hover:bg-gray-50"
-                }`}
-                onClick={() => {
-                  setPengajuanTab(j);
-                  setPengajuanPage(1);
-                }}
-              >
-                <span className="material-icons text-lg mr-2">
-                  {j === "izin"
-                    ? "event_note"
-                    : j === "cuti"
-                    ? "event"
-                    : "healing"}
-                </span>
-                {j.charAt(0).toUpperCase() + j.slice(1)}
-              </button>
-            ))}
+        <div className="mx-auto p-6 max-w-5xl flex flex-col gap-6">
+          {/* Tab Navigation - Enhanced Design */}
+          <div className="bg-white border-2 border-emerald-200 shadow-lg">
+            <div className="flex">
+              {["izin", "cuti", "sakit"].map((j) => (
+                <button
+                  key={j}
+                  className={`flex-1 px-4 py-2 font-semibold text-sm transition-all duration-200 border-r-2 border-emerald-200 last:border-r-0 ${
+                    pengajuanTab === j
+                      ? "bg-emerald-600 text-white shadow-lg"
+                      : "bg-white text-gray-700 hover:bg-emerald-50 hover:text-emerald-700"
+                  }`}
+                  onClick={() => {
+                    setPengajuanTab(j);
+                    setPengajuanPage(1);
+                  }}
+                >
+                  <div className="flex items-center justify-center gap-2">
+                    <span className="material-icons text-lg">
+                      {j === "izin"
+                        ? "event_note"
+                        : j === "cuti"
+                        ? "event"
+                        : "healing"}
+                    </span>
+                    <span className="uppercase tracking-wide">
+                      {j.charAt(0).toUpperCase() + j.slice(1)}
+                    </span>
+                  </div>
+                </button>
+              ))}
+            </div>
           </div>
 
-          <div className="border border-gray-200 bg-white p-6 shadow flex flex-col gap-4">
-            <div className="flex justify-between items-center mb-2">
-              <div className="font-bold text-emerald-600 text-xl flex items-center gap-2">
-                <span className="material-icons text-emerald-600 text-2xl">
-                  {pengajuanTab === "izin"
-                    ? "event_note"
-                    : pengajuanTab === "cuti"
-                    ? "event"
-                    : "healing"}
-                </span>
-                DATA PENGAJUAN {pengajuanTab.toUpperCase()}
+          {/* Main Content Card */}
+          <div className="bg-white border-2 border-emerald-200 shadow-lg">
+            {/* Card Header */}
+            <div className="bg-emerald-600 px-4 py-3 border-b-2 border-emerald-700">
+              <div className="flex justify-between items-center">
+                <div className="flex items-center gap-3">
+                  <div className="bg-white p-2">
+                    <span className="material-icons text-lg text-emerald-600">
+                      {pengajuanTab === "izin"
+                        ? "event_note"
+                        : pengajuanTab === "cuti"
+                        ? "event"
+                        : "healing"}
+                    </span>
+                  </div>
+                  <div>
+                    <h2 className="text-lg font-black text-white uppercase tracking-wide">
+                      Data Pengajuan {pengajuanTab.toUpperCase()}
+                    </h2>
+                    <p className="text-emerald-100 text-xs font-medium">
+                      Kelola pengajuan {pengajuanTab} karyawan
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={downloadPDF}
+                  className="bg-white text-emerald-600 hover:bg-emerald-50 px-4 py-2 font-bold text-xs border-2 border-emerald-300 flex items-center gap-1 transition-all duration-200 shadow-lg hover:shadow-xl"
+                  title={`Download PDF Rekap Pengajuan ${
+                    pengajuanTab.charAt(0).toUpperCase() + pengajuanTab.slice(1)
+                  }`}
+                  disabled={pengajuan.length === 0}
+                >
+                  <span className="material-icons text-sm">picture_as_pdf</span>
+                  <span className="hidden sm:inline">Download PDF</span>
+                  <span className="sm:hidden">PDF</span>
+                </button>
               </div>
-              <button
-                onClick={downloadPDF}
-                className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm rounded flex items-center gap-2 transition shadow-md hover:shadow-lg"
-                title={`Download PDF Rekap Pengajuan ${
-                  pengajuanTab.charAt(0).toUpperCase() + pengajuanTab.slice(1)
-                }`}
-                disabled={pengajuan.length === 0}
-              >
-                <span className="material-icons text-sm">picture_as_pdf</span>
-                <span className="hidden sm:inline">Download PDF</span>
-                <span className="sm:hidden">PDF</span>
-              </button>
             </div>
+            {/* Table Section */}
             <div className="overflow-x-auto">
-              <table className="min-w-full text-sm bg-white">
-                <thead className="sticky top-0 z-10 bg-white border-b-2 border-emerald-100">
+              <table className="min-w-full">
+                <thead className="bg-emerald-50 border-b-2 border-emerald-200">
                   <tr>
-                    <th className="px-4 py-4 text-center font-extrabold text-emerald-700 tracking-wide text-base uppercase w-12">
+                    <th className="px-3 py-2 text-center font-black text-emerald-800 text-xs uppercase tracking-wider border-r border-emerald-200">
                       No
                     </th>
-                    <th className="px-4 py-4 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-32">
+                    <th className="px-3 py-2 text-left font-black text-emerald-800 text-xs uppercase tracking-wider border-r border-emerald-200">
                       Pegawai ID
                     </th>
-                    <th className="px-4 py-4 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-32">
+                    <th className="px-3 py-2 text-left font-black text-emerald-800 text-xs uppercase tracking-wider border-r border-emerald-200">
+                      Nama Pegawai
+                    </th>
+                    <th className="px-3 py-2 text-left font-black text-emerald-800 text-xs uppercase tracking-wider border-r border-emerald-200">
                       Tanggal Mulai
                     </th>
-                    <th className="px-4 py-4 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-32">
+                    <th className="px-3 py-2 text-left font-black text-emerald-800 text-xs uppercase tracking-wider border-r border-emerald-200">
                       Tanggal Selesai
                     </th>
-                    <th className="px-4 py-4 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-40">
+                    <th className="px-3 py-2 text-left font-black text-emerald-800 text-xs uppercase tracking-wider border-r border-emerald-200">
                       Alasan
                     </th>
-                    <th className="px-4 py-4 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-32">
+                    <th className="px-3 py-2 text-center font-black text-emerald-800 text-xs uppercase tracking-wider border-r border-emerald-200">
                       Dokumen
                     </th>
-                    <th className="px-4 py-4 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-24">
+                    <th className="px-3 py-2 text-center font-black text-emerald-800 text-xs uppercase tracking-wider border-r border-emerald-200">
                       Status
                     </th>
-                    <th className="px-4 py-4 text-center font-extrabold text-emerald-700 tracking-wide text-base uppercase w-24">
+                    <th className="px-3 py-2 text-center font-black text-emerald-800 text-xs uppercase tracking-wider">
                       Aksi
                     </th>
                   </tr>
@@ -393,109 +416,148 @@ export default function DataIzin() {
                     pengajuan.map((row, idx) => (
                       <tr
                         key={row.id}
-                        className={
-                          "transition hover:bg-emerald-50 " +
-                          (idx % 2 === 0 ? "bg-white" : "bg-gray-50")
-                        }
+                        className={`transition-all duration-200 hover:bg-emerald-50 border-b border-emerald-100 ${
+                          idx % 2 === 0 ? "bg-white" : "bg-emerald-25"
+                        }`}
                       >
-                        <td className="px-4 py-4 text-center align-middle border-b border-gray-100 font-semibold text-sm">
+                        <td className="px-3 py-2 text-center font-bold text-emerald-700 border-r border-emerald-100 text-sm">
                           {idx +
                             1 +
                             ((pengajuanPagination.current_page - 1) * 10 || 0)}
                         </td>
-                        <td className="px-4 py-4 align-middle border-b border-gray-100 text-sm">
+                        <td className="px-3 py-2 font-semibold text-gray-800 border-r border-emerald-100 text-sm">
                           {row.pegawai_id}
                         </td>
-                        <td className="px-4 py-4 align-middle border-b border-gray-100 text-sm">
+                        <td className="px-3 py-2 font-bold text-emerald-800 border-r border-emerald-100 text-sm">
+                          {row.nama}
+                        </td>
+                        <td className="px-3 py-2 text-gray-700 border-r border-emerald-100 text-sm">
                           {row.tanggal_mulai}
                         </td>
-                        <td className="px-4 py-4 align-middle border-b border-gray-100 text-sm">
+                        <td className="px-3 py-2 text-gray-700 border-r border-emerald-100 text-sm">
                           {row.tanggal_selesai}
                         </td>
-                        <td className="px-4 py-4 align-middle border-b border-gray-100 text-sm">
+                        <td className="px-3 py-2 text-gray-600 border-r border-emerald-100 text-sm">
                           {row.alasan}
                         </td>
-                        <td className="px-4 py-4 align-middle border-b border-gray-100">
+                        <td className="px-3 py-2 text-center border-r border-emerald-100">
                           {row.dokumen ? (
                             <a
-                              href={`http://103.23.103.43/prototype/tes/storage/${row.dokumen}`}
+                              href={`${import.meta.env.VITE_API_URL}/${
+                                row.dokumen
+                              }`}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="text-emerald-600 underline"
+                              className="inline-flex items-center gap-1 px-3 py-1 bg-emerald-600 text-white font-bold text-xs hover:bg-emerald-700 transition-colors"
                             >
+                              <span className="material-icons text-sm">
+                                visibility
+                              </span>
                               Lihat
                             </a>
                           ) : (
-                            "-"
+                            <span className="text-gray-400 font-medium">-</span>
                           )}
                         </td>
-                        <td className="px-4 py-4 capitalize font-bold align-middle border-b border-gray-100 text-sm">
+                        <td className="px-3 py-2 text-center border-r border-emerald-100">
                           {row.status === "pending" && (
-                            <span className="text-yellow-500">Pending</span>
+                            <span className="inline-flex items-center px-2 py-1 bg-yellow-100 text-yellow-800 font-bold text-xs border border-yellow-300">
+                              <span className="material-icons text-xs mr-1">
+                                schedule
+                              </span>
+                              Pending
+                            </span>
                           )}
                           {row.status === "diterima" && (
-                            <span className="text-emerald-500">Diterima</span>
+                            <span className="inline-flex items-center px-2 py-1 bg-emerald-100 text-emerald-800 font-bold text-xs border border-emerald-300">
+                              <span className="material-icons text-xs mr-1">
+                                check_circle
+                              </span>
+                              Diterima
+                            </span>
                           )}
                           {row.status === "ditolak" && (
-                            <span className="text-red-500">Ditolak</span>
+                            <span className="inline-flex items-center px-2 py-1 bg-red-100 text-red-800 font-bold text-xs border border-red-300">
+                              <span className="material-icons text-xs mr-1">
+                                cancel
+                              </span>
+                              Ditolak
+                            </span>
                           )}
                         </td>
-                        <td className="px-4 py-4 text-center align-middle border-b border-gray-100 flex gap-1 justify-center text-sm">
+                        <td className="px-3 py-2 text-center">
                           {row.status === "pending" && (
-                            <>
+                            <div className="flex gap-1 justify-center">
                               <button
-                                className="px-2 py-1 bg-emerald-600 text-white rounded text-xs font-bold mr-1"
+                                className="px-2 py-1 bg-emerald-600 text-white font-bold text-xs border border-emerald-700 hover:bg-emerald-700 transition-all duration-200"
                                 onClick={() =>
                                   handleApprove(row.id, "diterima")
                                 }
                               >
+                                <span className="material-icons text-xs mr-1">
+                                  check
+                                </span>
                                 Approve
                               </button>
                               <button
-                                className="px-2 py-1 bg-red-500 text-white rounded text-xs font-bold"
+                                className="px-2 py-1 bg-red-500 text-white font-bold text-xs border border-red-600 hover:bg-red-600 transition-all duration-200"
                                 onClick={() => handleApprove(row.id, "ditolak")}
                               >
+                                <span className="material-icons text-xs mr-1">
+                                  close
+                                </span>
                                 Tolak
                               </button>
-                            </>
+                            </div>
                           )}
                         </td>
                       </tr>
                     ))
                   ) : (
                     <tr>
-                      <td
-                        colSpan={8}
-                        className="text-center text-gray-400 py-4"
-                      >
-                        Tidak ada data pengajuan.
+                      <td colSpan={9} className="text-center py-12">
+                        <div className="flex flex-col items-center gap-4">
+                          <span className="material-icons text-6xl text-gray-300">
+                            inbox
+                          </span>
+                          <div className="text-gray-500 font-bold text-lg">
+                            Tidak ada data pengajuan
+                          </div>
+                          <div className="text-gray-400 text-sm">
+                            Belum ada pengajuan {pengajuanTab} yang perlu
+                            diproses
+                          </div>
+                        </div>
                       </td>
                     </tr>
                   )}
                 </tbody>
               </table>
             </div>
+            {/* Pagination */}
             {pengajuanPagination.last_page > 1 && (
-              <div className="flex flex-wrap gap-1 justify-center mt-4">
-                {pengajuanPagination.links.map((link, i) => (
-                  <button
-                    key={i}
-                    className={`px-3 py-1 rounded text-xs font-bold border transition ${
-                      link.active
-                        ? "bg-emerald-600 text-white border-emerald-600"
-                        : "bg-white text-emerald-700 border-gray-300 hover:bg-gray-100"
-                    }`}
-                    onClick={() => {
-                      if (link.url) {
-                        const url = new URL(link.url);
-                        const p = url.searchParams.get("page");
-                        if (p) setPengajuanPage(Number(p));
-                      }
-                    }}
-                    disabled={!link.url || link.active}
-                    dangerouslySetInnerHTML={{ __html: link.label }}
-                  />
-                ))}
+              <div className="bg-emerald-50 border-t-2 border-emerald-200 px-6 py-4">
+                <div className="flex flex-wrap gap-2 justify-center">
+                  {pengajuanPagination.links.map((link, i) => (
+                    <button
+                      key={i}
+                      className={`px-4 py-2 font-bold text-sm border-2 transition-all duration-200 ${
+                        link.active
+                          ? "bg-emerald-600 text-white border-emerald-700 shadow-lg"
+                          : "bg-white text-emerald-700 border-emerald-300 hover:bg-emerald-50 hover:border-emerald-400"
+                      }`}
+                      onClick={() => {
+                        if (link.url) {
+                          const url = new URL(link.url);
+                          const p = url.searchParams.get("page");
+                          if (p) setPengajuanPage(Number(p));
+                        }
+                      }}
+                      disabled={!link.url || link.active}
+                      dangerouslySetInnerHTML={{ __html: link.label }}
+                    />
+                  ))}
+                </div>
               </div>
             )}
           </div>
@@ -506,138 +568,169 @@ export default function DataIzin() {
 
   return (
     <div className="w-full min-h-screen font-sans bg-gray-50">
-      <div className="px-4 sticky z-40 top-0 py-4 border-b border-gray-200 bg-white flex items-center gap-4">
-        <span className="material-icons text-lg text-green-200 bg-primary p-2 rounded opacity-80">
-          description
-        </span>
+      <div className="px-4 sticky z-40 top-0 py-4 border-b-2 border-emerald-200 bg-white flex items-center gap-4">
+        <div className="bg-emerald-600 p-2">
+          <span className="material-icons text-white text-lg">description</span>
+        </div>
         <div>
-          <div className="text-2xl font-extrabold text-emerald-700 tracking-tight drop-shadow-sm uppercase">
-            Manajemen Jenis Izin
+          <div className="text-2xl font-black text-emerald-600 tracking-tight uppercase">
+            Manajemen Jenis Izin/Cuti/Sakit
           </div>
-          <div className="text-gray-600 text-base font-medium">
-            Kelola jenis izin sakit & cuti
+          <div className="text-emerald-600 text-sm font-medium">
+            Kelola data jenis izin/cuti/sakit
           </div>
         </div>
       </div>
-      <div className="mx-auto p-4 max-w-5xl flex flex-col gap-8 px-2 md:px-0">
-        {/* Tab Navigation - Modern Style */}
-        <div className="flex border-b border-gray-200 bg-white shadow-sm">
-          {jenisList.map((j) => (
-            <button
-              key={j}
-              className={`px-6 py-3 font-semibold text-sm transition-colors ${
-                jenis === j
-                  ? "text-emerald-600 border-b-2 border-emerald-600 bg-emerald-50"
-                  : "text-gray-600 hover:text-emerald-600 hover:bg-gray-50"
-              }`}
-              onClick={() => {
-                setJenis(j);
-                setForm({ id: null, jenis: "" });
-                // setError(null);
-              }}
-            >
-              <span className="material-icons text-lg mr-2">
-                {j === "izin"
-                  ? "event_note"
-                  : j === "cuti"
-                  ? "event"
-                  : "healing"}
-              </span>
-              {j.charAt(0).toUpperCase() + j.slice(1)}
-            </button>
-          ))}
+      <div className="mx-auto p-6 max-w-7xl flex flex-col gap-6">
+        {/* Tab Navigation - Enhanced Design */}
+        <div className="bg-white border-2 border-emerald-200 shadow-lg">
+          <div className="flex">
+            {jenisList.map((j) => (
+              <button
+                key={j}
+                className={`flex-1 px-4 py-2 font-semibold text-sm transition-all duration-200 border-r-2 border-emerald-200 last:border-r-0 ${
+                  jenis === j
+                    ? "bg-emerald-600 text-white shadow-lg"
+                    : "bg-white text-gray-700 hover:bg-emerald-50 hover:text-emerald-700"
+                }`}
+                onClick={() => {
+                  setJenis(j);
+                  setForm({ id: null, jenis: "" });
+                }}
+              >
+                <div className="flex items-center justify-center gap-2">
+                  <span className="material-icons text-lg">
+                    {j === "izin"
+                      ? "event_note"
+                      : j === "cuti"
+                      ? "event"
+                      : "healing"}
+                  </span>
+                  <span className="uppercase tracking-wide">
+                    {j.charAt(0).toUpperCase() + j.slice(1)}
+                  </span>
+                </div>
+              </button>
+            ))}
+          </div>
         </div>
 
-        <div className="border border-gray-200 bg-white p-6 shadow flex flex-col gap-4">
-          <div className="font-bold text-emerald-600 text-xl flex items-center gap-2 mb-2">
-            <span className="material-icons text-emerald-600 text-2xl">
-              {jenis === "izin"
-                ? "event_note"
-                : jenis === "cuti"
-                ? "event"
-                : "healing"}
-            </span>
-            DATA JENIS {jenis.toUpperCase()}
+        {/* Main Content Card */}
+        <div className="bg-white border-2 border-emerald-200 shadow-lg">
+          {/* Card Header */}
+          <div className="bg-emerald-600 px-4 py-3 border-b-2 border-emerald-700">
+            <div className="flex items-center gap-3">
+              <div className="bg-white p-2">
+                <span className="material-icons text-lg text-emerald-600">
+                  {jenis === "izin"
+                    ? "event_note"
+                    : jenis === "cuti"
+                    ? "event"
+                    : "healing"}
+                </span>
+              </div>
+              <div>
+                <h2 className="text-lg font-black text-white uppercase tracking-wide">
+                  Data Jenis {jenis.toUpperCase()}
+                </h2>
+                <p className="text-emerald-100 text-xs font-medium">
+                  Kelola jenis {jenis} yang tersedia
+                </p>
+              </div>
+            </div>
           </div>
-          <form
-            className="flex flex-wrap gap-4 mb-4 items-end"
-            onSubmit={handleSubmit}
-          >
-            <div className="flex flex-col flex-1 min-w-[200px]">
-              <label className="text-xs font-semibold text-gray-600 mb-1">
-                Jenis {jenis.charAt(0).toUpperCase() + jenis.slice(1)}
-              </label>
-              <input
-                className="border border-gray-300 px-3 py-2 text-sm"
-                placeholder={`Jenis ${
-                  jenis.charAt(0).toUpperCase() + jenis.slice(1)
-                }`}
-                value={form.jenis}
-                onChange={(e) =>
-                  setForm((f) => ({ ...f, jenis: e.target.value }))
-                }
-                disabled={formLoading}
-                required
-              />
-            </div>
-            <div className="flex flex-col justify-end min-w-[120px]">
-              <button
-                type="submit"
-                className={`px-4 py-2 font-bold text-sm transition flex items-center gap-2 ${
-                  form.id
-                    ? "bg-yellow-500 hover:bg-yellow-600 text-white"
-                    : "bg-emerald-600 hover:bg-emerald-700 text-white"
-                }`}
-                disabled={formLoading}
-              >
-                {formLoading && (
-                  <span className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></span>
-                )}
-                {form.id
-                  ? formLoading
-                    ? "Menyimpan..."
-                    : "Simpan Perubahan"
-                  : formLoading
-                  ? "Menambah..."
-                  : "Tambah"}
-              </button>
-            </div>
-            {form.id && (
-              <div className="flex flex-col justify-end min-w-[80px]">
+
+          {/* Form Section */}
+          <div className="p-4 border-b-2 border-emerald-200">
+            <form
+              className="flex flex-wrap gap-3 items-end"
+              onSubmit={handleSubmit}
+            >
+              <div className="flex flex-col flex-1 min-w-[250px]">
+                <label className="text-xs font-bold text-emerald-700 mb-1 uppercase tracking-wide">
+                  Jenis {jenis.charAt(0).toUpperCase() + jenis.slice(1)}
+                </label>
+                <input
+                  className="border-2 border-emerald-300 px-3 py-2 text-sm font-medium focus:border-emerald-500 focus:outline-none transition-colors"
+                  placeholder={`Masukkan jenis ${
+                    jenis.charAt(0).toUpperCase() + jenis.slice(1)
+                  }`}
+                  value={form.jenis}
+                  onChange={(e) =>
+                    setForm((f) => ({ ...f, jenis: e.target.value }))
+                  }
+                  disabled={formLoading}
+                  required
+                />
+              </div>
+              <div className="flex gap-2">
                 <button
-                  type="button"
-                  className="px-4 py-2 font-bold text-sm bg-gray-300 hover:bg-gray-400 text-gray-700"
-                  onClick={() => setForm({ id: null, jenis: "" })}
+                  type="submit"
+                  className={`px-4 py-2 font-bold text-xs transition-all duration-200 flex items-center gap-1 border-2 shadow-lg hover:shadow-xl ${
+                    form.id
+                      ? "bg-yellow-500 hover:bg-yellow-600 text-white border-yellow-600"
+                      : "bg-emerald-600 hover:bg-emerald-700 text-white border-emerald-700"
+                  }`}
                   disabled={formLoading}
                 >
-                  Batal
+                  {formLoading && (
+                    <span className="animate-spin h-3 w-3 border-2 border-white border-t-transparent"></span>
+                  )}
+                  <span className="material-icons text-sm">
+                    {form.id ? "save" : "add"}
+                  </span>
+                  {form.id
+                    ? formLoading
+                      ? "Menyimpan..."
+                      : "Simpan Perubahan"
+                    : formLoading
+                    ? "Menambah..."
+                    : "Tambah"}
                 </button>
+                {form.id && (
+                  <button
+                    type="button"
+                    className="px-4 py-2 font-bold text-xs bg-gray-500 hover:bg-gray-600 text-white border-2 border-gray-600 transition-all duration-200 shadow-lg hover:shadow-xl"
+                    onClick={() => setForm({ id: null, jenis: "" })}
+                    disabled={formLoading}
+                  >
+                    <span className="material-icons text-sm mr-1">close</span>
+                    Batal
+                  </button>
+                )}
+              </div>
+            </form>
+            {form.id && (
+              <div className="mt-3 p-2 bg-yellow-100 border border-yellow-300">
+                <div className="flex items-center gap-1">
+                  <span className="material-icons text-yellow-600 text-sm">
+                    edit
+                  </span>
+                  <span className="text-yellow-800 font-bold text-xs">
+                    Sedang mengedit: {form.jenis}
+                  </span>
+                </div>
               </div>
             )}
-          </form>
-          {form.id && (
-            <div className="mb-2 text-sm text-yellow-700 font-semibold">
-              Edit {jenis.charAt(0).toUpperCase() + jenis.slice(1)}:{" "}
-              {form.jenis}
-            </div>
-          )}
+          </div>
+          {/* Table Section */}
           <div className="overflow-x-auto">
-            <table className="min-w-full text-sm bg-white">
-              <thead className="sticky top-0 z-10 bg-white border-b-2 border-emerald-100">
+            <table className="min-w-full">
+              <thead className="bg-emerald-50 border-b-2 border-emerald-200">
                 <tr>
-                  <th className="px-4 py-4 text-center font-extrabold text-emerald-700 tracking-wide text-base uppercase w-12">
+                  <th className="px-3 py-2 text-center font-black text-emerald-800 text-xs uppercase tracking-wider border-r border-emerald-200">
                     No
                   </th>
-                  <th className="px-4 py-4 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-40">
+                  <th className="px-3 py-2 text-left font-black text-emerald-800 text-xs uppercase tracking-wider border-r border-emerald-200">
                     Jenis {jenis.charAt(0).toUpperCase() + jenis.slice(1)}
                   </th>
-                  <th className="px-4 py-4 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-32">
-                    Created
+                  <th className="px-3 py-2 text-left font-black text-emerald-800 text-xs uppercase tracking-wider border-r border-emerald-200">
+                    Dibuat
                   </th>
-                  <th className="px-4 py-4 text-left font-extrabold text-emerald-700 tracking-wide text-base uppercase w-32">
-                    Updated
+                  <th className="px-3 py-2 text-left font-black text-emerald-800 text-xs uppercase tracking-wider border-r border-emerald-200">
+                    Diperbarui
                   </th>
-                  <th className="px-4 py-4 text-center font-extrabold text-emerald-700 tracking-wide text-base uppercase w-24">
+                  <th className="px-3 py-2 text-center font-black text-emerald-800 text-xs uppercase tracking-wider">
                     Aksi
                   </th>
                 </tr>
@@ -647,49 +740,60 @@ export default function DataIzin() {
                   data.map((row, idx) => (
                     <tr
                       key={row.id}
-                      className={
-                        "transition hover:bg-emerald-50 " +
-                        (idx % 2 === 0 ? "bg-white" : "bg-gray-50")
-                      }
+                      className={`transition-all duration-200 hover:bg-emerald-50 border-b border-emerald-100 ${
+                        idx % 2 === 0 ? "bg-white" : "bg-emerald-25"
+                      }`}
                     >
-                      <td className="px-4 py-4 text-center align-middle border-b border-gray-100 font-semibold text-base">
+                      <td className="px-3 py-2 text-center font-bold text-emerald-700 border-r border-emerald-100 text-sm">
                         {idx + 1}
                       </td>
-                      <td className="px-4 py-4 align-middle border-b border-gray-100 font-bold text-emerald-800 text-base">
+                      <td className="px-3 py-2 font-bold text-emerald-800 border-r border-emerald-100 text-sm">
                         {row.jenis}
                       </td>
-                      <td className="px-4 py-4 align-middle border-b border-gray-100 text-base">
+                      <td className="px-3 py-2 text-gray-700 border-r border-emerald-100 text-sm">
                         {new Date(row.created_at).toLocaleString("id-ID")}
                       </td>
-                      <td className="px-4 py-4 align-middle border-b border-gray-100 text-base">
+                      <td className="px-3 py-2 text-gray-700 border-r border-emerald-100 text-sm">
                         {new Date(row.updated_at).toLocaleString("id-ID")}
                       </td>
-                      <td className="px-4 py-4 text-center align-middle border-b border-gray-100 flex gap-1 justify-center text-base">
-                        <button
-                          className="w-8 h-8 flex items-center justify-center text-yellow-600 hover:text-yellow-800 rounded transition"
-                          onClick={() => handleEdit(row)}
-                          disabled={formLoading}
-                          title="Edit"
-                        >
-                          <span className="material-icons text-base">edit</span>
-                        </button>
-                        <button
-                          className="w-8 h-8 flex items-center justify-center text-red-600 hover:text-red-800 rounded transition"
-                          onClick={() => handleDelete(row.id)}
-                          disabled={formLoading}
-                          title="Hapus"
-                        >
-                          <span className="material-icons text-base">
-                            delete
-                          </span>
-                        </button>
+                      <td className="px-3 py-2 text-center">
+                        <div className="flex gap-1 justify-center">
+                          <button
+                            className="w-8 h-8 flex items-center justify-center text-yellow-600 hover:text-yellow-800 hover:bg-yellow-100 border border-yellow-300 transition-all duration-200"
+                            onClick={() => handleEdit(row)}
+                            disabled={formLoading}
+                            title="Edit"
+                          >
+                            <span className="material-icons text-sm">edit</span>
+                          </button>
+                          <button
+                            className="w-8 h-8 flex items-center justify-center text-red-600 hover:text-red-800 hover:bg-red-100 border border-red-300 transition-all duration-200"
+                            onClick={() => handleDelete(row.id)}
+                            disabled={formLoading}
+                            title="Hapus"
+                          >
+                            <span className="material-icons text-sm">
+                              delete
+                            </span>
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={5} className="text-center text-gray-400 py-4">
-                      Tidak ada data ditemukan.
+                    <td colSpan={5} className="text-center py-12">
+                      <div className="flex flex-col items-center gap-4">
+                        <span className="material-icons text-6xl text-gray-300">
+                          inbox
+                        </span>
+                        <div className="text-gray-500 font-bold text-lg">
+                          Tidak ada data ditemukan
+                        </div>
+                        <div className="text-gray-400 text-sm">
+                          Belum ada jenis {jenis} yang tersedia
+                        </div>
+                      </div>
                     </td>
                   </tr>
                 )}
