@@ -55,7 +55,7 @@ export default function ShiftDosenKaryawan() {
       )
     ).finally(() => setAssignLoading(false));
   };
-
+ 
   return (
     <div className="w-full min-h-screen font-sans bg-gray-50">
       <div className="px-4 sticky z-40 top-0 py-4 border-b-2 border-emerald-200 bg-white flex items-center gap-4">
@@ -334,7 +334,7 @@ export default function ShiftDosenKaryawan() {
                           key={s.shift_detail?.id || s.id}
                           value={s.shift_detail?.id || s.id}
                         >
-                          {s.name}
+                          {s.name}{s.unit_name ? ` ( ${s.unit_name} )` : ""}
                         </option>
                       ))}
                     </select>

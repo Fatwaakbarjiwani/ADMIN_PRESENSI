@@ -74,6 +74,7 @@ const MONTHS = [
 export default function Home() {
   const dispatch = useDispatch();
   const dashboard = useSelector((state) => state.dashboard.data);
+  const loading = useSelector((state) => state.dashboard.loading);
 
   // Gunakan Date bawaan JS
   const now = new Date();
@@ -234,22 +235,22 @@ export default function Home() {
         },
         {
           name: "Izin",
-          value: dashboard.ringkasan.ringkasan_presensi.izin,
+          value: dashboard?.ringkasan?.ringkasan_presensi?.izin,
           color: "#fbbf24",
         },
         {
           name: "Sakit",
-          value: dashboard.ringkasan.ringkasan_presensi.sakit,
+          value: dashboard?.ringkasan?.ringkasan_presensi?.sakit,
           color: "#3b82f6",
         },
         {
           name: "Cuti",
-          value: dashboard.ringkasan.ringkasan_presensi.cuti,
+          value: dashboard?.ringkasan?.ringkasan_presensi?.cuti,
           color: "#a78bfa",
         },
         {
           name: "Dinas",
-          value: dashboard.ringkasan.ringkasan_presensi.dinas,
+          value: dashboard?.ringkasan?.ringkasan_presensi?.dinas,
           color: "#10b981",
         },
       ].filter((item) => item.value > 0) // Hanya tampilkan yang ada nilainya
@@ -267,6 +268,90 @@ export default function Home() {
   // Sisa pengajuan
   const sisaPengajuan = dashboard?.ringkasan?.sisa_pengajuan || {};
 
+  // Loading Component - Tampil penuh saat proses loading
+  if (loading) {
+    return (
+      <div className="w-full min-h-screen font-sans bg-gradient-to-br from-emerald-50 via-white to-emerald-50 flex items-center justify-center">
+        <div className="flex flex-col items-center gap-6 p-8">
+          {/* Animated Logo/Icon */}
+          <div className="relative">
+            {/* Outer rotating ring */}
+            <div className="w-24 h-24 border-4 border-emerald-100 rounded-full absolute animate-spin"></div>
+            <div
+              className="w-24 h-24 border-4 border-transparent border-t-emerald-600 border-r-emerald-500 rounded-full animate-spin"
+              style={{ animationDuration: "1s" }}
+            ></div>
+            {/* Inner pulsing circle */}
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="w-16 h-16 bg-emerald-600 rounded-full flex items-center justify-center animate-pulse shadow-lg">
+                <span className="material-icons text-white text-3xl">
+                  dashboard
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Loading Text */}
+          <div className="text-center space-y-2">
+            <div className="text-emerald-700 font-black text-2xl tracking-tight uppercase">
+              Memuat Dashboard
+            </div>
+            <div className="text-emerald-600 text-sm font-medium">
+              Mohon tunggu, sedang mengambil data...
+            </div>
+          </div>
+
+          {/* Loading Dots Animation */}
+          <div className="flex gap-2">
+            <div
+              className="w-3 h-3 bg-emerald-600 rounded-full animate-bounce"
+              style={{ animationDelay: "0ms" }}
+            ></div>
+            <div
+              className="w-3 h-3 bg-emerald-500 rounded-full animate-bounce"
+              style={{ animationDelay: "150ms" }}
+            ></div>
+            <div
+              className="w-3 h-3 bg-emerald-400 rounded-full animate-bounce"
+              style={{ animationDelay: "300ms" }}
+            ></div>
+          </div>
+
+          {/* Progress Bar */}
+          <div className="w-64 h-1.5 bg-emerald-100 rounded-full overflow-hidden shadow-inner">
+            <div
+              className="h-full bg-gradient-to-r from-emerald-400 via-emerald-600 to-emerald-400 rounded-full animate-pulse shadow-lg"
+              style={{ animation: "pulse 1.5s ease-in-out infinite" }}
+            ></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Jika tidak ada data setelah loading selesai
+  if (!dashboard) {
+    return (
+      <div className="w-full min-h-screen font-sans bg-gray-50 flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4 p-8">
+          <div className="w-20 h-20 bg-emerald-100 border-2 border-emerald-200 flex items-center justify-center">
+            <span className="material-icons text-emerald-400 text-4xl">
+              error_outline
+            </span>
+          </div>
+          <div className="text-emerald-800 font-black text-xl">
+            Data Tidak Tersedia
+          </div>
+          <div className="text-emerald-600 text-center max-w-md text-sm">
+            Tidak dapat memuat data dashboard. Silakan refresh halaman atau
+            hubungi administrator.
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Tampilkan konten dashboard setelah loading selesai
   return (
     <div className="w-full min-h-screen font-sans bg-gray-50">
       {/* Header */}
@@ -609,238 +694,287 @@ export default function Home() {
           </div>
           {/* Grafik Presensi User */}
           <CollapsibleSection title="Grafik Presensi User" icon="pie_chart">
-            <div className="flex flex-col md:flex-row gap-8 items-center justify-center">
-              <div className="md:w-1/2 flex items-center justify-center">
-                <div className="w-full h-64">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                      <Pie
-                        data={userPresensiData}
-                        dataKey="value"
-                        nameKey="name"
-                        cx="50%"
-                        cy="50%"
-                        outerRadius={70}
-                        label
-                      >
-                        {userPresensiData.map((entry, index) => (
-                          <Cell
-                            key={`cell-presensi-${index}`}
-                            fill={userPresensiData[index].color}
-                          />
-                        ))}
-                      </Pie>
-                      <Tooltip />
-                      <Legend />
-                    </PieChart>
-                  </ResponsiveContainer>
+            {userPresensiData.length > 0 ? (
+              <div className="flex flex-col md:flex-row gap-8 items-center justify-center">
+                <div className="md:w-1/2 flex items-center justify-center">
+                  <div className="w-full h-64">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <PieChart>
+                        <Pie
+                          data={userPresensiData}
+                          dataKey="value"
+                          nameKey="name"
+                          cx="50%"
+                          cy="50%"
+                          outerRadius={70}
+                          label
+                        >
+                          {userPresensiData.map((entry, index) => (
+                            <Cell
+                              key={`cell-presensi-${index}`}
+                              fill={userPresensiData[index].color}
+                            />
+                          ))}
+                        </Pie>
+                        <Tooltip />
+                        <Legend />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+                <div className="md:w-1/2 overflow-x-auto max-h-60">
+                  <table className="w-full text-xs border-2 border-emerald-200">
+                    <thead>
+                      <tr className="bg-emerald-50 border-b-2 border-emerald-200">
+                        <th className="px-3 py-2 text-center font-black text-emerald-800 text-xs uppercase tracking-wider border-r border-emerald-200">
+                          Status
+                        </th>
+                        <th className="px-3 py-2 text-center font-black text-emerald-800 text-xs uppercase tracking-wider">
+                          Jumlah
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {userPresensiData.map((row, i) => (
+                        <tr
+                          key={row.name}
+                          className={`transition hover:bg-emerald-50 border-b border-emerald-100 ${
+                            i % 2 === 0 ? "bg-white" : "bg-emerald-25"
+                          }`}
+                        >
+                          <td className="px-3 py-2 text-sm">{row.name}</td>
+                          <td className="px-3 py-2 text-sm font-bold text-emerald-700">
+                            {row.value}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
               </div>
-              <div className="md:w-1/2 overflow-x-auto max-h-60">
-                <table className="w-full text-xs border-2 border-emerald-200">
-                  <thead>
-                    <tr className="bg-emerald-50 border-b-2 border-emerald-200">
-                      <th className="px-3 py-2 text-center font-black text-emerald-800 text-xs uppercase tracking-wider border-r border-emerald-200">
-                        Status
-                      </th>
-                      <th className="px-3 py-2 text-center font-black text-emerald-800 text-xs uppercase tracking-wider">
-                        Jumlah
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {userPresensiData.map((row, i) => (
-                      <tr
-                        key={row.name}
-                        className={`transition hover:bg-emerald-50 border-b border-emerald-100 ${
-                          i % 2 === 0 ? "bg-white" : "bg-emerald-25"
-                        }`}
-                      >
-                        <td className="px-3 py-2 text-sm">{row.name}</td>
-                        <td className="px-3 py-2 text-sm font-bold text-emerald-700">
-                          {row.value}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+            ) : (
+              <div className="flex flex-col items-center justify-center py-12 gap-4">
+                <div className="w-20 h-20 bg-emerald-100 border-2 border-emerald-200 flex items-center justify-center">
+                  <span className="material-icons text-emerald-400 text-4xl">
+                    pie_chart
+                  </span>
+                </div>
+                <div className="text-emerald-800 font-black text-xl">
+                  Tidak Ada Data Presensi
+                </div>
+                <div className="text-emerald-600 text-center max-w-md text-sm">
+                  Belum ada data presensi untuk periode ini atau semua nilai
+                  presensi masih 0.
+                </div>
               </div>
-            </div>
+            )}
           </CollapsibleSection>
           {/* Grafik Presensi Bulanan */}
           <CollapsibleSection title="Grafik Presensi Bulanan" icon="bar_chart">
-            <div className="w-full h-56">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={dataBulanan}>
-                  <XAxis
-                    dataKey="nama_bulan"
-                    tick={{ fontWeight: 500, fill: "#166534" }}
-                  />
-                  <YAxis tick={{ fontWeight: 500, fill: "#166534" }} />
-                  <Tooltip />
-                  <Legend />
-                  <Bar
-                    dataKey="hadir"
-                    fill="#2563eb"
-                    radius={[4, 4, 0, 0]}
-                    name="Hadir"
-                  />
-                  <Bar
-                    dataKey="terlambat"
-                    fill="#f59e42"
-                    radius={[4, 4, 0, 0]}
-                    name="Terlambat"
-                  />
-                  <Bar
-                    dataKey="tidak_hadir"
-                    fill="#f87171"
-                    radius={[4, 4, 0, 0]}
-                    name="Tidak Hadir"
-                  />
+            {dataBulanan.length > 0 ? (
+              <div className="w-full h-56">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={dataBulanan}>
+                    <XAxis
+                      dataKey="nama_bulan"
+                      tick={{ fontWeight: 500, fill: "#166534" }}
+                    />
+                    <YAxis tick={{ fontWeight: 500, fill: "#166534" }} />
+                    <Tooltip />
+                    <Legend />
+                    <Bar
+                      dataKey="hadir"
+                      fill="#2563eb"
+                      radius={[4, 4, 0, 0]}
+                      name="Hadir"
+                    />
+                    <Bar
+                      dataKey="terlambat"
+                      fill="#f59e42"
+                      radius={[4, 4, 0, 0]}
+                      name="Terlambat"
+                    />
+                    <Bar
+                      dataKey="tidak_hadir"
+                      fill="#f87171"
+                      radius={[4, 4, 0, 0]}
+                      name="Tidak Hadir"
+                    />
 
-                  <Bar
-                    dataKey="lembur"
-                    fill="#8b5cf6"
-                    radius={[4, 4, 0, 0]}
-                    name="Lembur"
-                  />
-                  <Bar
-                    dataKey="tidak_absen_masuk"
-                    fill="#f97316"
-                    radius={[4, 4, 0, 0]}
-                    name="Tidak Absen Masuk"
-                  />
-                  <Bar
-                    dataKey="pulang_awal"
-                    fill="#ef4444"
-                    radius={[4, 4, 0, 0]}
-                    name="Pulang Awal"
-                  />
-                  <Bar
-                    dataKey="tidak_absen_pulang"
-                    fill="#6b7280"
-                    radius={[4, 4, 0, 0]}
-                    name="Tidak Absen Pulang"
-                  />
+                    <Bar
+                      dataKey="lembur"
+                      fill="#8b5cf6"
+                      radius={[4, 4, 0, 0]}
+                      name="Lembur"
+                    />
+                    <Bar
+                      dataKey="tidak_absen_masuk"
+                      fill="#f97316"
+                      radius={[4, 4, 0, 0]}
+                      name="Tidak Absen Masuk"
+                    />
+                    <Bar
+                      dataKey="pulang_awal"
+                      fill="#ef4444"
+                      radius={[4, 4, 0, 0]}
+                      name="Pulang Awal"
+                    />
+                    <Bar
+                      dataKey="tidak_absen_pulang"
+                      fill="#6b7280"
+                      radius={[4, 4, 0, 0]}
+                      name="Tidak Absen Pulang"
+                    />
 
-                  <Bar
-                    dataKey="izin"
-                    fill="#fbbf24"
-                    radius={[4, 4, 0, 0]}
-                    name="Izin"
-                  />
-                  <Bar
-                    dataKey="sakit"
-                    fill="#3b82f6"
-                    radius={[4, 4, 0, 0]}
-                    name="Sakit"
-                  />
-                  <Bar
-                    dataKey="cuti"
-                    fill="#a78bfa"
-                    radius={[4, 4, 0, 0]}
-                    name="Cuti"
-                  />
-                  <Bar
-                    dataKey="dinas"
-                    fill="#10b981"
-                    radius={[4, 4, 0, 0]}
-                    name="Dinas"
-                  />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
+                    <Bar
+                      dataKey="izin"
+                      fill="#fbbf24"
+                      radius={[4, 4, 0, 0]}
+                      name="Izin"
+                    />
+                    <Bar
+                      dataKey="sakit"
+                      fill="#3b82f6"
+                      radius={[4, 4, 0, 0]}
+                      name="Sakit"
+                    />
+                    <Bar
+                      dataKey="cuti"
+                      fill="#a78bfa"
+                      radius={[4, 4, 0, 0]}
+                      name="Cuti"
+                    />
+                    <Bar
+                      dataKey="dinas"
+                      fill="#10b981"
+                      radius={[4, 4, 0, 0]}
+                      name="Dinas"
+                    />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center py-12 gap-4">
+                <div className="w-20 h-20 bg-emerald-100 border-2 border-emerald-200 flex items-center justify-center">
+                  <span className="material-icons text-emerald-400 text-4xl">
+                    bar_chart
+                  </span>
+                </div>
+                <div className="text-emerald-800 font-black text-xl">
+                  Tidak Ada Data Bulanan
+                </div>
+                <div className="text-emerald-600 text-center max-w-md text-sm">
+                  Belum ada data presensi bulanan untuk ditampilkan.
+                </div>
+              </div>
+            )}
           </CollapsibleSection>
           {/* Grafik Presensi Harian */}
           <CollapsibleSection title="Grafik Presensi Harian" icon="show_chart">
-            <div className="w-full overflow-y-hidden h-56">
-              <ResponsiveContainer width="300%" height="100%">
-                <BarChart data={dataHarian}>
-                  <XAxis
-                    dataKey="tanggal"
-                    tick={{ fontWeight: 500, fill: "#166534", fontSize: 10 }}
-                  />
-                  <YAxis tick={{ fontWeight: 500, fill: "#166534" }} />
-                  <Tooltip />
-                  <Legend
-                    wrapperStyle={{
-                      paddingTop: 10,
-                      fontSize: 12,
-                      fontWeight: 500,
-                    }}
-                    iconType="rect"
-                  />
-                  <Bar
-                    dataKey="hadir"
-                    fill="#2563eb"
-                    radius={[4, 4, 0, 0]}
-                    name="Hadir"
-                  />
-                  <Bar
-                    dataKey="terlambat"
-                    fill="#f59e42"
-                    radius={[4, 4, 0, 0]}
-                    name="Terlambat"
-                  />
-                  <Bar
-                    dataKey="tidak_hadir"
-                    fill="#f87171"
-                    radius={[4, 4, 0, 0]}
-                    name="Tidak Hadir"
-                  />
+            {dataHarian.length > 0 ? (
+              <div className="w-full overflow-y-hidden h-56">
+                <ResponsiveContainer width="300%" height="100%">
+                  <BarChart data={dataHarian}>
+                    <XAxis
+                      dataKey="tanggal"
+                      tick={{ fontWeight: 500, fill: "#166534", fontSize: 10 }}
+                    />
+                    <YAxis tick={{ fontWeight: 500, fill: "#166534" }} />
+                    <Tooltip />
+                    <Legend
+                      wrapperStyle={{
+                        paddingTop: 10,
+                        fontSize: 12,
+                        fontWeight: 500,
+                      }}
+                      iconType="rect"
+                    />
+                    <Bar
+                      dataKey="hadir"
+                      fill="#2563eb"
+                      radius={[4, 4, 0, 0]}
+                      name="Hadir"
+                    />
+                    <Bar
+                      dataKey="terlambat"
+                      fill="#f59e42"
+                      radius={[4, 4, 0, 0]}
+                      name="Terlambat"
+                    />
+                    <Bar
+                      dataKey="tidak_hadir"
+                      fill="#f87171"
+                      radius={[4, 4, 0, 0]}
+                      name="Tidak Hadir"
+                    />
 
-                  <Bar
-                    dataKey="lembur"
-                    fill="#8b5cf6"
-                    radius={[4, 4, 0, 0]}
-                    name="Lembur"
-                  />
-                  <Bar
-                    dataKey="tidak_absen_masuk"
-                    fill="#f97316"
-                    radius={[4, 4, 0, 0]}
-                    name="Tidak Absen Masuk"
-                  />
-                  <Bar
-                    dataKey="pulang_awal"
-                    fill="#ef4444"
-                    radius={[4, 4, 0, 0]}
-                    name="Pulang Awal"
-                  />
-                  <Bar
-                    dataKey="tidak_absen_pulang"
-                    fill="#6b7280"
-                    radius={[4, 4, 0, 0]}
-                    name="Tidak Absen Pulang"
-                  />
+                    <Bar
+                      dataKey="lembur"
+                      fill="#8b5cf6"
+                      radius={[4, 4, 0, 0]}
+                      name="Lembur"
+                    />
+                    <Bar
+                      dataKey="tidak_absen_masuk"
+                      fill="#f97316"
+                      radius={[4, 4, 0, 0]}
+                      name="Tidak Absen Masuk"
+                    />
+                    <Bar
+                      dataKey="pulang_awal"
+                      fill="#ef4444"
+                      radius={[4, 4, 0, 0]}
+                      name="Pulang Awal"
+                    />
+                    <Bar
+                      dataKey="tidak_absen_pulang"
+                      fill="#6b7280"
+                      radius={[4, 4, 0, 0]}
+                      name="Tidak Absen Pulang"
+                    />
 
-                  <Bar
-                    dataKey="izin"
-                    fill="#fbbf24"
-                    radius={[4, 4, 0, 0]}
-                    name="Izin"
-                  />
-                  <Bar
-                    dataKey="sakit"
-                    fill="#3b82f6"
-                    radius={[4, 4, 0, 0]}
-                    name="Sakit"
-                  />
-                  <Bar
-                    dataKey="cuti"
-                    fill="#a78bfa"
-                    radius={[4, 4, 0, 0]}
-                    name="Cuti"
-                  />
-                  <Bar
-                    dataKey="dinas"
-                    fill="#10b981"
-                    radius={[4, 4, 0, 0]}
-                    name="Dinas"
-                  />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
+                    <Bar
+                      dataKey="izin"
+                      fill="#fbbf24"
+                      radius={[4, 4, 0, 0]}
+                      name="Izin"
+                    />
+                    <Bar
+                      dataKey="sakit"
+                      fill="#3b82f6"
+                      radius={[4, 4, 0, 0]}
+                      name="Sakit"
+                    />
+                    <Bar
+                      dataKey="cuti"
+                      fill="#a78bfa"
+                      radius={[4, 4, 0, 0]}
+                      name="Cuti"
+                    />
+                    <Bar
+                      dataKey="dinas"
+                      fill="#10b981"
+                      radius={[4, 4, 0, 0]}
+                      name="Dinas"
+                    />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center py-12 gap-4">
+                <div className="w-20 h-20 bg-emerald-100 border-2 border-emerald-200 flex items-center justify-center">
+                  <span className="material-icons text-emerald-400 text-4xl">
+                    show_chart
+                  </span>
+                </div>
+                <div className="text-emerald-800 font-black text-xl">
+                  Tidak Ada Data Harian
+                </div>
+                <div className="text-emerald-600 text-center max-w-md text-sm">
+                  Belum ada data presensi harian untuk ditampilkan.
+                </div>
+              </div>
+            )}
           </CollapsibleSection>
           {/* Sisa Pengajuan */}
           <CollapsibleSection title="Sisa Pengajuan" icon="pending_actions">
