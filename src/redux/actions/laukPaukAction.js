@@ -72,53 +72,60 @@ export const fetchLaukPauk =
   };
 
 // Create lauk pauk
-export const createLaukPauk = (data) => async (dispatch, getState) => {
-  dispatch({ type: CREATE_LAUK_PAUK_REQUEST });
-  const { token } = getState().auth;
+export const createLaukPauk =
+  (data, filterUnit) => async (dispatch, getState) => {
+    dispatch({ type: CREATE_LAUK_PAUK_REQUEST });
+    const { token } = getState().auth;
+    const { user } = getState().auth;
 
-  try {
-    const response = await axios.post(
-      `${import.meta.env.VITE_API_URL}/api/lauk-pauk/create`,
-      data,
-      {
-        headers: { Authorization: `Bearer ${token}` },
-      }
-    );
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_URL}/api/lauk-pauk/create?${
+          user.role == "super_admin" && `unit_id=${filterUnit}`
+        }`,
+        data,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
 
-    dispatch({
-      type: CREATE_LAUK_PAUK_SUCCESS,
-      payload: response.data,
-    });
+      dispatch({
+        type: CREATE_LAUK_PAUK_SUCCESS,
+        payload: response.data,
+      });
 
-    Swal.fire({
-      icon: "success",
-      title: "Berhasil",
-      text: "Data lauk pauk berhasil ditambahkan",
-      timer: 1500,
-      showConfirmButton: false,
-    });
-  } catch (error) {
-    dispatch({
-      type: CREATE_LAUK_PAUK_FAILURE,
-      payload: "Gagal menambahkan data lauk pauk",
-    });
+      Swal.fire({
+        icon: "success",
+        title: "Berhasil",
+        text: "Data lauk pauk berhasil ditambahkan",
+        timer: 1500,
+        showConfirmButton: false,
+      });
+    } catch (error) {
+      dispatch({
+        type: CREATE_LAUK_PAUK_FAILURE,
+        payload: "Gagal menambahkan data lauk pauk",
+      });
 
-    Swal.fire({
-      icon: "error",
-      title: "Gagal",
-      text: "Gagal menambahkan data lauk pauk",
-    });
-  }
-};
+      Swal.fire({
+        icon: "error",
+        title: "Gagal",
+        text: "Gagal menambahkan data lauk pauk",
+      });
+    }
+  };
 
 // Update lauk pauk
-export const updateLaukPauk = (id, data) => async (dispatch, getState) => {
+export const updateLaukPauk = (id, data, filterUnit) => async (dispatch, getState) => {
   dispatch({ type: UPDATE_LAUK_PAUK_REQUEST });
   const { token } = getState().auth;
+  const { user } = getState().auth;
 
   try {
     const response = await axios.put(
-      `${import.meta.env.VITE_API_URL}/api/lauk-pauk/update/${id}`,
+      `${import.meta.env.VITE_API_URL}/api/lauk-pauk/update/${id}?${
+        user.role == "super_admin" && `unit_id=${filterUnit}`
+      }`,
       data,
       {
         headers: { Authorization: `Bearer ${token}` },

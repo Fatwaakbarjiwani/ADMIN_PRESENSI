@@ -52,23 +52,16 @@ export default function RekapPresensiBulanan() {
   const [rekapLaukPauk, setRekapLaukPauk] = useState([]);
   const [loadingLaukPauk, setLoadingLaukPauk] = useState(false);
 
-  // State untuk checklist lembur - menggunakan kombinasi ID dan index
   const [selectedLembur, setSelectedLembur] = useState([]);
 
-  // Fungsi untuk handle checklist lembur - menggunakan index sebagai identifier
   const handleLemburCheckbox = (index) => {
-    console.log("=== DEBUG CHECKBOX ===");
-    console.log("Clicked index:", index);
-    console.log("Current selectedLembur:", selectedLembur);
 
     setSelectedLembur((prev) => {
       if (prev.includes(index)) {
         const newSelection = prev.filter((idx) => idx !== index);
-        console.log("Removing, new selection:", newSelection);
         return newSelection;
       } else {
         const newSelection = [...prev, index];
-        console.log("Adding, new selection:", newSelection);
         return newSelection;
       }
     });
@@ -89,22 +82,6 @@ export default function RekapPresensiBulanan() {
 
   // Reset checklist ketika data lembur berubah
   useEffect(() => {
-    console.log("=== LEMBUR DATA CHANGED ===");
-    console.log("New lemburData:", lemburData);
-    if (lemburData) {
-      console.log(
-        "IDs in lemburData:",
-        lemburData.map((item) => item.id)
-      );
-      console.log("Unique IDs:", [
-        ...new Set(lemburData.map((item) => item.id)),
-      ]);
-      console.log(
-        "Has duplicates:",
-        lemburData.map((item) => item.id).length !==
-          [...new Set(lemburData.map((item) => item.id))].length
-      );
-    }
     setSelectedLembur([]);
   }, [lemburData]);
   // State untuk setting lauk pauk
@@ -224,9 +201,9 @@ export default function RekapPresensiBulanan() {
     };
 
     if (editingId) {
-      dispatch(updateLaukPauk(editingId, submitData));
+      dispatch(updateLaukPauk(editingId, submitData, filterUnit));
     } else {
-      dispatch(createLaukPauk(submitData));
+      dispatch(createLaukPauk(submitData, filterUnit));
     }
     setShowForm(false);
     setEditingId(null);
@@ -1618,12 +1595,6 @@ export default function RekapPresensiBulanan() {
                                   type="checkbox"
                                   checked={selectedLembur.includes(idx)}
                                   onChange={() => {
-                                    console.log(
-                                      "Checkbox clicked for row:",
-                                      idx,
-                                      "ID:",
-                                      row.id
-                                    );
                                     handleLemburCheckbox(idx);
                                   }}
                                   className="w-4 h-4 text-emerald-600 bg-gray-100 border-gray-300 focus:ring-emerald-500 focus:ring-2"
