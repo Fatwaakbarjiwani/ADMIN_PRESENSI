@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { useParams, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import {
-  fetchPegawai2,
+  fetchPegawai,
   assignPegawaiToShift,
 } from "../../redux/actions/shiftAction";
 
@@ -19,12 +19,12 @@ export default function TambahKaryawanKeShift() {
   const [searchValue, setSearchValue] = useState("");
 
   useEffect(() => {
-    dispatch(fetchPegawai2(page, ""));
+    dispatch(fetchPegawai(page, ""));
   }, [dispatch, page]);
 
   const handleSearch = (e) => {
     setSearchValue(e.target.value);
-    dispatch(fetchPegawai2(1, e.target.value));
+    dispatch(fetchPegawai(1, e.target.value));
   };
 
   const handleSimpan = () => {
