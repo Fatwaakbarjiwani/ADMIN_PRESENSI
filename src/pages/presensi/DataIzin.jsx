@@ -443,7 +443,7 @@ export default function DataIzin() {
                         <td className="px-3 py-2 text-center border-r border-emerald-100">
                           {row.dokumen ? (
                             <a
-                              href={`${import.meta.env.VITE_API_URL}/${
+                              href={`${import.meta.env.VITE_API_URL}/storage/${
                                 row.dokumen
                               }`}
                               target="_blank"
