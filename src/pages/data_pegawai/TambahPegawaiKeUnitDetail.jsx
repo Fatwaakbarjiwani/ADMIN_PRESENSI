@@ -152,7 +152,7 @@ export default function TambahPegawaiKeUnitDetail() {
                 onClick={handleTambah}
               >
                 <span className="material-icons text-base">add</span> Tambah ke
-                Unit Detail
+                Lokasi Presensi
               </button>
               <div>
                 <span className="text-gray-400">
@@ -169,29 +169,29 @@ export default function TambahPegawaiKeUnitDetail() {
                 </div>
               </div>
             </div>
-            <div className="overflow-x-auto">
-              <table className="min-w-full text-sm bg-white">
+            <div className="w-full border border-emerald-200 shadow-inner overflow-y-hidden">
+              <table className="text-sm bg-white table-auto w-[140%]">
                 <thead className="sticky top-0 z-10 bg-emerald-50 border-b-2 border-emerald-200">
                   <tr>
-                    <th className="px-3 py-2 text-center font-black text-emerald-800 text-xs uppercase tracking-wider border-r border-emerald-200 w-12">
+                    <th className="px-3 py-2 text-center font-black text-emerald-800 text-xs uppercase tracking-wider border-r border-emerald-200">
                       No
                     </th>
-                    <th className="px-3 py-2 text-left font-black text-emerald-800 text-xs uppercase tracking-wider border-r border-emerald-200 w-56">
+                    <th className="px-3 py-2 text-left font-black text-emerald-800 text-xs uppercase tracking-wider border-r border-emerald-200">
                       Nama Pegawai
                     </th>
-                    <th className="px-3 py-2 text-left font-black text-emerald-800 text-xs uppercase tracking-wider border-r border-emerald-200 w-32">
+                    <th className="px-3 py-2 text-left font-black text-emerald-800 text-xs uppercase tracking-wider border-r border-emerald-200">
                       NIK
                     </th>
-                    <th className="px-3 py-2 text-left font-black text-emerald-800 text-xs uppercase tracking-wider border-r border-emerald-200 w-32">
+                    <th className="px-3 py-2 text-left font-black text-emerald-800 text-xs uppercase tracking-wider border-r border-emerald-200">
                       No. HP
                     </th>
-                    <th className="px-3 py-2 text-left font-black text-emerald-800 text-xs uppercase tracking-wider border-r border-emerald-200 w-32">
+                    <th className="px-3 py-2 text-left font-black text-emerald-800 text-xs uppercase tracking-wider border-r border-emerald-200">
                       Tempat Lahir
                     </th>
-                    <th className="px-3 py-2 text-left font-black text-emerald-800 text-xs uppercase tracking-wider border-r border-emerald-200 w-32">
+                    <th className="px-3 py-2 text-left font-black text-emerald-800 text-xs uppercase tracking-wider border-r border-emerald-200">
                       Tanggal Lahir
                     </th>
-                    <th className="px-3 py-2 text-left font-black text-emerald-800 text-xs uppercase tracking-wider border-r border-emerald-200 w-40">
+                    <th className="px-3 py-2 text-left font-black text-emerald-800 text-xs uppercase tracking-wider border-r border-emerald-200">
                       <div className="flex flex-col leading-tight">
                         <span>Unit</span>
                         <span className="text-xs font-normal text-gray-400 normal-case">
@@ -199,8 +199,11 @@ export default function TambahPegawaiKeUnitDetail() {
                         </span>
                       </div>
                     </th>
-                    <th className="px-3 py-2 text-left font-black text-emerald-800 text-xs uppercase tracking-wider border-r border-emerald-200 w-40">
+                    <th className="px-3 py-2 text-left font-black text-emerald-800 text-xs uppercase tracking-wider border-r border-emerald-200">
                       Shift
+                    </th>
+                    <th className="px-3 py-2 text-left font-black text-emerald-800 text-xs uppercase tracking-wider border-r border-emerald-200">
+                      Lokasi Presensi
                     </th>
                     <th className="px-3 py-2 text-center font-black text-emerald-800 text-xs uppercase tracking-wider w-16">
                       <div className="flex flex-col items-center gap-1">
@@ -227,7 +230,7 @@ export default function TambahPegawaiKeUnitDetail() {
                   {loading ? (
                     <tr>
                       <td
-                        colSpan={6}
+                        colSpan={10}
                         className="text-center py-6 text-emerald-600 font-bold"
                       >
                         Memuat data...
@@ -237,9 +240,11 @@ export default function TambahPegawaiKeUnitDetail() {
                     pegawaiData.data.map((row, idx) => (
                       <tr
                         key={row.id}
-                        className={idx % 2 === 0 ? "bg-white" : "bg-emerald-25"}
+                        className={`transition-colors duration-200 ${
+                          idx % 2 === 0 ? "bg-white" : "bg-emerald-25"
+                        } hover:bg-emerald-50`}
                       >
-                        <td className="px-3 py-2 text-center align-middle border-b border-emerald-100 font-semibold">
+                        <td className="px-3 py-2 text-center align-middle border-b border-emerald-100 font-semibold whitespace-nowrap">
                           {(pegawaiData.per_page || 20) *
                             ((pegawaiData.current_page || 1) - 1) +
                             idx +
@@ -248,16 +253,16 @@ export default function TambahPegawaiKeUnitDetail() {
                         <td className="px-3 py-2 align-middle border-b border-emerald-100 font-bold text-emerald-800">
                           {row.nama}
                         </td>
-                        <td className="px-3 py-2 align-middle border-b border-emerald-100">
+                        <td className="px-3 py-2 align-middle border-b border-emerald-100 break-all">
                           {row.no_ktp}
                         </td>
-                        <td className="px-3 py-2 align-middle border-b border-emerald-100">
+                        <td className="px-3 py-2 align-middle border-b border-emerald-100 break-all">
                           {row.no_hp}
                         </td>
                         <td className="px-3 py-2 align-middle border-b border-emerald-100">
                           {row.tmpt_lahir}
                         </td>
-                        <td className="px-3 py-2 align-middle border-b border-emerald-100">
+                        <td className="px-3 py-2 align-middle border-b border-emerald-100 whitespace-nowrap">
                           {row.tgl_lahir}
                         </td>
                         <td className="px-3 py-2 align-middle border-b border-emerald-100 font-bold text-emerald-700">
@@ -282,6 +287,20 @@ export default function TambahPegawaiKeUnitDetail() {
                             </span>
                           )}
                         </td>
+                        <td className="px-3 py-2 align-middle border-b border-emerald-100 font-bold text-emerald-700">
+                          {row?.nama_lokasi_presensi ? (
+                            <span className="inline-flex items-center gap-2 px-2 py-1 text-xs font-bold text-emerald-900 bg-emerald-50 border border-emerald-200">
+                              <span className="material-icons text-sm text-emerald-500">
+                                place
+                              </span>
+                              <span>{row.nama_lokasi_presensi}</span>
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center px-2 py-1 text-xs font-bold bg-gray-100 text-gray-400 border border-gray-300">
+                              -
+                            </span>
+                          )}
+                        </td>
                         <td className="px-3 py-2 text-center align-middle border-b border-emerald-100">
                           <input
                             type="checkbox"
@@ -295,7 +314,7 @@ export default function TambahPegawaiKeUnitDetail() {
                   ) : (
                     <tr>
                       <td
-                        colSpan={6}
+                        colSpan={10}
                         className="text-center text-gray-400 py-4"
                       >
                         Tidak ada data pegawai.

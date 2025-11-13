@@ -102,8 +102,8 @@ export default function TambahKaryawanKeShift() {
               </div>
             </div>
           </div>
-          <div className="p-4 overflow-x-auto">
-            <table className="min-w-full text-sm bg-white">
+          <div className="p-4 overflow-y-auto">
+            <table className="min-w-[140%] w-full text-sm bg-white">
               <thead className="sticky top-0 z-10 bg-emerald-50 border-b-2 border-emerald-200">
                 <tr>
                   <th className="px-3 py-2 text-center font-black text-emerald-800 text-xs uppercase tracking-wider border-r border-emerald-200 w-12">
@@ -132,6 +132,9 @@ export default function TambahKaryawanKeShift() {
                   </th>
                   <th className="px-3 py-2 text-center font-black text-emerald-800 text-xs uppercase tracking-wider border-r border-emerald-200 w-40">
                     Shift
+                  </th>
+                  <th className="px-3 py-2 text-left font-black text-emerald-800 text-xs uppercase tracking-wider border-r border-emerald-200 w-40">
+                    Lokasi Presensi
                   </th>
                   <th className="px-3 py-2 text-center font-black text-emerald-800 text-xs uppercase tracking-wider w-24">
                     Pilih
@@ -179,6 +182,20 @@ export default function TambahKaryawanKeShift() {
                           </span>
                         )}
                       </td>
+                      <td className="px-3 py-2 align-middle border-b border-emerald-100 font-bold text-emerald-700">
+                        {row?.nama_lokasi_presensi ? (
+                          <span className="inline-flex items-center gap-2 px-2 py-1 text-xs font-bold text-emerald-900 bg-emerald-50 border border-emerald-200">
+                            <span className="material-icons text-sm text-emerald-500">
+                              place
+                            </span>
+                            <span>{row.nama_lokasi_presensi}</span>
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center px-2 py-1 text-xs font-bold bg-gray-100 text-gray-400 border border-gray-300">
+                            -
+                          </span>
+                        )}
+                      </td>
                       <td className="px-3 py-2 text-center align-middle border-b border-emerald-100">
                         <input
                           type="checkbox"
@@ -198,7 +215,7 @@ export default function TambahKaryawanKeShift() {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={5} className="text-center text-gray-400 py-4">
+                    <td colSpan={10} className="text-center text-gray-400 py-4">
                       Tidak ada data ditemukan.
                     </td>
                   </tr>

@@ -53,7 +53,7 @@ export default function Pegawai() {
                 className="px-4 py-2 bg-emerald-600 text-white font-bold text-xs hover:bg-emerald-700 transition-all duration-200 flex items-center gap-1 border-2 border-emerald-700 shadow-lg hover:shadow-xl"
               >
                 <span className="material-icons text-sm">person_add</span>
-                Tambah Pegawai
+                Setting Lokasi Pegawai
               </button>
             </div>
 
@@ -95,8 +95,8 @@ export default function Pegawai() {
           </div>
 
           {/* Table Section */}
-          <div className="overflow-x-hidden">
-            <table className="w-full table-fixed text-xs">
+          <div className="overflow-x-auto">
+            <table className="min-w-[1200px] w-full text-xs table-auto">
               <thead className="bg-emerald-50 border-b-2 border-emerald-200">
                 <tr>
                   <th className="px-2 py-1.5 text-center font-black text-emerald-800 text-[11px] uppercase tracking-wider border-r border-emerald-200">
@@ -135,6 +135,9 @@ export default function Pegawai() {
                   </th>
                   <th className="px-2 py-1.5 text-left font-black text-emerald-800 text-[11px] uppercase tracking-wider">
                     Shift
+                  </th>
+                  <th className="px-2 py-1.5 text-left font-black text-emerald-800 text-[11px] uppercase tracking-wider">
+                    Lokasi Presensi
                   </th>
                 </tr>
               </thead>
@@ -195,6 +198,17 @@ export default function Pegawai() {
                         {row?.nama_shift ? (
                           <span className="inline-flex items-center px-2 py-1 text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
                             {row.nama_shift}
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center px-2 py-1 text-xs font-bold bg-gray-100 text-gray-400 border border-gray-300">
+                            -
+                          </span>
+                        )}
+                      </td>
+                      <td className="px-2 py-1.5">
+                        {row?.nama_lokasi_presensi ? (
+                          <span className="inline-flex items-center px-2 py-1 text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                            {row.nama_lokasi_presensi}
                           </span>
                         ) : (
                           <span className="inline-flex items-center px-2 py-1 text-xs font-bold bg-gray-100 text-gray-400 border border-gray-300">

@@ -1277,6 +1277,9 @@ export default function RekapPresensiBulanan() {
                         <th className="px-3 py-2 text-left font-black text-emerald-700 text-xs uppercase tracking-wider w-40">
                           Shift
                         </th>
+                        <th className="px-3 py-2 text-left font-black text-emerald-700 text-xs uppercase tracking-wider w-40">
+                          Lokasi
+                        </th>
                         <th className="px-3 py-2 text-center font-black text-emerald-700 text-xs uppercase tracking-wider w-40">
                           <div className="flex flex-col leading-tight">
                             <span>REKAP BULANAN</span>
@@ -1328,6 +1331,9 @@ export default function RekapPresensiBulanan() {
                             </td>
                             <td className="px-3 py-2 align-middle font-bold text-emerald-700">
                               {row?.nama_shift || "-"}
+                            </td>
+                            <td className="px-3 py-2 align-middle font-bold text-emerald-700">
+                              {row?.nama_lokasi_presensi || "-"}
                             </td>
                             <td className="px-3 py-2 text-center align-middle">
                               <button
