@@ -15,6 +15,9 @@ import {
   setDinasLoading,
   setDinasData,
   setLemburData,
+  setLaporanKehadiran,
+  setLaporanKehadiranLoading,
+  setLaporanKehadiranError,
 } from "../reducers/presensiReducer";
 
 export const fetchPresensiHistoryByUnit =
@@ -147,7 +150,6 @@ export const fetchDinasData =
     }
   };
 
-// Fetch lembur
 export const fetchLembur =
   (mount, year, filterUnit, isSuperAdmin) => async (dispatch, getState) => {
     const { token } = getState().auth;
@@ -168,5 +170,29 @@ export const fetchLembur =
       if (error) {
         return;
       }
+    }
+  };
+
+export const fetchLaporanKehadiranPegawai =
+  (pegawai_id, bulan, tahun) => async (dispatch, getState) => {
+    dispatch(setLaporanKehadiranLoading(true));
+    dispatch(setLaporanKehadiranError(null));
+    const { token } = getState().auth;
+    try {
+      const response = await axios.get(
+        `${
+          import.meta.env.VITE_API_URL
+        }/api/presensi/laporan-kehadiran-karyawan/${pegawai_id}?bulan=${bulan}&tahun=${tahun}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      dispatch(setLaporanKehadiran(response.data));
+      dispatch(setLaporanKehadiranLoading(false));
+    } catch (error) {
+      dispatch(setLaporanKehadiranLoading(false));
+      dispatch(
+        setLaporanKehadiranError("Gagal mengambil data laporan kehadiran")
+      );
     }
   };

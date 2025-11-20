@@ -16,6 +16,9 @@ const initialState = {
   detailHistoryError: null,
   dinasData: [],
   dinasLoading: false,
+  laporanKehadiran: null,
+  laporanKehadiranLoading: false,
+  laporanKehadiranError: null,
 };
 
 const presensiSlice = createSlice({
@@ -67,6 +70,15 @@ const presensiSlice = createSlice({
     setDinasLoading: (state, action) => {
       state.dinasLoading = action.payload;
     },
+    setLaporanKehadiran: (state, action) => {
+      state.laporanKehadiran = action.payload;
+    },
+    setLaporanKehadiranLoading: (state, action) => {
+      state.laporanKehadiranLoading = action.payload;
+    },
+    setLaporanKehadiranError: (state, action) => {
+      state.laporanKehadiranError = action.payload;
+    },
   },
 });
 
@@ -86,5 +98,8 @@ export const {
   setDetailHistoryError,
   setDinasData,
   setDinasLoading,
+  setLaporanKehadiran,
+  setLaporanKehadiranLoading,
+  setLaporanKehadiranError,
 } = presensiSlice.actions;
 export default presensiSlice.reducer;

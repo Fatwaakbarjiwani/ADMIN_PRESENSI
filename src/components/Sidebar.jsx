@@ -118,7 +118,7 @@ export default function Sidebar() {
   }
 
   return (
-    <aside className="sticky top-0 left-0 h-screen bg-gradient-to-b from-green-900 via-green-800 to-green-700 shadow-xl flex flex-col z-40">
+    <aside className="sticky top-0 left-0 h-screen bg-gradient-to-b max-w-[20%] from-green-900 via-green-800 to-green-700 shadow-xl flex flex-col z-40">
       {/* Logo */}
       <div className="flex items-center p-4  border-b border-green-800">
         <span className="font-extrabold text-3xl tracking-wide">

@@ -1,19 +1,20 @@
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { useParams, useNavigate } from "react-router-dom";
+import { fetchLaporanKehadiranPegawai } from "../../redux/actions/presensiAction";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import Swal from "sweetalert2";
 
-// Logo ybwsa base64 PNG (dummy, ganti dengan logo asli jika ada)
-const logoBase64 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQC..."; // Potong, ganti dengan base64 logo asli jika ada
+const logoBase64 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQC...";
 
 export default function LaporanKehadiranPegawai() {
+  const dispatch = useDispatch();
   const { pegawai_id } = useParams();
   const navigate = useNavigate();
-  const token = useSelector((state) => state.auth.token);
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const data = useSelector((state) => state.presensi.laporanKehadiran);
+  const loading = useSelector(
+    (state) => state.presensi.laporanKehadiranLoading
+  );
   const [bulan, setBulan] = useState(new Date().getMonth() + 1);
   const [tahun, setTahun] = useState(new Date().getFullYear());
 
@@ -32,57 +33,23 @@ export default function LaporanKehadiranPegawai() {
     { value: 12, label: "Desember" },
   ];
 
-  const fetchLaporanKehadiran = async (bulan, tahun) => {
-    setLoading(true);
-    try {
-      const response = await fetch(
-        `${
-          import.meta.env.VITE_API_URL
-        }/api/presensi/laporan-kehadiran-karyawan/${pegawai_id}?bulan=${bulan}&tahun=${tahun}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Gagal mengambil data laporan kehadiran");
-      }
-
-      const result = await response.json();
-      setData(result);
-    } catch (error) {
-      console.error("Error fetching laporan kehadiran:", error);
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: "Gagal mengambil data laporan kehadiran",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
-    if (token && pegawai_id) {
-      fetchLaporanKehadiran(bulan, tahun);
+    if (pegawai_id) {
+      dispatch(fetchLaporanKehadiranPegawai(pegawai_id, bulan, tahun));
     }
-  }, [token, pegawai_id, bulan, tahun]);
+  }, [dispatch, pegawai_id, bulan, tahun]);
 
   const handleDownloadPDF = () => {
     if (!data) return;
 
-    const doc = new jsPDF("l", "mm", "a4"); // landscape, mm, A4
+    const doc = new jsPDF("l", "mm", "a4");
 
-    // Logo kiri atas
     try {
       doc.addImage(logoBase64, "PNG", 10, 10, 25, 25);
     } catch {
-      // logo gagal dimuat, lanjutkan tanpa logo
+      void 0;
     }
 
-    // Judul dan alamat
     doc.setFontSize(16);
     doc.text("YAYASAN BADAN WAKAF SULTAN AGUNG", 148, 20, {
       align: "center",
@@ -104,11 +71,9 @@ export default function LaporanKehadiranPegawai() {
       { align: "center" }
     );
 
-    // Garis bawah
     doc.setLineWidth(0.5);
     doc.line(10, 44, 287, 44);
 
-    // Informasi pegawai
     doc.setFontSize(12);
     doc.text("LAPORAN KEHADIRAN PEGAWAI", 148, 55, { align: "center" });
     doc.setFontSize(10);
@@ -125,7 +90,6 @@ export default function LaporanKehadiranPegawai() {
       93
     );
 
-    // Tabel dengan format yang lebih rapi
     autoTable(doc, {
       startY: 100,
       head: [
@@ -165,7 +129,7 @@ export default function LaporanKehadiranPegawai() {
         row.alasan || "-",
       ]),
       headStyles: {
-        fillColor: [64, 64, 64], // Dark grey header like in the image
+        fillColor: [64, 64, 64],
         halign: "center",
         fontStyle: "bold",
         fontSize: 8,
@@ -184,23 +148,22 @@ export default function LaporanKehadiranPegawai() {
       margin: { left: 10, right: 10 },
       tableWidth: "auto",
       columnStyles: {
-        0: { cellWidth: 30, halign: "center" }, // TGL. ABSENSI
-        1: { cellWidth: 20, halign: "center" }, // JAM KERJA (MASUK)
-        2: { cellWidth: 20, halign: "center" }, // JAM KERJA (PULANG)
-        3: { cellWidth: 25, halign: "center" }, // JAM MASUK
-        4: { cellWidth: 25, halign: "center" }, // JAM KELUAR
-        5: { cellWidth: 22, halign: "center" }, // JML MENIT DATANG (CEPAT)
-        6: { cellWidth: 22, halign: "center" }, // JML MENIT DATANG (TELAT)
-        7: { cellWidth: 22, halign: "center" }, // JML MENIT PULANG (CEPAT)
-        8: { cellWidth: 22, halign: "center" }, // JML MENIT PULANG (LEMBUR)
-        9: { cellWidth: 25, halign: "center" }, // JML JAM KERJA
-        10: { cellWidth: 35, halign: "left" }, // ALASAN
+        0: { cellWidth: 30, halign: "center" },
+        1: { cellWidth: 20, halign: "center" },
+        2: { cellWidth: 20, halign: "center" },
+        3: { cellWidth: 25, halign: "center" },
+        4: { cellWidth: 25, halign: "center" },
+        5: { cellWidth: 22, halign: "center" },
+        6: { cellWidth: 22, halign: "center" },
+        7: { cellWidth: 22, halign: "center" },
+        8: { cellWidth: 22, halign: "center" },
+        9: { cellWidth: 25, halign: "center" },
+        10: { cellWidth: 35, halign: "left" },
       },
       alternateRowStyles: {
         fillColor: [245, 245, 245],
       },
       didDrawPage: function (data) {
-        // Add page number
         doc.setFontSize(8);
         doc.text(
           `Halaman ${doc.internal.getNumberOfPages()}`,
@@ -219,7 +182,6 @@ export default function LaporanKehadiranPegawai() {
 
   return (
     <div className="w-full min-h-screen font-sans bg-gray-50">
-      {/* Header */}
       <div className="px-4 sticky z-40 top-0 py-4 border-b-2 border-emerald-200 bg-white flex items-center gap-4">
         <button
           onClick={() => navigate(-1)}
@@ -260,7 +222,6 @@ export default function LaporanKehadiranPegawai() {
             </div>
           </div>
           <div className="p-4">
-            {/* Filter Section */}
             <div className="flex flex-col md:flex-row gap-4 items-end mb-4">
               <div className="flex-1">
                 <label className="block text-xs font-bold text-emerald-700 uppercase tracking-wide mb-2 flex items-center gap-2">
@@ -296,7 +257,11 @@ export default function LaporanKehadiranPegawai() {
               <div className="flex gap-2">
                 <button
                   className="px-4 py-2 bg-emerald-600 text-white font-bold text-xs border-2 border-emerald-700 hover:bg-emerald-700 transition flex items-center gap-2"
-                  onClick={() => fetchLaporanKehadiran(bulan, tahun)}
+                  onClick={() =>
+                    dispatch(
+                      fetchLaporanKehadiranPegawai(pegawai_id, bulan, tahun)
+                    )
+                  }
                   disabled={loading}
                 >
                   {loading ? (
@@ -325,7 +290,6 @@ export default function LaporanKehadiranPegawai() {
               </div>
             </div>
 
-            {/* Informasi Pegawai */}
             {data && (
               <div className="bg-emerald-50 border-2 border-emerald-200 p-4 mb-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -359,7 +323,6 @@ export default function LaporanKehadiranPegawai() {
               </div>
             )}
 
-            {/* Tabel Data */}
             {loading ? (
               <div className="text-center py-12 text-emerald-600 font-bold flex items-center justify-center gap-2">
                 <span className="material-icons animate-spin">refresh</span>

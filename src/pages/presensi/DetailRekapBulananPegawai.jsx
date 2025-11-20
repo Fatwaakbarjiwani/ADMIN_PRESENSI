@@ -31,10 +31,8 @@ export default function DetailRekapBulananPegawai() {
     }
   }, [token, user]);
 
-  // Ambil data pegawai berdasarkan pegawai_id
   const pegawaiData = pegawai?.find((p) => p.id == pegawai_id);
 
-  // Hitung total untuk summary
   const totalStats = useMemo(() => {
     if (!detailRekap?.length) return null;
 
@@ -97,7 +95,6 @@ export default function DetailRekapBulananPegawai() {
 
   return (
     <div className="w-full min-h-screen font-sans bg-gray-50">
-      {/* Header */}
       <div className="px-4 sticky z-40 top-0 py-4 border-b-2 border-emerald-200 bg-white flex items-center gap-4">
         <button
           onClick={() => navigate(-1)}
@@ -119,7 +116,6 @@ export default function DetailRekapBulananPegawai() {
       </div>
 
       <div className="mx-auto p-6 max-w-7xl flex flex-col gap-6">
-        {/* Navigation & Title */}
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-4">
             <div className="text-xl font-bold text-emerald-700">
@@ -128,7 +124,6 @@ export default function DetailRekapBulananPegawai() {
           </div>
         </div>
 
-        {/* Summary Cards */}
         {totalStats && (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-4 mb-6">
             <div className="bg-white p-4 border-2 border-emerald-200 shadow-lg">
@@ -234,7 +229,6 @@ export default function DetailRekapBulananPegawai() {
           </div>
         )}
 
-        {/* Main Table */}
         <div className="bg-white border-2 border-emerald-200 shadow-lg overflow-hidden">
           <div className="bg-emerald-600 px-4 py-3 border-b-2 border-emerald-700">
             <div className="flex items-center gap-3">
@@ -270,132 +264,154 @@ export default function DetailRekapBulananPegawai() {
                 </div>
               </div>
               <div className="overflow-x-auto">
-                <table className="min-w-full text-xs bg-white">
+                <table className="min-w-full text-xs bg-white border-2 border-emerald-200">
                   <thead className="bg-emerald-50 border-b-2 border-emerald-200">
                     <tr>
-                      <th className="px-3 py-2 text-center font-black text-emerald-800 text-xs uppercase tracking-wider border-r border-emerald-200 w-32">
+                      <th
+                        rowSpan={2}
+                        className="px-3 py-2 text-center font-black text-emerald-800 text-xs uppercase tracking-wider border-r border-emerald-200 w-32"
+                      >
                         BULAN
                       </th>
-                      <th className="px-3 py-2 text-center font-black text-emerald-800 text-xs uppercase tracking-wider border-r border-emerald-200 w-24">
+                      <th
+                        rowSpan={2}
+                        className="px-3 py-2 text-center font-black text-emerald-800 text-xs uppercase tracking-wider border-r border-emerald-200 w-24"
+                      >
                         HARI EFEKTIF
                       </th>
-                      <th className="px-3 py-2 text-center font-black text-emerald-800 text-xs uppercase tracking-wider border-r border-emerald-200 w-24">
+                      <th
+                        colSpan={7}
+                        className="px-3 py-2 text-center font-black text-emerald-800 text-xs uppercase tracking-wider border-r border-emerald-200 border-b-2 border-emerald-200"
+                      >
                         HADIR
                       </th>
-                      <th className="px-3 py-2 text-center font-black text-emerald-800 text-xs uppercase tracking-wider border-r border-emerald-200 w-24">
-                        IZIN
-                      </th>
-                      <th className="px-3 py-2 text-center font-black text-emerald-800 text-xs uppercase tracking-wider border-r border-emerald-200 w-24">
-                        SAKIT
-                      </th>
-                      <th className="px-3 py-2 text-center font-black text-emerald-800 text-xs uppercase tracking-wider border-r border-emerald-200 w-24">
-                        CUTI
-                      </th>
-                      <th className="px-3 py-2 text-center font-black text-emerald-800 text-xs uppercase tracking-wider border-r border-emerald-200 w-28">
+                      <th
+                        colSpan={5}
+                        className="px-3 py-2 text-center font-black text-emerald-800 text-xs uppercase tracking-wider border-b-2 border-emerald-200"
+                      >
                         TIDAK HADIR
                       </th>
-                      <th className="px-3 py-2 text-center font-black text-emerald-800 text-xs uppercase tracking-wider border-r border-emerald-200 w-28">
-                        DINAS
+                    </tr>
+                    <tr>
+                      <th className="px-2 py-2 text-center font-black text-emerald-800 text-[10px] uppercase tracking-wider border-r border-emerald-200 w-24">
+                        TEPAT WAKTU
                       </th>
-                      <th className="px-3 py-2 text-center font-black text-emerald-800 text-xs uppercase tracking-wider border-r border-emerald-200 w-28">
-                        LEMBUR
-                      </th>
-                      <th className="px-3 py-2 text-center font-black text-emerald-800 text-xs uppercase tracking-wider border-r border-emerald-200 w-28">
-                        TERLAMBAT
-                      </th>
-                      <th className="px-3 py-2 text-center font-black text-emerald-800 text-xs uppercase tracking-wider border-r border-emerald-200 w-28">
-                        PULANG AWAL
-                      </th>
-                      <th className="px-3 py-2 text-center font-black text-emerald-800 text-xs uppercase tracking-wider border-r border-emerald-200 w-28">
+                      <th className="px-2 py-2 text-center font-black text-emerald-800 text-[10px] uppercase tracking-wider border-r border-emerald-200 w-28">
                         TIDAK ABSEN MASUK
                       </th>
-                      <th className="px-3 py-2 text-center font-black text-emerald-800 text-xs uppercase tracking-wider border-emerald-200 w-28">
+                      <th className="px-2 py-2 text-center font-black text-emerald-800 text-[10px] uppercase tracking-wider border-r border-emerald-200 w-28">
                         TIDAK ABSEN PULANG
                       </th>
-                      <th className="px-3 py-2 text-center font-black text-emerald-800 text-xs uppercase tracking-wider w-32">
+                      <th className="px-2 py-2 text-center font-black text-emerald-800 text-[10px] uppercase tracking-wider border-r border-emerald-200 w-24">
+                        TERLAMBAT
+                      </th>
+                      <th className="px-2 py-2 text-center font-black text-emerald-800 text-[10px] uppercase tracking-wider border-r border-emerald-200 w-24">
+                        PULANG AWAL
+                      </th>
+                      <th className="px-2 py-2 text-center font-black text-emerald-800 text-[10px] uppercase tracking-wider border-r border-emerald-200 w-24">
+                        LEMBUR
+                      </th>
+                      <th className="px-2 py-2 text-center font-black text-emerald-800 text-[10px] uppercase tracking-wider border-r border-emerald-200 w-24">
+                        DINAS
+                      </th>
+                      <th className="px-2 py-2 text-center font-black text-emerald-800 text-[10px] uppercase tracking-wider border-r border-emerald-200 w-24">
+                        ALPA
+                      </th>
+                      <th className="px-2 py-2 text-center font-black text-emerald-800 text-[10px] uppercase tracking-wider border-r border-emerald-200 w-24">
+                        IZIN
+                      </th>
+                      <th className="px-2 py-2 text-center font-black text-emerald-800 text-[10px] uppercase tracking-wider border-r border-emerald-200 w-24">
+                        SAKIT
+                      </th>
+                      <th className="px-2 py-2 text-center font-black text-emerald-800 text-[10px] uppercase tracking-wider border-r border-emerald-200 w-24">
+                        CUTI
+                      </th>
+                      <th className="px-2 py-2 text-center font-black text-emerald-800 text-[10px] uppercase tracking-wider w-32">
                         BELUM PRESENSI
                       </th>
                     </tr>
                   </thead>
                   <tbody>
                     {detailRekap?.length > 0 ? (
-                      detailRekap.map((row, idx) => (
-                        <tr
-                          key={idx}
-                          className={`transition hover:bg-emerald-50 border-b border-emerald-100 ${
-                            idx % 2 === 0 ? "bg-white" : "bg-emerald-25"
-                          }`}
-                        >
-                          <td className="px-3 py-2 text-center align-middle text-sm border-r border-emerald-100 font-semibold">
-                            {bulanLabels[row.bulan] || row.bulan}
-                          </td>
-                          <td className="px-3 py-2 text-center align-middle text-sm border-r border-emerald-100">
-                            <span className="font-bold text-emerald-700">
-                              {row.hari_efektif}
-                            </span>
-                          </td>
-                          <td className="px-3 py-2 text-center align-middle text-sm border-r border-emerald-100">
-                            <span className="font-bold text-emerald-700">
-                              {row.hadir}
-                            </span>
-                          </td>
-                          <td className="px-3 py-2 text-center align-middle text-sm border-r border-emerald-100">
-                            <span className="font-bold text-emerald-600">
-                              {row.izin}
-                            </span>
-                          </td>
-                          <td className="px-3 py-2 text-center align-middle text-sm border-r border-emerald-100">
-                            <span className="font-bold text-emerald-500">
-                              {row.sakit}
-                            </span>
-                          </td>
-                          <td className="px-3 py-2 text-center align-middle text-sm border-r border-emerald-100">
-                            <span className="font-bold text-emerald-400">
-                              {row.cuti}
-                            </span>
-                          </td>
-                          <td className="px-3 py-2 text-center align-middle text-sm border-r border-emerald-100">
-                            <span className="font-bold text-gray-500">
-                              {row.tidak_hadir}
-                            </span>
-                          </td>
-                          <td className="px-3 py-2 text-center align-middle text-sm border-r border-emerald-100">
-                            <span className="font-bold text-gray-500">
-                              {row.dinas}
-                            </span>
-                          </td>
-                          <td className="px-3 py-2 text-center align-middle text-sm border-r border-emerald-100">
-                            <span className="font-bold text-gray-500">
-                              {row.lembur}
-                            </span>
-                          </td>
-                          <td className="px-3 py-2 text-center align-middle text-sm border-r border-emerald-100">
-                            <span className="font-bold text-gray-500">
-                              {row.terlambat}
-                            </span>
-                          </td>
-                          <td className="px-3 py-2 text-center align-middle text-sm border-r border-emerald-100">
-                            <span className="font-bold text-gray-500">
-                              {row.pulang_awal}
-                            </span>
-                          </td>
-                          <td className="px-3 py-2 text-center align-middle text-sm border-r border-emerald-100">
-                            <span className="font-bold text-gray-500">
-                              {row.tidak_absen_masuk}
-                            </span>
-                          </td>
-                          <td className="px-3 py-2 text-center align-middle text-sm border-r border-emerald-100">
-                            <span className="font-bold text-gray-500">
-                              {row.tidak_absen_pulang}
-                            </span>
-                          </td>
-                          <td className="px-3 py-2 text-center align-middle text-sm">
-                            <span className="font-bold text-gray-400">
-                              {row.belum_presensi}
-                            </span>
-                          </td>
-                        </tr>
-                      ))
+                      detailRekap.map((row, idx) => {
+                        return (
+                          <tr
+                            key={idx}
+                            className={`transition hover:bg-emerald-50 border-b border-emerald-100 ${
+                              idx % 2 === 0 ? "bg-white" : "bg-emerald-25"
+                            }`}
+                          >
+                            <td className="px-3 py-2 text-center align-middle text-sm border-r border-emerald-100 font-semibold">
+                              {bulanLabels[row.bulan] || row.bulan}
+                            </td>
+                            <td className="px-3 py-2 text-center align-middle text-sm border-r border-emerald-100">
+                              <span className="font-bold text-emerald-700">
+                                {row.hari_efektif || 0}
+                              </span>
+                            </td>
+                            <td className="px-2 py-2 text-center align-middle text-sm border-r border-emerald-100">
+                              <span className="font-bold text-emerald-700">
+                                {row.hadir || 0}
+                              </span>
+                            </td>
+                            <td className="px-2 py-2 text-center align-middle text-sm border-r border-emerald-100">
+                              <span className="font-bold text-emerald-700">
+                                {row.tidak_absen_masuk || 0}
+                              </span>
+                            </td>
+                            <td className="px-2 py-2 text-center align-middle text-sm border-r border-emerald-100">
+                              <span className="font-bold text-emerald-700">
+                                {row.tidak_absen_pulang || 0}
+                              </span>
+                            </td>
+                            <td className="px-2 py-2 text-center align-middle text-sm border-r border-emerald-100">
+                              <span className="font-bold text-emerald-700">
+                                {row.terlambat || 0}
+                              </span>
+                            </td>
+                            <td className="px-2 py-2 text-center align-middle text-sm border-r border-emerald-100">
+                              <span className="font-bold text-emerald-700">
+                                {row.pulang_awal || 0}
+                              </span>
+                            </td>
+                            <td className="px-2 py-2 text-center align-middle text-sm border-r border-emerald-100">
+                              <span className="font-bold text-emerald-700">
+                                {row.lembur || 0}
+                              </span>
+                            </td>
+                            <td className="px-2 py-2 text-center align-middle text-sm border-r border-emerald-100">
+                              <span className="font-bold text-emerald-700">
+                                {row.dinas || 0}
+                              </span>
+                            </td>
+                            <td className="px-2 py-2 text-center align-middle text-sm border-r border-emerald-100">
+                              <span className="font-bold text-red-600">
+                                {row.tidak_hadir || 0}
+                              </span>
+                            </td>
+                            <td className="px-2 py-2 text-center align-middle text-sm border-r border-emerald-100">
+                              <span className="font-bold text-emerald-600">
+                                {row.izin || 0}
+                              </span>
+                            </td>
+                            <td className="px-2 py-2 text-center align-middle text-sm border-r border-emerald-100">
+                              <span className="font-bold text-emerald-500">
+                                {row.sakit || 0}
+                              </span>
+                            </td>
+                            <td className="px-2 py-2 text-center align-middle text-sm border-r border-emerald-100">
+                              <span className="font-bold text-emerald-400">
+                                {row.cuti || 0}
+                              </span>
+                            </td>
+                            <td className="px-2 py-2 text-center align-middle text-sm">
+                              <span className="font-bold text-gray-400">
+                                {row.belum_presensi || 0}
+                              </span>
+                            </td>
+                          </tr>
+                        );
+                      })
                     ) : (
                       <tr>
                         <td colSpan={14} className="px-3 py-8 text-center">
