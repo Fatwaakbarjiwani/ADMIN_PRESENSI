@@ -39,8 +39,41 @@ export default function HistoryPresensi() {
   const getPresensiCode = (row) => {
     if (!row) return "";
 
+    const statusPresensi = (row.status_presensi || "").toLowerCase();
     const ketMasuk = (row.keterangan_masuk || "").toLowerCase();
     const ketPulang = (row.keterangan_pulang || "").toLowerCase();
+
+    if (
+      statusPresensi === "sakit" ||
+      ketMasuk.includes("sakit") ||
+      ketPulang.includes("sakit")
+    ) {
+      return "S";
+    }
+
+    if (
+      statusPresensi === "izin" ||
+      ketMasuk.includes("izin") ||
+      ketPulang.includes("izin")
+    ) {
+      return "I";
+    }
+
+    if (
+      statusPresensi === "cuti" ||
+      ketMasuk.includes("cuti") ||
+      ketPulang.includes("cuti")
+    ) {
+      return "C";
+    }
+
+    if (
+      statusPresensi === "dinas" ||
+      ketMasuk.includes("dinas") ||
+      ketPulang.includes("dinas")
+    ) {
+      return "D";
+    }
 
     if (
       row.status_masuk !== "absen_masuk" ||
@@ -84,6 +117,10 @@ export default function HistoryPresensi() {
     if (code === "V") return "bg-green-500 text-white";
     if (code === "TL" || code === "PSW") return "bg-orange-400 text-white";
     if (code === "TAM" || code === "TAP") return "bg-pink-400 text-white";
+    if (code === "S") return "bg-blue-500 text-white";
+    if (code === "I") return "bg-yellow-400 text-white";
+    if (code === "C") return "bg-purple-400 text-white";
+    if (code === "D") return "bg-emerald-500 text-white";
     return "bg-gray-200 text-gray-600";
   };
 
@@ -385,6 +422,30 @@ export default function HistoryPresensi() {
                   TAP
                 </div>
                 <span className="text-gray-700">= Tidak Absen Pulang</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-6 h-6 bg-blue-500 flex items-center justify-center text-white font-bold">
+                  S
+                </div>
+                <span className="text-gray-700">= Sakit</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-6 h-6 bg-yellow-400 flex items-center justify-center text-white font-bold">
+                  I
+                </div>
+                <span className="text-gray-700">= Izin</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-6 h-6 bg-purple-400 flex items-center justify-center text-white font-bold">
+                  C
+                </div>
+                <span className="text-gray-700">= Cuti</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-6 h-6 bg-emerald-500 flex items-center justify-center text-white font-bold">
+                  D
+                </div>
+                <span className="text-gray-700">= Dinas</span>
               </div>
             </div>
           </div>

@@ -248,7 +248,7 @@ export default function DataIzin() {
       body: pengajuan.map((row, idx) => [
         idx + 1,
         row.pegawai_id || "-",
-        row.nama_pegawai || row.pegawai?.nama || "-",
+        row.nama || "-",
         row.tanggal_mulai || "-",
         row.tanggal_selesai || "-",
         row.alasan || "-",
