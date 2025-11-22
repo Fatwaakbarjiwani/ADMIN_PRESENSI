@@ -33,7 +33,7 @@ export default function RekapPresensiBulanan() {
           </div>
         </div>
       </div>
-      <div className="mx-auto p-6 flex max-w-5xl flex-col gap-6">
+      <div className="mx-auto p-4 flex max-w-5xl flex-col gap-6">
         <div className="border border-gray-300 bg-white p-4">
           <div className="grid grid-cols-5 gap-2 mb-6">
             {!isSuperAdmin ? (

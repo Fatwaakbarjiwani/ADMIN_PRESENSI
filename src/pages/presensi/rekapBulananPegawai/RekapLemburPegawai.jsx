@@ -561,7 +561,7 @@ export default function RekapLemburPegawai() {
                         selectedLembur.length > 0
                       }
                       onChange={handleSelectAllLembur}
-                      className="w-4 h-4 text-emerald-600 bg-gray-100 border-gray-300 focus:ring-emerald-500 focus:ring-2"
+                      className="w-6 h-6 text-emerald-600 bg-gray-100 border-gray-300 focus:ring-emerald-500 focus:ring-2"
                     />
                   </th>
                   <th className="px-3 py-2 text-center font-black text-emerald-800 text-xs uppercase tracking-wider w-12">
@@ -617,7 +617,7 @@ export default function RekapLemburPegawai() {
                           onChange={() => {
                             handleLemburCheckbox(idx);
                           }}
-                          className="w-4 h-4 text-emerald-600 bg-gray-100 border-gray-300 focus:ring-emerald-500 focus:ring-2"
+                          className="w-6 h-6 text-emerald-600 bg-gray-100 border-gray-300 focus:ring-emerald-500 focus:ring-2"
                         />
                       </td>
                       <td className="px-3 py-2 text-center align-middle font-semibold">

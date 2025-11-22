@@ -5,7 +5,7 @@ const MainLayout = ({ children }) => {
   return (
     <div className="w-full flex">
       <Sidebar />
-      <div className="w-full">{children}</div>
+      <div className="w-full overflow-hidden">{children}</div>
     </div>
   );
 };
