@@ -284,6 +284,7 @@ export default function RekapLaukPauk() {
     );
   };
 
+  
   return (
     <div className="space-y-6">
       {isSuperAdmin && (

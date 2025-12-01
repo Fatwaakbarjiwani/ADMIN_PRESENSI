@@ -76,7 +76,7 @@ export default function HistoryPresensi() {
     }
 
     if (
-      row.status_masuk !== "absen_masuk" ||
+      // row.status_masuk !== "absen_masuk" ||
       ketMasuk.includes("tidak absen") ||
       ketMasuk.includes("belum absen")
     ) {
@@ -84,7 +84,7 @@ export default function HistoryPresensi() {
     }
 
     if (
-      row.status_pulang !== "absen_pulang" ||
+      // row.status_pulang !== "absen_pulang" ||
       ketPulang.includes("tidak absen") ||
       ketPulang.includes("belum absen")
     ) {
