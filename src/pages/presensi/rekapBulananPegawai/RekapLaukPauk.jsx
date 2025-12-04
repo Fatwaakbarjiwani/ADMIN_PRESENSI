@@ -284,7 +284,6 @@ export default function RekapLaukPauk() {
     );
   };
 
-  
   return (
     <div className="space-y-6">
       {isSuperAdmin && (
@@ -1322,248 +1321,179 @@ export default function RekapLaukPauk() {
                           {expandedRows.has(idx) && (
                             <tr className="bg-gray-50">
                               <td colSpan={14} className="px-0 py-0">
-                                <div className="p-6 bg-white border-t-2 border-emerald-200">
-                                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                                    {/* Detail Potongan */}
-                                    <div className="border-2 border-red-200 bg-white shadow-md">
-                                      <div className="bg-gradient-to-r from-red-600 to-red-700 px-4 py-3 border-b-2 border-red-800">
-                                        <div className="flex items-center gap-2">
-                                          <span className="material-icons text-white text-xl">
-                                            money_off
-                                          </span>
-                                          <h4 className="text-base font-bold text-white">
-                                            Detail Potongan
-                                          </h4>
-                                        </div>
-                                      </div>
-                                      <div className="p-4">
-                                        <table className="w-full text-sm">
-                                          <thead>
-                                            <tr className="bg-red-50 border-b border-red-200">
-                                              <th className="px-3 py-2 text-left font-semibold text-gray-700 text-xs">
-                                                Jenis Potongan
-                                              </th>
-                                              <th className="px-3 py-2 text-right font-semibold text-gray-700 text-xs">
-                                                Nominal
-                                              </th>
-                                            </tr>
-                                          </thead>
-                                          <tbody>
-                                            <tr className="border-b border-gray-100 hover:bg-red-50 transition">
-                                              <td className="px-3 py-2.5 text-gray-700 font-medium">
-                                                Potongan Terlambat
-                                              </td>
-                                              <td className="px-3 py-2.5 text-right font-bold text-red-700">
-                                                Rp{" "}
-                                                {(
-                                                  detail.potongan_terlambat || 0
-                                                ).toLocaleString("id-ID")}
-                                              </td>
-                                            </tr>
-                                            <tr className="border-b border-gray-100 hover:bg-red-50 transition">
-                                              <td className="px-3 py-2.5 text-gray-700 font-medium">
-                                                Potongan Tidak Absen Masuk
-                                              </td>
-                                              <td className="px-3 py-2.5 text-right font-bold text-red-700">
-                                                Rp{" "}
-                                                {(
-                                                  detail.potongan_tidak_absen_masuk ||
-                                                  0
-                                                ).toLocaleString("id-ID")}
-                                              </td>
-                                            </tr>
-                                            <tr className="border-b border-gray-100 hover:bg-red-50 transition">
-                                              <td className="px-3 py-2.5 text-gray-700 font-medium">
-                                                Potongan Tidak Absen Pulang
-                                              </td>
-                                              <td className="px-3 py-2.5 text-right font-bold text-red-700">
-                                                Rp{" "}
-                                                {(
-                                                  detail.potongan_tidak_absen_pulang ||
-                                                  0
-                                                ).toLocaleString("id-ID")}
-                                              </td>
-                                            </tr>
-                                            <tr className="border-b border-gray-100 hover:bg-red-50 transition">
-                                              <td className="px-3 py-2.5 text-gray-700 font-medium">
-                                                Potongan Pulang Awal Beralasan
-                                              </td>
-                                              <td className="px-3 py-2.5 text-right font-bold text-red-700">
-                                                Rp{" "}
-                                                {(
-                                                  detail.potongan_pulang_awal_beralasan ||
-                                                  0
-                                                ).toLocaleString("id-ID")}
-                                              </td>
-                                            </tr>
-                                            <tr className="border-b border-gray-100 hover:bg-red-50 transition">
-                                              <td className="px-3 py-2.5 text-gray-700 font-medium">
-                                                Potongan Pulang Awal Tanpa
-                                                Beralasan
-                                              </td>
-                                              <td className="px-3 py-2.5 text-right font-bold text-red-700">
-                                                Rp{" "}
-                                                {(
-                                                  detail.potongan_pulang_awal_tanpa_beralasan ||
-                                                  0
-                                                ).toLocaleString("id-ID")}
-                                              </td>
-                                            </tr>
-                                            <tr className="border-b border-gray-100 hover:bg-red-50 transition">
-                                              <td className="px-3 py-2.5 text-gray-700 font-medium">
-                                                Potongan Izin
-                                              </td>
-                                              <td className="px-3 py-2.5 text-right font-bold text-red-700">
-                                                Rp{" "}
-                                                {(
-                                                  detail.potongan_izin || 0
-                                                ).toLocaleString("id-ID")}
-                                              </td>
-                                            </tr>
-                                            <tr className="border-b border-gray-100 hover:bg-red-50 transition">
-                                              <td className="px-3 py-2.5 text-gray-700 font-medium">
-                                                Potongan Sakit
-                                              </td>
-                                              <td className="px-3 py-2.5 text-right font-bold text-red-700">
-                                                Rp{" "}
-                                                {(
-                                                  detail.potongan_sakit || 0
-                                                ).toLocaleString("id-ID")}
-                                              </td>
-                                            </tr>
-                                            <tr className="border-b border-gray-100 hover:bg-red-50 transition">
-                                              <td className="px-3 py-2.5 text-gray-700 font-medium">
-                                                Potongan Tanpa Izin
-                                              </td>
-                                              <td className="px-3 py-2.5 text-right font-bold text-red-700">
-                                                Rp{" "}
-                                                {(
-                                                  detail.potongan_tanpa_izin ||
-                                                  0
-                                                ).toLocaleString("id-ID")}
-                                              </td>
-                                            </tr>
-                                            <tr className="border-b border-gray-100 hover:bg-red-50 transition">
-                                              <td className="px-3 py-2.5 text-gray-700 font-medium">
-                                                Potongan Belum Presensi
-                                              </td>
-                                              <td className="px-3 py-2.5 text-right font-bold text-red-700">
-                                                Rp{" "}
-                                                {(
-                                                  detail.potongan_belum_presensi ||
-                                                  0
-                                                ).toLocaleString("id-ID")}
-                                              </td>
-                                            </tr>
-                                            <tr className="border-b border-gray-100 hover:bg-red-50 transition">
-                                              <td className="px-3 py-2.5 text-gray-700 font-medium">
-                                                Potongan Dinas
-                                              </td>
-                                              <td className="px-3 py-2.5 text-right font-bold text-red-700">
-                                                Rp{" "}
-                                                {(
-                                                  detail.potongan_dinas || 0
-                                                ).toLocaleString("id-ID")}
-                                              </td>
-                                            </tr>
-                                          </tbody>
-                                          <tfoot>
-                                            <tr className="bg-red-100 border-t-2 border-red-300">
-                                              <td className="px-3 py-3 text-left font-bold text-gray-800">
-                                                Total Potongan
-                                              </td>
-                                              <td className="px-3 py-3 text-right font-bold text-lg text-red-700">
-                                                Rp{" "}
-                                                {(
-                                                  (detail.potongan_terlambat ||
-                                                    0) +
-                                                  (detail.potongan_tidak_absen_masuk ||
-                                                    0) +
-                                                  (detail.potongan_tidak_absen_pulang ||
-                                                    0) +
-                                                  (detail.potongan_pulang_awal_beralasan ||
-                                                    0) +
-                                                  (detail.potongan_pulang_awal_tanpa_beralasan ||
-                                                    0) +
-                                                  (detail.potongan_izin || 0) +
-                                                  (detail.potongan_sakit || 0) +
-                                                  (detail.potongan_tanpa_izin ||
-                                                    0) +
-                                                  (detail.potongan_belum_presensi ||
-                                                    0) +
-                                                  (detail.potongan_dinas || 0)
-                                                ).toLocaleString("id-ID")}
-                                              </td>
-                                            </tr>
-                                          </tfoot>
-                                        </table>
+                                <div className="p-6 bg-white border-t-2 border-emerald-200 flex justify-center">
+                                  {/* Detail Potongan */}
+                                  <div className="border-2 border-red-200 bg-white shadow-md max-w-2xl w-full">
+                                    <div className="bg-gradient-to-r from-red-600 to-red-700 px-4 py-3 border-b-2 border-red-800">
+                                      <div className="flex items-center gap-2">
+                                        <span className="material-icons text-white text-xl">
+                                          money_off
+                                        </span>
+                                        <h4 className="text-base font-bold text-white">
+                                          Detail Potongan
+                                        </h4>
                                       </div>
                                     </div>
-
-                                    {/* Detail Lembur */}
-                                    <div className="border-2 border-emerald-200 bg-white shadow-md">
-                                      <div className="bg-gradient-to-r from-emerald-600 to-emerald-700 px-4 py-3 border-b-2 border-emerald-800">
-                                        <div className="flex items-center gap-2">
-                                          <span className="material-icons text-white text-xl">
-                                            attach_money
-                                          </span>
-                                          <h4 className="text-base font-bold text-white">
-                                            Detail Lembur
-                                          </h4>
-                                        </div>
-                                      </div>
-                                      <div className="p-4">
-                                        <table className="w-full text-sm">
-                                          <thead>
-                                            <tr className="bg-emerald-50 border-b border-emerald-200">
-                                              <th className="px-3 py-2 text-left font-semibold text-gray-700 text-xs">
-                                                Jenis Lembur
-                                              </th>
-                                              <th className="px-3 py-2 text-right font-semibold text-gray-700 text-xs">
-                                                Nominal
-                                              </th>
-                                            </tr>
-                                          </thead>
-                                          <tbody>
-                                            <tr className="border-b border-gray-100 hover:bg-emerald-50 transition">
-                                              <td className="px-3 py-2.5 text-gray-700 font-medium">
-                                                Lembur Weekday
-                                              </td>
-                                              <td className="px-3 py-2.5 text-right font-bold text-emerald-700">
-                                                Rp{" "}
-                                                {(
-                                                  detail.lembur_weekday || 0
-                                                ).toLocaleString("id-ID")}
-                                              </td>
-                                            </tr>
-                                            <tr className="border-b border-gray-100 hover:bg-emerald-50 transition">
-                                              <td className="px-3 py-2.5 text-gray-700 font-medium">
-                                                Lembur Weekend
-                                              </td>
-                                              <td className="px-3 py-2.5 text-right font-bold text-emerald-700">
-                                                Rp{" "}
-                                                {(
-                                                  detail.lembur_weekend || 0
-                                                ).toLocaleString("id-ID")}
-                                              </td>
-                                            </tr>
-                                          </tbody>
-                                          <tfoot>
-                                            <tr className="bg-emerald-100 border-t-2 border-emerald-300">
-                                              <td className="px-3 py-3 text-left font-bold text-gray-800">
-                                                Total Lembur
-                                              </td>
-                                              <td className="px-3 py-3 text-right font-bold text-lg text-emerald-700">
-                                                Rp{" "}
-                                                {(
-                                                  (detail.lembur_weekday || 0) +
-                                                  (detail.lembur_weekend || 0)
-                                                ).toLocaleString("id-ID")}
-                                              </td>
-                                            </tr>
-                                          </tfoot>
-                                        </table>
-                                      </div>
+                                    <div className="p-4">
+                                      <table className="w-full text-sm">
+                                        <thead>
+                                          <tr className="bg-red-50 border-b border-red-200">
+                                            <th className="px-4 py-2.5 text-left font-semibold text-gray-700 text-xs w-3/5">
+                                              Jenis Potongan
+                                            </th>
+                                            <th className="px-4 py-2.5 text-right font-semibold text-gray-700 text-xs w-2/5">
+                                              Nominal
+                                            </th>
+                                          </tr>
+                                        </thead>
+                                        <tbody>
+                                          <tr className="border-b border-gray-100 hover:bg-red-50 transition">
+                                            <td className="px-4 py-2 text-gray-700 font-medium">
+                                              Potongan Terlambat
+                                            </td>
+                                            <td className="px-4 py-2 text-right font-bold text-red-700 whitespace-nowrap">
+                                              Rp{" "}
+                                              {(
+                                                detail.potongan_terlambat || 0
+                                              ).toLocaleString("id-ID")}
+                                            </td>
+                                          </tr>
+                                          <tr className="border-b border-gray-100 hover:bg-red-50 transition">
+                                            <td className="px-4 py-2 text-gray-700 font-medium">
+                                              Potongan Tidak Absen Masuk
+                                            </td>
+                                            <td className="px-4 py-2 text-right font-bold text-red-700 whitespace-nowrap">
+                                              Rp{" "}
+                                              {(
+                                                detail.potongan_tidak_absen_masuk ||
+                                                0
+                                              ).toLocaleString("id-ID")}
+                                            </td>
+                                          </tr>
+                                          <tr className="border-b border-gray-100 hover:bg-red-50 transition">
+                                            <td className="px-4 py-2 text-gray-700 font-medium">
+                                              Potongan Tidak Absen Pulang
+                                            </td>
+                                            <td className="px-4 py-2 text-right font-bold text-red-700 whitespace-nowrap">
+                                              Rp{" "}
+                                              {(
+                                                detail.potongan_tidak_absen_pulang ||
+                                                0
+                                              ).toLocaleString("id-ID")}
+                                            </td>
+                                          </tr>
+                                          <tr className="border-b border-gray-100 hover:bg-red-50 transition">
+                                            <td className="px-4 py-2 text-gray-700 font-medium">
+                                              Potongan Pulang Awal Beralasan
+                                            </td>
+                                            <td className="px-4 py-2 text-right font-bold text-red-700 whitespace-nowrap">
+                                              Rp{" "}
+                                              {(
+                                                detail.potongan_pulang_awal_beralasan ||
+                                                0
+                                              ).toLocaleString("id-ID")}
+                                            </td>
+                                          </tr>
+                                          <tr className="border-b border-gray-100 hover:bg-red-50 transition">
+                                            <td className="px-4 py-2 text-gray-700 font-medium">
+                                              Potongan Pulang Awal Tanpa
+                                              Beralasan
+                                            </td>
+                                            <td className="px-4 py-2 text-right font-bold text-red-700 whitespace-nowrap">
+                                              Rp{" "}
+                                              {(
+                                                detail.potongan_pulang_awal_tanpa_beralasan ||
+                                                0
+                                              ).toLocaleString("id-ID")}
+                                            </td>
+                                          </tr>
+                                          <tr className="border-b border-gray-100 hover:bg-red-50 transition">
+                                            <td className="px-4 py-2 text-gray-700 font-medium">
+                                              Potongan Izin
+                                            </td>
+                                            <td className="px-4 py-2 text-right font-bold text-red-700 whitespace-nowrap">
+                                              Rp{" "}
+                                              {(
+                                                detail.potongan_izin || 0
+                                              ).toLocaleString("id-ID")}
+                                            </td>
+                                          </tr>
+                                          <tr className="border-b border-gray-100 hover:bg-red-50 transition">
+                                            <td className="px-4 py-2 text-gray-700 font-medium">
+                                              Potongan Sakit
+                                            </td>
+                                            <td className="px-4 py-2 text-right font-bold text-red-700 whitespace-nowrap">
+                                              Rp{" "}
+                                              {(
+                                                detail.potongan_sakit || 0
+                                              ).toLocaleString("id-ID")}
+                                            </td>
+                                          </tr>
+                                          <tr className="border-b border-gray-100 hover:bg-red-50 transition">
+                                            <td className="px-4 py-2 text-gray-700 font-medium">
+                                              Potongan Tanpa Izin
+                                            </td>
+                                            <td className="px-4 py-2 text-right font-bold text-red-700 whitespace-nowrap">
+                                              Rp{" "}
+                                              {(
+                                                detail.potongan_tanpa_izin || 0
+                                              ).toLocaleString("id-ID")}
+                                            </td>
+                                          </tr>
+                                          <tr className="border-b border-gray-100 hover:bg-red-50 transition">
+                                            <td className="px-4 py-2 text-gray-700 font-medium">
+                                              Potongan Belum Presensi
+                                            </td>
+                                            <td className="px-4 py-2 text-right font-bold text-red-700 whitespace-nowrap">
+                                              Rp{" "}
+                                              {(
+                                                detail.potongan_belum_presensi ||
+                                                0
+                                              ).toLocaleString("id-ID")}
+                                            </td>
+                                          </tr>
+                                          <tr className="border-b border-gray-100 hover:bg-red-50 transition">
+                                            <td className="px-4 py-2 text-gray-700 font-medium">
+                                              Potongan Dinas
+                                            </td>
+                                            <td className="px-4 py-2 text-right font-bold text-red-700 whitespace-nowrap">
+                                              Rp{" "}
+                                              {(
+                                                detail.potongan_dinas || 0
+                                              ).toLocaleString("id-ID")}
+                                            </td>
+                                          </tr>
+                                        </tbody>
+                                        <tfoot>
+                                          <tr className="bg-red-100 border-t-2 border-red-300">
+                                            <td className="px-4 py-2.5 text-left font-bold text-gray-800">
+                                              Total Potongan
+                                            </td>
+                                            <td className="px-4 py-2.5 text-right font-bold text-lg text-red-700 whitespace-nowrap">
+                                              Rp{" "}
+                                              {(
+                                                (detail.potongan_terlambat ||
+                                                  0) +
+                                                (detail.potongan_tidak_absen_masuk ||
+                                                  0) +
+                                                (detail.potongan_tidak_absen_pulang ||
+                                                  0) +
+                                                (detail.potongan_pulang_awal_beralasan ||
+                                                  0) +
+                                                (detail.potongan_pulang_awal_tanpa_beralasan ||
+                                                  0) +
+                                                (detail.potongan_izin || 0) +
+                                                (detail.potongan_sakit || 0) +
+                                                (detail.potongan_tanpa_izin ||
+                                                  0) +
+                                                (detail.potongan_belum_presensi ||
+                                                  0) +
+                                                (detail.potongan_dinas || 0)
+                                              ).toLocaleString("id-ID")}
+                                            </td>
+                                          </tr>
+                                        </tfoot>
+                                      </table>
                                     </div>
                                   </div>
                                 </div>

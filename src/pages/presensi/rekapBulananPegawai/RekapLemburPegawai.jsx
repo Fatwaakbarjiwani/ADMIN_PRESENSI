@@ -19,6 +19,7 @@ export default function RekapLemburPegawai() {
   const filterUnit = "";
   const [selectedLembur, setSelectedLembur] = useState([]);
   const [loadingLembur, setLoadingLembur] = useState(false);
+  const [filterTanggal, setFilterTanggal] = useState("");
 
   const bulanOptions = [
     { value: 1, label: "Januari" },
@@ -44,7 +45,20 @@ export default function RekapLemburPegawai() {
 
   useEffect(() => {
     setSelectedLembur([]);
-  }, [lemburData]);
+  }, [lemburData, filterTanggal]);
+
+  useEffect(() => {
+    if (filterTanggal) {
+      const selectedDate = new Date(filterTanggal);
+      const selectedMonth = selectedDate.getMonth() + 1;
+      const selectedYear = selectedDate.getFullYear();
+
+      if (selectedMonth !== bulan || selectedYear !== tahun) {
+        setFilterTanggal("");
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [bulan, tahun]);
 
   const handleLemburCheckbox = (index) => {
     setSelectedLembur((prev) => {
@@ -57,12 +71,38 @@ export default function RekapLemburPegawai() {
   };
 
   const handleSelectAllLembur = () => {
-    if (!lemburData || lemburData.length === 0) return;
+    if (!filteredLemburData || filteredLemburData.length === 0) return;
 
-    if (selectedLembur.length === lemburData.length) {
-      setSelectedLembur([]);
+    // Buat mapping index dari filteredLemburData ke lemburData
+    const filteredIndices = filteredLemburData.map((filteredRow) => {
+      return lemburData.findIndex(
+        (row) =>
+          row.no_ktp === filteredRow.no_ktp &&
+          row.tanggal === filteredRow.tanggal &&
+          row.waktu_masuk === filteredRow.waktu_masuk
+      );
+    });
+
+    const allFilteredSelected = filteredIndices.every((idx) =>
+      selectedLembur.includes(idx)
+    );
+
+    if (allFilteredSelected) {
+      // Hapus semua yang terfilter
+      setSelectedLembur((prev) =>
+        prev.filter((idx) => !filteredIndices.includes(idx))
+      );
     } else {
-      setSelectedLembur(lemburData.map((_, index) => index));
+      // Tambahkan semua yang terfilter
+      setSelectedLembur((prev) => {
+        const newSelected = [...prev];
+        filteredIndices.forEach((idx) => {
+          if (!newSelected.includes(idx)) {
+            newSelected.push(idx);
+          }
+        });
+        return newSelected;
+      });
     }
   };
 
@@ -88,6 +128,36 @@ export default function RekapLemburPegawai() {
       year: "numeric",
     });
   };
+
+  // Fungsi untuk mendapatkan min dan max date berdasarkan bulan dan tahun
+  const getDateRange = () => {
+    const firstDay = new Date(tahun, bulan - 1, 1);
+    const lastDay = new Date(tahun, bulan, 0); // Hari terakhir dari bulan
+
+    const minDate = firstDay.toISOString().split("T")[0];
+    const maxDate = lastDay.toISOString().split("T")[0];
+
+    return { minDate, maxDate };
+  };
+
+  const { minDate, maxDate } = getDateRange();
+
+  // Fungsi untuk memfilter data berdasarkan tanggal
+  const getFilteredLemburData = () => {
+    if (!filterTanggal) return lemburData || [];
+
+    const filterDate = new Date(filterTanggal);
+    filterDate.setHours(0, 0, 0, 0);
+
+    return (lemburData || []).filter((row) => {
+      if (!row.tanggal) return false;
+      const rowDate = new Date(row.tanggal);
+      rowDate.setHours(0, 0, 0, 0);
+      return rowDate.getTime() === filterDate.getTime();
+    });
+  };
+
+  const filteredLemburData = getFilteredLemburData();
 
   // Fungsi untuk generate SURAT TUGAS lembur
   const handleDownloadSuratTugasLembur = () => {
@@ -237,7 +307,7 @@ export default function RekapLemburPegawai() {
     const doc = new jsPDF("l", "mm", "a4");
 
     const totalLembur = filteredData.reduce((sum, row) => {
-      return sum + (parseInt(row?.nom_lembur) || 0);
+      return sum + (parseInt(row?.total_nom_lembur) || 0);
     }, 0);
 
     const tableStartY = 50;
@@ -464,81 +534,148 @@ export default function RekapLemburPegawai() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col md:flex-row gap-4 items-end mb-6">
-        <div className="flex-1">
-          <label className="flex text-sm font-semibold text-gray-700 mb-2 items-center gap-2">
-            <span className="material-icons text-base">calendar_month</span>
-            Bulan
-          </label>
-          <select
-            className="w-full px-3 py-2 border border-gray-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-            value={bulan}
-            onChange={(e) => setBulan(Number(e.target.value))}
-          >
-            {bulanOptions.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
+      {/* Filter Section */}
+      <div className="bg-white border border-gray-200 shadow-sm p-6">
+        <div className="mb-4 pb-4 border-b border-gray-200">
+          <h2 className="text-lg font-bold text-gray-800 flex items-center gap-2">
+            <span className="material-icons text-emerald-600">filter_list</span>
+            Filter Data Lembur
+          </h2>
         </div>
-        <div className="flex-1">
-          <label className="flex text-sm font-semibold text-gray-700 mb-2 items-center gap-2">
-            <span className="material-icons text-base">event</span>
-            Tahun
-          </label>
-          <input
-            type="number"
-            className="w-full px-3 py-2 border border-gray-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-            value={tahun}
-            onChange={(e) => setTahun(Number(e.target.value))}
-            min="2000"
-            max={new Date().getFullYear() + 1}
-          />
-        </div>
-        <div className="flex gap-2">
-          <button
-            className="px-6 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm transition flex items-center gap-2"
-            onClick={() => fetchLaporanLembur(bulan, tahun)}
-            disabled={loadingLembur}
-          >
-            {loadingLembur ? (
-              <>
-                <span className="material-icons animate-spin">refresh</span>
-                Loading...
-              </>
-            ) : (
-              <>
-                <span className="material-icons text-base">search</span>
-                Cari Data
-              </>
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-4">
+          <div>
+            <label className="flex text-sm font-semibold text-gray-700 mb-2 items-center gap-2">
+              <span className="material-icons text-base text-emerald-600">
+                calendar_month
+              </span>
+              Bulan
+            </label>
+            <select
+              className="w-full px-4 py-2.5 border border-gray-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition shadow-sm hover:shadow-md"
+              value={bulan}
+              onChange={(e) => setBulan(Number(e.target.value))}
+            >
+              {bulanOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="flex text-sm font-semibold text-gray-700 mb-2 items-center gap-2">
+              <span className="material-icons text-base text-emerald-600">
+                event
+              </span>
+              Tahun
+            </label>
+            <input
+              type="number"
+              className="w-full px-4 py-2.5 border border-gray-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition shadow-sm hover:shadow-md"
+              value={tahun}
+              onChange={(e) => setTahun(Number(e.target.value))}
+              min="2000"
+              max={new Date().getFullYear() + 1}
+            />
+          </div>
+          <div>
+            <label className="flex text-sm font-semibold text-gray-700 mb-2 items-center gap-2">
+              <span className="material-icons text-base text-emerald-600">
+                calendar_today
+              </span>
+              Filter Tanggal
+            </label>
+            <input
+              type="date"
+              className="w-full px-4 py-2.5 border border-gray-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition shadow-sm hover:shadow-md"
+              value={filterTanggal}
+              onChange={(e) => setFilterTanggal(e.target.value)}
+              min={minDate}
+              max={maxDate}
+              title={`Pilih tanggal antara ${minDate} dan ${maxDate}`}
+            />
+            <p className="text-xs text-gray-500 mt-1.5">
+              Hanya bisa memilih tanggal di bulan{" "}
+              <span className="font-semibold text-emerald-600">
+                {bulanOptions.find((b) => b.value === bulan)?.label} {tahun}
+              </span>
+            </p>
+            {filterTanggal && (
+              <button
+                type="button"
+                onClick={() => setFilterTanggal("")}
+                className="mt-2 text-xs text-emerald-600 hover:text-emerald-700 font-medium flex items-center gap-1 transition"
+              >
+                <span className="material-icons text-sm">close</span>
+                Hapus Filter
+              </button>
             )}
-          </button>
-          {lemburData.length > 0 && (
-            <>
-              <div className="text-sm text-gray-600 mb-2">
-                Dipilih: {selectedLembur.length} dari {lemburData.length}{" "}
-                pegawai
-              </div>
-              <button
-                className="px-6 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm transition flex items-center gap-2 disabled:bg-gray-400 disabled:cursor-not-allowed"
-                onClick={handleDownloadSuratTugasLembur}
-                disabled={selectedLembur.length === 0}
-              >
-                <span className="material-icons text-base">description</span>
-                Surat Tugas
-              </button>
-              <button
-                className="px-6 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm transition flex items-center gap-2 disabled:bg-gray-400 disabled:cursor-not-allowed"
-                onClick={handleDownloadDaftarLembur}
-                disabled={selectedLembur.length === 0}
-              >
-                <span className="material-icons text-base">download</span>
-                Daftar Lembur
-              </button>
-            </>
-          )}
+          </div>
+          <div className="flex flex-col">
+            <div className="h-7 mb-2"></div>
+            <button
+              className="w-full px-6 py-2.5 bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white font-semibold text-sm transition-all duration-200 flex items-center justify-center gap-2 shadow-md hover:shadow-lg transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+              onClick={() => fetchLaporanLembur(bulan, tahun)}
+              disabled={loadingLembur}
+            >
+              {loadingLembur ? (
+                <>
+                  <span className="material-icons animate-spin text-base">
+                    refresh
+                  </span>
+                  Loading...
+                </>
+              ) : (
+                <>
+                  <span className="material-icons text-base">search</span>
+                  Cari Data
+                </>
+              )}
+            </button>
+          </div>
         </div>
+
+        {/* Action Buttons Section */}
+        {filteredLemburData.length > 0 && (
+          <div className="mt-4 pt-4 border-t border-gray-200">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <div className="flex items-center gap-3 px-4 py-2 bg-emerald-50 border border-emerald-200 rounded-md">
+                <span className="material-icons text-emerald-600 text-lg">
+                  info
+                </span>
+                <span className="text-sm font-medium text-gray-700">
+                  Dipilih:{" "}
+                  <span className="font-bold text-emerald-600">
+                    {selectedLembur.length}
+                  </span>{" "}
+                  dari{" "}
+                  <span className="font-bold text-emerald-600">
+                    {filteredLemburData.length}
+                  </span>{" "}
+                  pegawai
+                </span>
+              </div>
+              <div className="flex gap-2">
+                <button
+                  className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm transition-all duration-200 flex items-center gap-2 shadow-md hover:shadow-lg transform hover:scale-105 disabled:bg-gray-400 disabled:cursor-not-allowed disabled:transform-none rounded-md"
+                  onClick={handleDownloadSuratTugasLembur}
+                  disabled={selectedLembur.length === 0}
+                >
+                  <span className="material-icons text-base">description</span>
+                  Surat Tugas
+                </button>
+                <button
+                  className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm transition-all duration-200 flex items-center gap-2 shadow-md hover:shadow-lg transform hover:scale-105 disabled:bg-gray-400 disabled:cursor-not-allowed disabled:transform-none rounded-md"
+                  onClick={handleDownloadDaftarLembur}
+                  disabled={selectedLembur.length === 0}
+                >
+                  <span className="material-icons text-base">download</span>
+                  Daftar Lembur
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
       {loadingLembur ? (
         <div className="text-center py-12 text-emerald-600 font-bold flex items-center justify-center gap-2">
@@ -546,123 +683,150 @@ export default function RekapLemburPegawai() {
           Memuat data rekap lembur...
         </div>
       ) : (
-        <div>
+        <div className="bg-white border border-gray-200 shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="min-w-[130%] text-xs border-2 border-emerald-200 overflow-hidden shadow-lg">
-              <thead className="sticky top-0 z-10 bg-emerald-50 border-b-2 border-emerald-200">
+            <table className="min-w-[130%] text-xs">
+              <thead className="sticky top-0 z-10 bg-gradient-to-r from-emerald-600 to-emerald-700 text-white">
                 <tr>
-                  <th className="px-3 py-2 text-center font-black text-emerald-800 text-xs uppercase tracking-wider w-12">
+                  <th className="px-4 py-3 text-center font-bold text-sm uppercase tracking-wider w-12">
                     <input
                       type="checkbox"
                       checked={
-                        lemburData &&
-                        lemburData.length > 0 &&
-                        selectedLembur.length === lemburData.length &&
-                        selectedLembur.length > 0
+                        filteredLemburData &&
+                        filteredLemburData.length > 0 &&
+                        (() => {
+                          const filteredIndices = filteredLemburData.map(
+                            (filteredRow) => {
+                              return lemburData.findIndex(
+                                (row) =>
+                                  row.no_ktp === filteredRow.no_ktp &&
+                                  row.tanggal === filteredRow.tanggal &&
+                                  row.waktu_masuk === filteredRow.waktu_masuk
+                              );
+                            }
+                          );
+                          return (
+                            filteredIndices.length > 0 &&
+                            filteredIndices.every((idx) =>
+                              selectedLembur.includes(idx)
+                            )
+                          );
+                        })()
                       }
                       onChange={handleSelectAllLembur}
-                      className="w-6 h-6 text-emerald-600 bg-gray-100 border-gray-300 focus:ring-emerald-500 focus:ring-2"
+                      className="w-5 h-5 text-emerald-600 bg-white border-gray-300 focus:ring-emerald-500 focus:ring-2 cursor-pointer"
                     />
                   </th>
-                  <th className="px-3 py-2 text-center font-black text-emerald-800 text-xs uppercase tracking-wider w-12">
-                    <span className="material-icons text-base">
+                  <th className="px-4 py-3 text-center font-bold text-sm uppercase tracking-wider w-12">
+                    <span className="material-icons text-lg">
                       format_list_numbered
                     </span>
                   </th>
-                  <th className="px-3 py-2 text-left font-black text-emerald-800 text-xs uppercase tracking-wider w-32">
+                  <th className="px-4 py-3 text-left font-bold text-sm uppercase tracking-wider w-32">
                     NIK
                   </th>
-                  <th className="px-3 py-2 text-left font-black text-emerald-800 text-xs uppercase tracking-wider w-56">
+                  <th className="px-4 py-3 text-left font-bold text-sm uppercase tracking-wider w-56">
                     Nama
                   </th>
-                  <th className="px-3 py-2 text-left font-black text-emerald-800 text-xs uppercase tracking-wider w-40">
+                  <th className="px-4 py-3 text-left font-bold text-sm uppercase tracking-wider w-40">
                     Jabatan
                   </th>
-                  <th className="px-3 py-2 text-left font-black text-emerald-800 text-xs uppercase tracking-wider w-40">
+                  <th className="px-4 py-3 text-left font-bold text-sm uppercase tracking-wider w-40">
                     Unit
                   </th>
-                  <th className="px-3 py-2 text-left font-black text-emerald-800 text-xs uppercase tracking-wider w-40">
+                  <th className="px-4 py-3 text-left font-bold text-sm uppercase tracking-wider w-40">
                     Tanggal
                   </th>
-                  <th className="px-3 py-2 text-left font-black text-emerald-800 text-xs uppercase tracking-wider w-40">
+                  <th className="px-4 py-3 text-left font-bold text-sm uppercase tracking-wider w-40">
                     Waktu Masuk
                   </th>
-                  <th className="px-3 py-2 text-left font-black text-emerald-800 text-xs uppercase tracking-wider w-40">
+                  <th className="px-4 py-3 text-left font-bold text-sm uppercase tracking-wider w-40">
                     Waktu Pulang
                   </th>
-                  <th className="px-3 py-2 text-center font-black text-emerald-800 text-xs uppercase tracking-wider w-40">
+                  <th className="px-4 py-3 text-center font-bold text-sm uppercase tracking-wider w-40">
                     Lembur
                   </th>
-                  <th className="px-3 py-2 text-center font-black text-emerald-800 text-xs uppercase tracking-wider w-32">
+                  <th className="px-4 py-3 text-center font-bold text-sm uppercase tracking-wider w-32">
                     Nominal Lembur
                   </th>
-                  <th className="px-3 py-2 text-center font-black text-emerald-800 text-xs uppercase tracking-wider w-32">
+                  <th className="px-4 py-3 text-center font-bold text-sm uppercase tracking-wider w-32">
                     Nominal Total
                   </th>
                 </tr>
               </thead>
               <tbody>
-                {lemburData?.length > 0 ? (
-                  lemburData?.map((row, idx) => (
-                    <tr
-                      key={`${row.no_ktp}-${row.tanggal}-${idx}`}
-                      className={`transition hover:bg-emerald-50 border-b border-emerald-100 ${
-                        idx % 2 === 0 ? "bg-white" : "bg-emerald-25"
-                      }`}
-                    >
-                      <td className="px-3 py-2 text-center align-middle">
-                        <input
-                          type="checkbox"
-                          checked={selectedLembur.includes(idx)}
-                          onChange={() => {
-                            handleLemburCheckbox(idx);
-                          }}
-                          className="w-6 h-6 text-emerald-600 bg-gray-100 border-gray-300 focus:ring-emerald-500 focus:ring-2"
-                        />
-                      </td>
-                      <td className="px-3 py-2 text-center align-middle font-semibold">
-                        {idx + 1}
-                      </td>
-                      <td className="px-3 py-2 align-middle">
-                        {row.no_ktp || "-"}
-                      </td>
-                      <td className="px-3 py-2 align-middle font-bold text-emerald-800">
-                        {row.nama || "-"}
-                      </td>
-                      <td className="px-3 py-2 align-middle font-bold text-emerald-700">
-                        {row?.jabatan || "-"}
-                      </td>
-                      <td className="px-3 py-2 align-middle font-bold text-emerald-700">
-                        {row?.unit_detail || "-"}
-                      </td>
-                      <td className="px-3 py-2 align-middle font-bold text-emerald-700">
-                        {formatTanggal(row?.tanggal)}
-                      </td>
-                      <td className="px-3 py-2 align-middle font-bold text-emerald-700">
-                        {row?.waktu_masuk || "-"}
-                      </td>
-                      <td className="px-3 py-2 align-middle font-bold text-emerald-700">
-                        {row?.waktu_pulang || "-"}
-                      </td>
-                      <td className="px-3 py-2 align-middle font-bold text-emerald-700">
-                        {formatOvertime(row?.menit_overtime)}
-                      </td>
-                      <td className="px-3 py-2 align-middle font-bold text-emerald-600">
-                        {row?.nom_lembur
-                          ? `Rp ${parseInt(row.nom_lembur || 0).toLocaleString(
-                              "id-ID"
-                            )}`
-                          : "Rp 0"}
-                      </td>
-                      <td className="px-3 py-2 align-middle font-bold text-emerald-600">
-                        {row?.total_nom_lembur
-                          ? `Rp ${parseInt(
-                              row.total_nom_lembur || 0
-                            ).toLocaleString("id-ID")}`
-                          : "Rp 0"}
-                      </td>
-                    </tr>
-                  ))
+                {filteredLemburData?.length > 0 ? (
+                  filteredLemburData?.map((row, idx) => {
+                    // Cari index di lemburData asli
+                    const originalIdx = lemburData.findIndex(
+                      (r) =>
+                        r.no_ktp === row.no_ktp &&
+                        r.tanggal === row.tanggal &&
+                        r.waktu_masuk === row.waktu_masuk
+                    );
+                    return (
+                      <tr
+                        key={`${row.no_ktp}-${row.tanggal}-${idx}`}
+                        className={`transition hover:bg-emerald-50 border-b border-gray-200 ${
+                          idx % 2 === 0 ? "bg-white" : "bg-gray-50"
+                        }`}
+                      >
+                        <td className="px-4 py-3 text-center align-middle">
+                          <input
+                            type="checkbox"
+                            checked={selectedLembur.includes(originalIdx)}
+                            onChange={() => {
+                              handleLemburCheckbox(originalIdx);
+                            }}
+                            className="w-5 h-5 text-emerald-600 bg-white border-gray-300 focus:ring-emerald-500 focus:ring-2 cursor-pointer"
+                          />
+                        </td>
+                        <td className="px-4 py-3 text-center align-middle font-semibold text-gray-700">
+                          {idx + 1}
+                        </td>
+                        <td className="px-4 py-3 align-middle text-gray-700 font-mono text-xs">
+                          {row.no_ktp || "-"}
+                        </td>
+                        <td className="px-4 py-3 align-middle font-semibold text-gray-800">
+                          {row.nama || "-"}
+                        </td>
+                        <td className="px-4 py-3 align-middle text-gray-700">
+                          {row?.jabatan || "-"}
+                        </td>
+                        <td className="px-4 py-3 align-middle text-gray-700">
+                          {row?.unit_detail || "-"}
+                        </td>
+                        <td className="px-4 py-3 align-middle text-gray-700">
+                          {formatTanggal(row?.tanggal)}
+                        </td>
+                        <td className="px-4 py-3 align-middle text-gray-700 font-mono">
+                          {row?.waktu_masuk || "-"}
+                        </td>
+                        <td className="px-4 py-3 align-middle text-gray-700 font-mono">
+                          {row?.waktu_pulang || "-"}
+                        </td>
+                        <td className="px-4 py-3 text-center align-middle">
+                          <span className="inline-flex items-center px-2.5 py-1 text-xs font-semibold bg-emerald-100 text-emerald-800">
+                            {formatOvertime(row?.menit_overtime)}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3 text-center align-middle font-semibold text-emerald-600">
+                          {row?.nom_lembur
+                            ? `Rp ${parseInt(
+                                row.nom_lembur || 0
+                              ).toLocaleString("id-ID")}`
+                            : "Rp 0"}
+                        </td>
+                        <td className="px-4 py-3 text-center align-middle font-bold text-emerald-700">
+                          {row?.total_nom_lembur
+                            ? `Rp ${parseInt(
+                                row.total_nom_lembur || 0
+                              ).toLocaleString("id-ID")}`
+                            : "Rp 0"}
+                        </td>
+                      </tr>
+                    );
+                  })
                 ) : (
                   <tr>
                     <td colSpan={12} className="text-center text-gray-400 py-8">
@@ -683,7 +847,7 @@ export default function RekapLemburPegawai() {
               </tbody>
             </table>
 
-            {lemburData?.length > 0 && (
+            {filteredLemburData?.length > 0 && (
               <div className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div className="bg-white border border-gray-200 shadow-sm p-4">
                   <div className="flex items-center justify-between">
@@ -692,7 +856,7 @@ export default function RekapLemburPegawai() {
                         Total Pegawai
                       </p>
                       <p className="text-2xl font-bold text-emerald-600">
-                        {lemburData.length}
+                        {filteredLemburData.length}
                       </p>
                     </div>
                     <div className="p-3 bg-emerald-100">
@@ -711,11 +875,15 @@ export default function RekapLemburPegawai() {
                       </p>
                       <p className="text-2xl font-bold text-emerald-600">
                         {(() => {
-                          const totalJam = lemburData.reduce((sum, row) => {
-                            return (
-                              sum + Math.floor((row?.menit_overtime || 0) / 60)
-                            );
-                          }, 0);
+                          const totalJam = filteredLemburData.reduce(
+                            (sum, row) => {
+                              return (
+                                sum +
+                                Math.floor((row?.menit_overtime || 0) / 60)
+                              );
+                            },
+                            0
+                          );
                           return `${totalJam} Jam`;
                         })()}
                       </p>
@@ -736,9 +904,14 @@ export default function RekapLemburPegawai() {
                       </p>
                       <p className="text-2xl font-bold text-emerald-600">
                         {(() => {
-                          const totalLembur = lemburData.reduce((sum, row) => {
-                            return sum + (parseInt(row?.nom_lembur) || 0);
-                          }, 0);
+                          const totalLembur = filteredLemburData.reduce(
+                            (sum, row) => {
+                              return (
+                                sum + (parseInt(row?.total_nom_lembur) || 0)
+                              );
+                            },
+                            0
+                          );
                           return `Rp ${totalLembur.toLocaleString("id-ID")}`;
                         })()}
                       </p>
@@ -759,11 +932,16 @@ export default function RekapLemburPegawai() {
                       </p>
                       <p className="text-2xl font-bold text-emerald-600">
                         {(() => {
-                          const totalLembur = lemburData.reduce((sum, row) => {
-                            return sum + (parseInt(row?.nom_lembur) || 0);
-                          }, 0);
+                          const totalLembur = filteredLemburData.reduce(
+                            (sum, row) => {
+                              return (
+                                sum + (parseInt(row?.total_nom_lembur) || 0)
+                              );
+                            },
+                            0
+                          );
                           const rataRata = Math.round(
-                            totalLembur / lemburData.length
+                            totalLembur / filteredLemburData.length
                           );
                           return `Rp ${rataRata.toLocaleString("id-ID")}`;
                         })()}
