@@ -77,8 +77,8 @@ export default function HistoryPresensi() {
 
     if (
       // row.status_masuk !== "absen_masuk" ||
-      statusPresensi.includes("tidak absen") ||
-      statusPresensi.includes("belum absen") 
+      statusPresensi.includes("tidak_absen_masuk") 
+      // row.statusPresensi.includes("belum_absen") ||
       // ketMasuk.includes("tidak absen") ||
       // ketMasuk.includes("belum absen")
     ) {
