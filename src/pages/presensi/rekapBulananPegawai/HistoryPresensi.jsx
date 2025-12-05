@@ -44,41 +44,43 @@ export default function HistoryPresensi() {
     const ketPulang = (row.keterangan_pulang || "").toLowerCase();
 
     if (
-      statusPresensi === "sakit" ||
-      ketMasuk.includes("sakit") ||
-      ketPulang.includes("sakit")
+      statusPresensi === "sakit" 
+      // ketMasuk.includes("sakit") ||
+      // ketPulang.includes("sakit")
     ) {
       return "S";
     }
 
     if (
-      statusPresensi === "izin" ||
-      ketMasuk.includes("izin") ||
-      ketPulang.includes("izin")
+      statusPresensi === "izin" 
+      // ketMasuk.includes("izin") ||
+      // ketPulang.includes("izin")
     ) {
       return "I";
     }
 
     if (
-      statusPresensi === "cuti" ||
-      ketMasuk.includes("cuti") ||
-      ketPulang.includes("cuti")
+      statusPresensi === "cuti" 
+      // ketMasuk.includes("cuti") ||
+      // ketPulang.includes("cuti")
     ) {
       return "C";
     }
 
     if (
-      statusPresensi === "dinas" ||
-      ketMasuk.includes("dinas") ||
-      ketPulang.includes("dinas")
+      statusPresensi === "dinas" 
+      // ketMasuk.includes("dinas") ||
+      // ketPulang.includes("dinas")
     ) {
       return "D";
     }
 
     if (
       // row.status_masuk !== "absen_masuk" ||
-      ketMasuk.includes("tidak absen") ||
-      ketMasuk.includes("belum absen")
+      statusPresensi.includes("tidak absen") ||
+      statusPresensi.includes("belum absen") 
+      // ketMasuk.includes("tidak absen") ||
+      // ketMasuk.includes("belum absen")
     ) {
       return "TAM";
     }
@@ -91,7 +93,10 @@ export default function HistoryPresensi() {
       return "TAP";
     }
 
-    if (ketMasuk.includes("terlambat")) {
+    if (
+      statusPresensi === "terlambat" 
+      // ketMasuk.includes("terlambat")
+    ) {
       return "TL";
     }
 
@@ -110,7 +115,7 @@ export default function HistoryPresensi() {
       return "V";
     }
 
-    return "V";
+    return "TAP";
   };
 
   const getPresensiColor = (code) => {
