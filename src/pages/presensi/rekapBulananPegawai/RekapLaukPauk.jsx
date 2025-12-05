@@ -236,7 +236,7 @@ export default function RekapLaukPauk() {
           "Tidak Absen Pulang",
           "Belum Presensi",
           "Jumlah Libur",
-          "Nominal Lauk Pauk",
+          "Nominal Transport",
         ],
       ],
       body: rekapLaukPauk.map((row) => {
@@ -602,7 +602,7 @@ export default function RekapLaukPauk() {
                       placeholder="500000"
                     />
                     <p className="text-xs text-gray-500 mt-1">
-                      Nominal Lauk Pauk
+                      Nominal Transport
                     </p>
                   </div>
                   <div className="p-0 border-b border-gray-200">
