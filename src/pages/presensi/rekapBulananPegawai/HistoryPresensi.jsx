@@ -87,8 +87,8 @@ export default function HistoryPresensi() {
 
     if (
       // row.status_pulang !== "absen_pulang" ||
-      ketPulang.includes("tidak absen") ||
-      ketPulang.includes("belum absen")
+      statusPresensi.includes("tidak_absen_pulang") 
+      // ketPulang.includes("belum absen")
     ) {
       return "TAP";
     }
@@ -105,6 +105,10 @@ export default function HistoryPresensi() {
       ketPulang.includes("sebelum waktunya")
     ) {
       return "PSW";
+    }
+
+    if(statusPresensi.includes("tidak_hadir")) {
+      return "A";
     }
 
     if (
@@ -126,6 +130,7 @@ export default function HistoryPresensi() {
     if (code === "I") return "bg-yellow-400 text-white";
     if (code === "C") return "bg-purple-400 text-white";
     if (code === "D") return "bg-emerald-500 text-white";
+    if (code === "A") return "bg-red-500 text-white";
     return "bg-gray-200 text-gray-600";
   };
 
@@ -403,6 +408,12 @@ export default function HistoryPresensi() {
                   V
                 </div>
                 <span className="text-gray-700">= Tepat Waktu</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-6 h-6 bg-red-500 flex items-center justify-center text-white font-bold">
+                  A
+                </div>
+                <span className="text-gray-700">= Alpha</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-6 h-6 bg-orange-400 flex items-center justify-center text-white font-bold">

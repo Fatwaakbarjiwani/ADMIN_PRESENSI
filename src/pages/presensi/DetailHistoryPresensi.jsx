@@ -306,7 +306,7 @@ export default function DetailHistoryPresensi() {
               </div>
               <div>
                 <label className="text-sm font-semibold text-gray-600">
-                  ID Pegawai:
+                  ID:
                 </label>
                 <p className="text-base text-gray-800">
                   {pegawaiFromResponse.id}

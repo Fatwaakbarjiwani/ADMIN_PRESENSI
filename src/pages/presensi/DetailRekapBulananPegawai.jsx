@@ -119,7 +119,7 @@ export default function DetailRekapBulananPegawai() {
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-4">
             <div className="text-xl font-bold text-emerald-700">
-              REKAP PRESENSI PER BULAN - {tahun}
+              REKAP PRESENSI
             </div>
           </div>
         </div>
