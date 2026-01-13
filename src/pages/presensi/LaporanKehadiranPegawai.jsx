@@ -202,7 +202,7 @@ export default function LaporanKehadiranPegawai() {
         </div>
       </div>
 
-      <div className="mx-auto p-6 max-w-7xl flex flex-col gap-6">
+      <div className="mx-auto p-6 max-w-full flex flex-col gap-6">
         <div className="bg-white border-2 border-emerald-200 shadow-lg">
           <div className="bg-emerald-600 px-4 py-3 border-b-2 border-emerald-700">
             <div className="flex items-center gap-3">
@@ -354,7 +354,7 @@ export default function LaporanKehadiranPegawai() {
                   </div>
                 </div>
                 <div className="overflow-x-auto border-2 border-emerald-200 shadow-lg">
-                  <table className="min-w-[150%] text-xs bg-white">
+                  <table className="min-w-full text-xs bg-white">
                     <thead className="bg-emerald-50 border-b-2 border-emerald-200">
                       <tr>
                         <th className="px-3 py-2 text-center font-black text-emerald-800 uppercase tracking-wider border-r border-emerald-200 w-32">

@@ -94,7 +94,7 @@ export default function ShiftDetail() {
           <span className="material-icons text-white text-lg">dashboard</span>
         </div>
         <div>
-          <div className="text-2xl font-black text-emerald-800 tracking-tight uppercase">
+          <div className="text-2xl font-black text-emerald-600 tracking-tight uppercase">
             Shifts Scheduling
           </div>
           <div className="text-emerald-600 text-sm font-medium">
@@ -102,7 +102,7 @@ export default function ShiftDetail() {
           </div>
         </div>
       </div>
-      <div className="max-w-7xl mx-auto p-6 bg-white border-2 border-emerald-200 shadow-lg mt-4 mb-12">
+      <div className="max-w-full mx-auto p-6 bg-white border-2 border-emerald-200 shadow-lg bg-black m-4 mb-12">
         <div className="bg-emerald-600 px-4 py-3 border-b-2 border-emerald-700 mb-4">
           <div className="flex items-center gap-3">
             <div className="bg-white p-2">

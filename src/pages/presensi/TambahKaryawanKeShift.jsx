@@ -69,7 +69,7 @@ export default function TambahKaryawanKeShift() {
           </div>
         </div>
       </div>
-      <div className="mx-auto p-6 max-w-7xl flex flex-col gap-6">
+      <div className="mx-auto p-6 max-w-full flex flex-col gap-6">
         <div className="bg-white border-2 border-emerald-200 shadow-lg">
           <div className="bg-emerald-600 px-4 py-3 border-b-2 border-emerald-700">
             <div className="flex items-center justify-between">
@@ -103,7 +103,7 @@ export default function TambahKaryawanKeShift() {
             </div>
           </div>
           <div className="p-4 overflow-y-auto">
-            <table className="min-w-[140%] w-full text-sm bg-white">
+            <table className="min-w-full w-full text-sm bg-white">
               <thead className="sticky top-0 z-10 bg-emerald-50 border-b-2 border-emerald-200">
                 <tr>
                   <th className="px-3 py-2 text-center font-black text-emerald-800 text-xs uppercase tracking-wider border-r border-emerald-200 w-12">
@@ -117,15 +117,6 @@ export default function TambahKaryawanKeShift() {
                   </th>
                   <th className="px-3 py-2 text-left font-black text-emerald-800 text-xs uppercase tracking-wider border-r border-emerald-200 w-32">
                     NIK
-                  </th>
-                  <th className="px-3 py-2 text-left font-black text-emerald-800 text-xs uppercase tracking-wider border-r border-emerald-200 w-40">
-                    No. HP
-                  </th>
-                  <th className="px-3 py-2 text-left font-black text-emerald-800 text-xs uppercase tracking-wider border-r border-emerald-200 w-40">
-                    Tempat Lahir
-                  </th>
-                  <th className="px-3 py-2 text-left font-black text-emerald-800 text-xs uppercase tracking-wider border-r border-emerald-200 w-40">
-                    Tanggal Lahir
                   </th>
                   <th className="px-3 py-2 text-left font-black text-emerald-800 text-xs uppercase tracking-wider border-r border-emerald-200 w-40">
                     Unit Detail
@@ -158,16 +149,7 @@ export default function TambahKaryawanKeShift() {
                       </td>
                       <td className="px-3 py-2 align-middle border-b border-emerald-100">
                         {row.no_ktp}
-                      </td>
-                      <td className="px-3 py-2 align-middle border-b border-emerald-100">
-                        {row.no_hp}
-                      </td>
-                      <td className="px-3 py-2 align-middle border-b border-emerald-100">
-                        {row.tmpt_lahir}
-                      </td>
-                      <td className="px-3 py-2 align-middle border-b border-emerald-100">
-                        {row.tgl_lahir}
-                      </td>
+                      </td>                      
                       <td className="px-3 py-2 align-middle border-b border-emerald-100">
                         {row.nama_unit}
                       </td>

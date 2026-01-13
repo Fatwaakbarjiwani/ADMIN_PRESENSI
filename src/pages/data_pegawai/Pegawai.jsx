@@ -43,7 +43,7 @@ export default function Pegawai() {
           </div>
         </div>
       </div>
-      <div className="mx-auto max-w-5xl p-4 flex flex-col gap-8 px-2 md:px-0">
+      <div className="mx-auto max-w-full p-6 flex flex-col gap-8">
         {/* Action Bar */}
         <div className="bg-white border-2 border-emerald-200 shadow-lg p-4">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">

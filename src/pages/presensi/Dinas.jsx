@@ -453,7 +453,7 @@ export default function Dinas() {
         </div>
       </div>
 
-      <div className="mx-auto p-6 max-w-5xl flex flex-col gap-6">
+      <div className="mx-auto p-6 max-w-full flex flex-col gap-6">
         {/* Action Bar */}
         <div className="bg-white border-2 border-emerald-200 shadow-lg">
           <div className="bg-emerald-50 px-4 py-3 border-b-2 border-emerald-200">

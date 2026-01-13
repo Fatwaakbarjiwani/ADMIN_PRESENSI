@@ -479,7 +479,7 @@ export default function Home() {
           </div>
         )}
       </div>
-      <div className="mx-auto p-4 max-w-5xl flex flex-col gap-8 px-2 md:px-0">
+      <div className="mx-auto p-6 max-w-full flex flex-col gap-8">
         <>
           {/* Info Scope & Periode Detail */}
           {dashboard && (

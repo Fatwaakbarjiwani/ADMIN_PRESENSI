@@ -685,7 +685,7 @@ export default function RekapLemburPegawai() {
       ) : (
         <div className="bg-white border border-gray-200 shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="min-w-[130%] text-xs">
+            <table className="min-w-full text-xs">
               <thead className="sticky top-0 z-10 bg-gradient-to-r from-emerald-600 to-emerald-700 text-white">
                 <tr>
                   <th className="px-4 py-3 text-center font-bold text-sm uppercase tracking-wider w-12">

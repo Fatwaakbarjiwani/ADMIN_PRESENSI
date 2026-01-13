@@ -100,7 +100,7 @@ export default function AturShift() {
           </div>
         </div>
       </div>
-      <div className="mx-auto p-6 max-w-7xl flex flex-col gap-6">
+      <div className="mx-auto p-6 max-w-full flex flex-col gap-6">
         {/* Main Content Card */}
         <div className="bg-white border-2 border-emerald-200 shadow-lg">
           {/* Card Header */}

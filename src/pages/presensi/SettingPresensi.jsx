@@ -6,7 +6,8 @@ import Swal from "sweetalert2";
 
 export default function SettingPresensi() {
   const dispatch = useDispatch();
-  const { token, isSuperAdmin } = useSelector((state) => state.auth);
+  const { token, user } = useSelector((state) => state.auth);
+  const isSuperAdmin = user?.role === "super_admin";
   const {
     data: pegawaiData,
     loading,

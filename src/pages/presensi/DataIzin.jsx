@@ -305,7 +305,7 @@ export default function DataIzin() {
             </div>
           </div>
         </div>
-        <div className="mx-auto p-6 max-w-5xl flex flex-col gap-6">
+        <div className="mx-auto p-6 max-w-full flex flex-col gap-6">
           {/* Tab Navigation - Enhanced Design */}
           <div className="bg-white border-2 border-emerald-200 shadow-lg">
             <div className="flex">

@@ -110,7 +110,7 @@ export default function RekapPresensiPegawai() {
         </div>
       ) : (
         <div className="overflow-x-auto">
-          <table className="min-w-[120%] text-xs border-2 border-emerald-200 overflow-hidden shadow-lg">
+          <table className="min-w-[100%] text-xs border-2 border-emerald-200 overflow-hidden shadow-lg">
             <thead className="sticky top-0 z-10 bg-emerald-50 border-b-2 border-emerald-200">
               <tr>
                 <th className="px-3 py-2 text-center font-black text-emerald-700 text-xs uppercase tracking-wider w-12">

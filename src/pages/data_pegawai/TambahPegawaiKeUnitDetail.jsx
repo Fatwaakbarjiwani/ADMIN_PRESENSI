@@ -110,7 +110,7 @@ export default function TambahPegawaiKeUnitDetail() {
           </div>
         </div>
       </div>
-      <div className="mx-auto p-6 max-w-7xl flex flex-col gap-6">
+      <div className="mx-auto p-6 max-w-full flex flex-col gap-6">
         <div className="bg-white border-2 border-emerald-200 shadow-lg">
           <div className="bg-emerald-600 px-4 py-3 border-b-2 border-emerald-700">
             <div className="flex items-center gap-3">
@@ -183,15 +183,6 @@ export default function TambahPegawaiKeUnitDetail() {
                       NIK
                     </th>
                     <th className="px-3 py-2 text-left font-black text-emerald-800 text-xs uppercase tracking-wider border-r border-emerald-200">
-                      No. HP
-                    </th>
-                    <th className="px-3 py-2 text-left font-black text-emerald-800 text-xs uppercase tracking-wider border-r border-emerald-200">
-                      Tempat Lahir
-                    </th>
-                    <th className="px-3 py-2 text-left font-black text-emerald-800 text-xs uppercase tracking-wider border-r border-emerald-200">
-                      Tanggal Lahir
-                    </th>
-                    <th className="px-3 py-2 text-left font-black text-emerald-800 text-xs uppercase tracking-wider border-r border-emerald-200">
                       <div className="flex flex-col leading-tight">
                         <span>Unit</span>
                         <span className="text-xs font-normal text-gray-400 normal-case">
@@ -255,15 +246,6 @@ export default function TambahPegawaiKeUnitDetail() {
                         </td>
                         <td className="px-3 py-2 align-middle border-b border-emerald-100 break-all">
                           {row.no_ktp}
-                        </td>
-                        <td className="px-3 py-2 align-middle border-b border-emerald-100 break-all">
-                          {row.no_hp}
-                        </td>
-                        <td className="px-3 py-2 align-middle border-b border-emerald-100">
-                          {row.tmpt_lahir}
-                        </td>
-                        <td className="px-3 py-2 align-middle border-b border-emerald-100 whitespace-nowrap">
-                          {row.tgl_lahir}
                         </td>
                         <td className="px-3 py-2 align-middle border-b border-emerald-100 font-bold text-emerald-700">
                           {row?.nama_unit ? (

@@ -115,7 +115,7 @@ export default function DetailRekapBulananPegawai() {
         </div>
       </div>
 
-      <div className="mx-auto p-6 max-w-7xl flex flex-col gap-6">
+      <div className="mx-auto p-6 max-w-full flex flex-col gap-6">
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-4">
             <div className="text-xl font-bold text-emerald-700">
