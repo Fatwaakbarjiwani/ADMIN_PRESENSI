@@ -111,6 +111,10 @@ export default function HistoryPresensi() {
       return "A";
     }
 
+    if(statusPresensi.includes("libur")) {
+      return "L";
+    }
+
     if (
       row.status_presensi === "hadir" ||
       ketMasuk.includes("tepat waktu") ||
@@ -124,6 +128,7 @@ export default function HistoryPresensi() {
 
   const getPresensiColor = (code) => {
     if (code === "V") return "bg-green-500 text-white";
+    if (code === "L") return "bg-gray-500 text-white";
     if (code === "TL" || code === "PSW") return "bg-orange-400 text-white";
     if (code === "TAM" || code === "TAP") return "bg-pink-400 text-white";
     if (code === "S") return "bg-blue-500 text-white";
@@ -462,6 +467,12 @@ export default function HistoryPresensi() {
                   D
                 </div>
                 <span className="text-gray-700">= Dinas</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-6 h-6 bg-gray-500 flex items-center justify-center text-white font-bold">
+                  L
+                </div>
+                <span className="text-gray-700">= Libur</span>
               </div>
             </div>
           </div>
