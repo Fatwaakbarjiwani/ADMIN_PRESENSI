@@ -184,18 +184,20 @@ export default function RekapLemburPegawai() {
 
     doc.setFontSize(16);
     doc.setFont("times", "bold");
-    doc.text("SURAT TUGAS", 105, 50, { align: "center" });
+    // Jarak dikurangi setengah: dari 50 menjadi 35 (jarak dari logo 20 ke judul 50 = 30, setengahnya = 15, jadi 20+15=35)
+    doc.text("SURAT TUGAS", 105, 25, { align: "center" });
 
     doc.setFontSize(12);
     doc.setFont("times", "normal");
+    // Posisi disesuaikan karena judul dipindah lebih dekat (dari 65 menjadi 50, dikurangi 15)
     doc.text(
       "Yayasan Badan Wakaf Sultan Agung (YBW-SA) memberi tugas lembur kepada,",
       20,
-      65
+      35
     );
 
     autoTable(doc, {
-      startY: 70,
+      startY: 45,
       head: [["No.", "Nama", "Jabatan", "Tugas", "Total Nominal Lembur"]],
       body: filteredData.map((row, idx) => [
         idx + 1,
@@ -233,9 +235,9 @@ export default function RekapLemburPegawai() {
     );
     doc.text("Demikian untuk menjadikan periksa", 20, finalY + 6);
 
-    doc.text("Semarang", 105, finalY + 20, { align: "center" });
+    doc.text("Semarang", 105, finalY + 15, { align: "center" });
 
-    const signatureY = finalY + 35;
+    const signatureY = finalY + 25;
     doc.setFontSize(10);
 
     doc.setFont("times", "normal");
@@ -277,7 +279,7 @@ export default function RekapLemburPegawai() {
       signatureY + 27
     );
 
-    const tembusanY = signatureY + 50;
+    const tembusanY = signatureY + 35;
     doc.setFont("times", "normal");
     doc.text("Tembusan Yth.:", 20, tembusanY);
     doc.text("Kepala Bagian Keuangan dan Akuntansi YBW-SA", 20, tembusanY + 5);
@@ -310,28 +312,155 @@ export default function RekapLemburPegawai() {
       return sum + (parseInt(row?.total_nom_lembur) || 0);
     }, 0);
 
-    const tableStartY = 50;
-    autoTable(doc, {
-      startY: tableStartY,
-      head: [
-        [
-          "No.",
-          "NIK",
-          "Nama",
-          "Bidang/Bagian",
-          "Jabatan",
-          "Waktu",
-          "Durasi (Jam)",
-          "Nominal Lembur",
-          "Total Nominal Lembur",
-          "TTD",
-        ],
-      ],
-      body: filteredData.map((row, idx) => {
+    // Bagi data menjadi chunk maksimal 15 per halaman
+    const maxRowsPerPage = 15;
+    const dataChunks = [];
+    for (let i = 0; i < filteredData.length; i += maxRowsPerPage) {
+      dataChunks.push(filteredData.slice(i, i + maxRowsPerPage));
+    }
+
+    const tableStartY = 25;
+    let startX = 10;
+    // Hitung lebar kotak agar sejajar dengan tabel
+    // Untuk landscape A4, lebar halaman = 297mm, margin kiri dan kanan = 10mm
+    const pageWidth = doc.internal.pageSize.width; // 297mm untuk landscape A4
+    const tableMarginLeft = 10;
+    const tableMarginRight = 10;
+    const boxWidth = pageWidth - tableMarginLeft - tableMarginRight; // 277mm
+    const colWidth = boxWidth / 4; // 69.25mm per kolom
+
+    // Fungsi untuk membuat tanda tangan
+    const drawSignature = (signatureY) => {
+      // Posisi untuk tanggal dan tempat
+      const dateY = signatureY;
+      doc.setFontSize(10);
+      doc.setFont("helvetica", "normal");
+      doc.text("Semarang", 120, dateY + 5, { align: "center" });
+      doc.text("Yayasan Badan Wakaf Sultan Agung", 120, dateY + 10, {
+        align: "center", 
+      });
+
+      // Posisi untuk box tanda tangan - tinggi dikurangi dari 50 menjadi 40
+      const boxY = dateY + 15; // Jarak dari judul dikurangi dari 8 menjadi 5 untuk lebih kompak
+      const boxHeight = 40; // Tinggi kotak dikurangi dari 50 menjadi 40
+      doc.setLineWidth(0.5);
+      doc.rect(startX, boxY, boxWidth, boxHeight);
+
+      doc.line(startX + colWidth, boxY, startX + colWidth, boxY + boxHeight);
+      doc.line(startX + colWidth * 2, boxY, startX + colWidth * 2, boxY + boxHeight);
+      doc.line(startX + colWidth * 3, boxY, startX + colWidth * 3, boxY + boxHeight);
+
+      doc.setFontSize(7);
+      doc.setFont("helvetica", "normal");
+      doc.text("Disetujui Oleh", startX + colWidth / 2, boxY + 5, {
+        align: "center",
+      });
+      doc.text("Sekretaris YBW-SA", startX + colWidth / 2, boxY + 14, {
+        align: "center",
+      });
+      doc.setFont("helvetica", "bold");
+      doc.text(
+        "Dr. Muhammad Ja'far Shodiq., SE., S.Si., M.Si., Ak., CA.",
+        startX + colWidth / 2,
+        boxY + 35,
+        { align: "center" }
+      );
+
+      doc.setFont("helvetica", "normal");
+      doc.text("Diketahui Oleh", startX + colWidth + colWidth / 2, boxY + 5, {
+        align: "center",
+      });
+      doc.text(
+        "Kepala Sekretariat YBW-SA",
+        startX + colWidth + colWidth / 2,
+        boxY + 14,
+        { align: "center" }
+      );
+      doc.setFont("helvetica", "bold");
+      doc.text(
+        "Ifan Rikhza Auladi, S.Pd., M.Ed.",
+        startX + colWidth + colWidth / 2,
+        boxY + 35,
+        { align: "center" }
+      );
+
+      doc.setFont("helvetica", "normal");
+      doc.text("Diperiksa Oleh", startX + colWidth * 2 + colWidth / 2, boxY + 5, {
+        align: "center",
+      });
+      doc.text(
+        "Kabag. SDI Sekretariat YBW-SA",
+        startX + colWidth * 2 + colWidth / 2,
+        boxY + 14,
+        { align: "center" }
+      );
+      doc.setFont("helvetica", "bold");
+      doc.text(
+        "Ahmad Rudi Yulianto",
+        startX + colWidth * 2 + colWidth / 2,
+        boxY + 35,
+        { align: "center" }
+      );
+
+      const nameStr = String(user?.name ?? "").toLowerCase();
+      const unitStr = String(user?.unit ?? "").toLowerCase();
+      const isYbwsaUser = nameStr.includes("ybw") || unitStr.includes("ybw");
+      doc.setFont("helvetica", "normal");
+      doc.text("Dibuat Oleh", startX + colWidth * 3 + colWidth / 2, boxY + 5, {
+        align: "center",
+      });
+      if (isYbwsaUser) {
+        doc.text(
+          "SDI Sekretariat YBW-SA",
+          startX + colWidth * 3 + colWidth / 2,
+          boxY + 14,
+          { align: "center" }
+        );
+        doc.setFont("helvetica", "bold");
+        doc.text("Samsul Alam", startX + colWidth * 3 + colWidth / 2, boxY + 35, {
+          align: "center",
+        });
+      }
+
+      doc.setLineWidth(0.3);
+      doc.line(startX + 5, boxY + 36, startX + colWidth - 5, boxY + 36);
+      doc.line(
+        startX + colWidth + 5,
+        boxY + 36,
+        startX + colWidth * 2 - 5,
+        boxY + 36
+      );
+      doc.line(
+        startX + colWidth * 2 + 5,
+        boxY + 36,
+        startX + colWidth * 3 - 5,
+        boxY + 36
+      );
+      doc.line(
+        startX + colWidth * 3 + 5,
+        boxY + 36,
+        startX + boxWidth - 5,
+        boxY + 36
+      );
+    };
+
+    // Loop untuk setiap chunk data
+    dataChunks.forEach((chunk, chunkIndex) => {
+      // Jika bukan halaman pertama, tambahkan halaman baru
+      if (chunkIndex > 0) {
+        doc.addPage();
+      }
+
+      // Hitung nomor urut global
+      const globalStartIndex = chunkIndex * maxRowsPerPage;
+
+      // Siapkan body data untuk tabel
+      const tableBody = chunk.map((row, idx) => {
         const durasiJam = Math.floor((row?.menit_overtime || 0) / 60);
+        const globalIndex = globalStartIndex + idx;
 
         return [
-          idx + 1,
+          globalIndex + 1,
           row.no_ktp || "-",
           row?.nama || "-",
           row?.unit_detail || "-",
@@ -342,188 +471,117 @@ export default function RekapLemburPegawai() {
           `Rp ${(parseInt(row?.total_nom_lembur) || 0).toLocaleString(
             "id-ID"
           )}`,
-          idx + 1,
+          globalIndex + 1,
         ];
-      }),
-      foot: [
-        [
-          "",
-          "",
-          "",
-          "",
-          "",
-          "",
-          "",
-          "Jumlah",
-          `Rp ${totalLembur.toLocaleString("id-ID")}`,
-          "",
-        ],
-      ],
-      headStyles: {
-        fillColor: [0, 0, 0],
-        textColor: [255, 255, 255],
-        halign: "center",
-        fontStyle: "bold",
-        fontSize: 8,
-      },
-      bodyStyles: {
-        fontSize: 7,
-        halign: "center",
-      },
-      footStyles: {
-        fontSize: 8,
-        halign: "center",
-        fontStyle: "bold",
-        fillColor: [240, 240, 240],
-        textColor: [0, 0, 0],
-      },
-      styles: {
-        cellPadding: 2,
-        font: "helvetica",
-      },
-      margin: { top: tableStartY, left: 10, right: 10 },
-      tableWidth: "auto",
-    });
-
-    // Cek apakah masih ada space di halaman yang sama dengan tabel
-    const tableEndY = doc.lastAutoTable.finalY;
-    const pageHeight = doc.internal.pageSize.height; // Untuk landscape A4 = 210mm
-    const requiredHeight = 90; // Tinggi yang dibutuhkan: tanggal (20) + box (50) + margin (20)
-    const marginBottom = 10; // Margin bawah minimum
-
-    let signatureY;
-    let startX = 10;
-    const colWidth = 70;
-
-    // Hitung posisi Y relatif terhadap halaman saat ini
-    // Jika tableEndY lebih kecil dari pageHeight, berarti masih di halaman pertama
-    // Jika lebih besar, berarti sudah di halaman berikutnya
-    const isOnFirstPage = tableEndY <= pageHeight;
-    const relativeY = isOnFirstPage ? tableEndY : tableEndY % pageHeight;
-
-    // Cek apakah masih ada space di halaman yang sama dengan tabel
-    if (
-      isOnFirstPage &&
-      relativeY + requiredHeight + marginBottom <= pageHeight
-    ) {
-      // Jika masih ada space di halaman pertama, gunakan space yang tersedia di bawah tabel
-      signatureY = tableEndY + 15; // Spasi setelah tabel
-    } else {
-      // Jika tidak cukup space atau sudah di halaman berikutnya, buat halaman baru
-      doc.addPage();
-      signatureY = 30;
-    }
-
-    // Posisi untuk tanggal dan tempat
-    const dateY = signatureY;
-    doc.setFontSize(10);
-    doc.setFont("helvetica", "normal");
-    doc.text("Semarang", 120, dateY, { align: "center" });
-    doc.text("Yayasan Badan Wakaf Sultan Agung", 120, dateY + 8, {
-      align: "center",
-    });
-
-    // Posisi untuk box tanda tangan
-    const boxY = dateY + 20;
-    doc.setLineWidth(0.5);
-    doc.rect(startX, boxY, colWidth * 4, 50);
-
-    doc.line(startX + colWidth, boxY, startX + colWidth, boxY + 50);
-    doc.line(startX + colWidth * 2, boxY, startX + colWidth * 2, boxY + 50);
-    doc.line(startX + colWidth * 3, boxY, startX + colWidth * 3, boxY + 50);
-
-    doc.setFontSize(7);
-    doc.setFont("helvetica", "normal");
-    doc.text("Disetujui Oleh", startX + colWidth / 2, boxY + 8, {
-      align: "center",
-    });
-    doc.text("Sekretaris YBW-SA", startX + colWidth / 2, boxY + 22, {
-      align: "center",
-    });
-    doc.setFont("helvetica", "bold");
-    doc.text(
-      "Dr. Muhammad Ja'far Shodiq., SE., S.Si., M.Si., Ak., CA.",
-      startX + colWidth / 2,
-      boxY + 42,
-      { align: "center" }
-    );
-
-    doc.setFont("helvetica", "normal");
-    doc.text("Diketahui Oleh", startX + colWidth + colWidth / 2, boxY + 8, {
-      align: "center",
-    });
-    doc.text(
-      "Kepala Sekretariat YBW-SA",
-      startX + colWidth + colWidth / 2,
-      boxY + 22,
-      { align: "center" }
-    );
-    doc.setFont("helvetica", "bold");
-    doc.text(
-      "Ifan Rikhza Auladi, S.Pd., M.Ed.",
-      startX + colWidth + colWidth / 2,
-      boxY + 42,
-      { align: "center" }
-    );
-
-    doc.setFont("helvetica", "normal");
-    doc.text("Diperiksa Oleh", startX + colWidth * 2 + colWidth / 2, boxY + 8, {
-      align: "center",
-    });
-    doc.text(
-      "Kabag. SDI Sekretariat YBW-SA",
-      startX + colWidth * 2 + colWidth / 2,
-      boxY + 22,
-      { align: "center" }
-    );
-    doc.setFont("helvetica", "bold");
-    doc.text(
-      "Ahmad Rudi Yulianto",
-      startX + colWidth * 2 + colWidth / 2,
-      boxY + 42,
-      { align: "center" }
-    );
-
-    const nameStr = String(user?.name ?? "").toLowerCase();
-    const unitStr = String(user?.unit ?? "").toLowerCase();
-    const isYbwsaUser = nameStr.includes("ybw") || unitStr.includes("ybw");
-    doc.setFont("helvetica", "normal");
-    doc.text("Dibuat Oleh", startX + colWidth * 3 + colWidth / 2, boxY + 8, {
-      align: "center",
-    });
-    if (isYbwsaUser) {
-      doc.text(
-        "SDI Sekretariat YBW-SA",
-        startX + colWidth * 3 + colWidth / 2,
-        boxY + 22,
-        { align: "center" }
-      );
-      doc.setFont("helvetica", "bold");
-      doc.text("Samsul Alam", startX + colWidth * 3 + colWidth / 2, boxY + 42, {
-        align: "center",
       });
-    }
 
-    doc.setLineWidth(0.3);
-    doc.line(startX + 5, boxY + 44, startX + colWidth - 5, boxY + 44);
-    doc.line(
-      startX + colWidth + 5,
-      boxY + 44,
-      startX + colWidth * 2 - 5,
-      boxY + 44
-    );
-    doc.line(
-      startX + colWidth * 2 + 5,
-      boxY + 44,
-      startX + colWidth * 3 - 5,
-      boxY + 44
-    );
-    doc.line(
-      startX + colWidth * 3 + 5,
-      boxY + 44,
-      startX + colWidth * 4 - 5,
-      boxY + 44
-    );
+      // Jika ini chunk terakhir dan memiliki 15 data atau kurang,
+      // sesuaikan startY agar ada ruang untuk tanda tangan
+      const isLastChunk = chunkIndex === dataChunks.length - 1;
+      const isExact15OrLess = chunk.length <= maxRowsPerPage && isLastChunk;
+      let adjustedStartY = tableStartY;
+      
+      // Jika data tepat 15 atau kurang, kurangi startY agar ada ruang untuk tanda tangan
+      if (isExact15OrLess && chunk.length === maxRowsPerPage) {
+        adjustedStartY = 15; // Kurangi lebih banyak untuk memberi ruang lebih untuk tanda tangan
+      } else if (isExact15OrLess) {
+        adjustedStartY = 20; // Untuk data kurang dari 15, kurangi sedikit
+      }
+
+      // Siapkan konfigurasi tabel
+      const tableConfig = {
+        startY: adjustedStartY,
+        head: [
+          [
+            "No.",
+            "NIK",
+            "Nama",
+            "Bidang/Bagian",
+            "Jabatan",
+            "Waktu",
+            "Durasi (Jam)",
+            "Nominal Lembur",
+            "Total Nominal Lembur",
+            "TTD",
+          ],
+        ],
+        body: tableBody,
+        headStyles: {
+          fillColor: [0, 0, 0],
+          textColor: [255, 255, 255],
+          halign: "center",
+          fontStyle: "bold",
+          fontSize: 8,
+        },
+        bodyStyles: {
+          fontSize: 7,
+          halign: "center",
+        },
+        styles: {
+          cellPadding: 2,
+          font: "helvetica",
+        },
+        margin: { top: adjustedStartY, left: 10, right: 10 },
+        tableWidth: "auto",
+      };
+
+      // Jika ini chunk terakhir, tambahkan footer dengan total
+      if (isLastChunk) {
+        tableConfig.foot = [
+          [
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "Jumlah",
+            `Rp ${totalLembur.toLocaleString("id-ID")}`,
+            "",
+          ],
+        ];
+        tableConfig.footStyles = {
+          fontSize: 8,
+          halign: "center",
+          fontStyle: "bold",
+          fillColor: [240, 240, 240],
+          textColor: [0, 0, 0],
+        };
+      }
+
+      // Buat tabel
+      autoTable(doc, tableConfig);
+
+      // Jika ini chunk terakhir, tambahkan tanda tangan
+      if (isLastChunk) {
+        const tableEndY = doc.lastAutoTable.finalY;
+        const pageHeight = doc.internal.pageSize.height; // Untuk landscape A4 = 210mm
+        const requiredHeight = 55; // Tinggi yang dibutuhkan: tanggal (5) + box (40) + margin (5) + spasi (5)
+        const marginBottom = 5; // Margin bawah minimum
+        
+        // Hitung posisi Y relatif terhadap halaman terakhir
+        // tableEndY adalah posisi absolut dari awal dokumen
+        // Jika tableEndY adalah 0 atau kelipatan pageHeight, berarti di awal halaman baru
+        let relativeY = tableEndY % pageHeight;
+        if (relativeY === 0) {
+          relativeY = pageHeight; // Jika tepat di awal halaman baru, gunakan tinggi halaman
+        }
+        
+        // Cek apakah masih ada space di halaman terakhir
+        // Jika relativeY + requiredHeight masih dalam batas pageHeight, berarti masih muat
+        if (relativeY + requiredHeight + marginBottom <= pageHeight) {
+          // Jika masih ada space, gunakan space yang tersedia di bawah tabel
+          // Spasi dikurangi dari 3 menjadi 1 untuk mengurangi jarak antara tabel dan judul
+          const signatureY = relativeY + 1; // Spasi setelah tabel (dikurangi agar lebih kompak)
+          drawSignature(signatureY);
+        } else {
+          // Jika tidak cukup space, buat halaman baru
+          doc.addPage();
+          drawSignature(5);
+        }
+      }
+    });
 
     doc.save(
       `daftar-lembur-${

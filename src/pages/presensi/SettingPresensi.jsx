@@ -40,13 +40,13 @@ export default function SettingPresensi() {
   const handleSelectAll = () => {
     const currentIds = pegawaiData.map((p) => p.id);
     const allCurrentSelected = currentIds.every((id) =>
-      selectedPegawai.includes(id)
+      selectedPegawai.includes(id),
     );
 
     if (allCurrentSelected) {
       // Deselect current page
       setSelectedPegawai((prev) =>
-        prev.filter((id) => !currentIds.includes(id))
+        prev.filter((id) => !currentIds.includes(id)),
       );
     } else {
       // Select current page
@@ -84,7 +84,7 @@ export default function SettingPresensi() {
         },
         {
           headers: { Authorization: `Bearer ${token}` },
-        }
+        },
       );
 
       if (response) {
@@ -96,7 +96,7 @@ export default function SettingPresensi() {
         Swal.fire(
           "Error",
           response.data.message || "Gagal menyimpan presensi",
-          "error"
+          "error",
         );
       }
     } catch (error) {
@@ -171,6 +171,7 @@ export default function SettingPresensi() {
             </p>
           </div>
         )}
+
 
         <button
           type="submit"
@@ -251,7 +252,7 @@ export default function SettingPresensi() {
                         checked={
                           pegawaiData.length > 0 &&
                           pegawaiData.every((p) =>
-                            selectedPegawai.includes(p.id)
+                            selectedPegawai.includes(p.id),
                           )
                         }
                         onChange={handleSelectAll}
