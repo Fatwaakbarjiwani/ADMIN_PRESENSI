@@ -19,7 +19,7 @@ export default function Pegawai() {
   }, [token, isSuperAdmin, dispatch]);
 
   const handlePageChange = (page) => {
-    dispatch(fetchPegawai(isSuperAdmin, token, page));
+    dispatch(fetchPegawai(isSuperAdmin, token, page, searchValue));
   };
 
   const handleSearch = (e) => {

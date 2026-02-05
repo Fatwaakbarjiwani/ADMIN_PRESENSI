@@ -40,11 +40,16 @@ export default function Sidebar() {
       section: "MENEJEMEN PRESENSI",
       items: [
         { icon: "add_location_alt", label: "Atur Lokasi", link: "/lokasi" },
-        { icon: "event", label: "Shift", link: "/atur_shift" },
+        { icon: "schedule", label: "Shift", link: "/atur_shift" },
         {
           icon: "tune",
           label: "Shift Karyawan",
           link: "/shift_dosen_karyawan",
+        },
+        {
+          icon: "event",
+          label: "Event",
+          link: "/event",
         },
         ...(!isSuperAdmin
           ? [

@@ -21,6 +21,11 @@ import DetailHistoryPresensi from "./pages/presensi/DetailHistoryPresensi";
 import LaporanKehadiranPegawai from "./pages/presensi/LaporanKehadiranPegawai";
 import Dinas from "./pages/presensi/Dinas";
 import TambahDinas from "./pages/presensi/TambahDinas";
+import Event from "./pages/presensi/Event";
+import EventDetail from "./pages/presensi/EventDetail";
+import EventTambah from "./pages/presensi/EventTambah";
+import EventEdit from "./pages/presensi/EventEdit";
+import EventPegawai from "./pages/presensi/EventPegawai";
 
 function App() {
   return (
@@ -80,6 +85,56 @@ function App() {
             <Protected>
               <MainLayout>
                 <Pegawai />
+              </MainLayout>
+            </Protected>
+          }
+        />
+        <Route
+          path="/event"
+          element={
+            <Protected>
+              <MainLayout>
+                <Event />
+              </MainLayout>
+            </Protected>
+          }
+        />
+        <Route
+          path="/event/tambah"
+          element={
+            <Protected>
+              <MainLayout>
+                <EventTambah />
+              </MainLayout>
+            </Protected>
+          }
+        />
+        <Route
+          path="/event/:id/edit"
+          element={
+            <Protected>
+              <MainLayout>
+                <EventEdit />
+              </MainLayout>
+            </Protected>
+          }
+        />
+        <Route
+          path="/event/:id/pegawai"
+          element={
+            <Protected>
+              <MainLayout>
+                <EventPegawai />
+              </MainLayout>
+            </Protected>
+          }
+        />
+        <Route
+          path="/event/:id"
+          element={
+            <Protected>
+              <MainLayout>
+                <EventDetail />
               </MainLayout>
             </Protected>
           }

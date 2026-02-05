@@ -15,17 +15,21 @@ export default function TambahKaryawanKeShift() {
   const pagination = useSelector((state) => state.shift.pegawaiPagination);
   const [selectedPegawai, setSelectedPegawai] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [page, setPage] = useState(1);
+  // const [page, setPage] = useState(1);
   const [searchValue, setSearchValue] = useState("");
 
   useEffect(() => {
-    dispatch(fetchPegawai(page, ""));
-  }, [dispatch, page]);
+    dispatch(fetchPegawai(1, ""));
+  }, [dispatch]);
 
   const handleSearch = (e) => {
     setSearchValue(e.target.value);
     dispatch(fetchPegawai(1, e.target.value));
   };
+
+  const handleClick = (page) => {
+    dispatch(fetchPegawai(page, searchValue));
+  }
 
   const handleSimpan = () => {
     if (selectedPegawai.length === 0) {
@@ -43,7 +47,7 @@ export default function TambahKaryawanKeShift() {
           showConfirmButton: false,
         });
         navigate(`/atur_shift`);
-      })
+      }),
     ).finally(() => setLoading(false));
   };
 
@@ -149,7 +153,7 @@ export default function TambahKaryawanKeShift() {
                       </td>
                       <td className="px-3 py-2 align-middle border-b border-emerald-100">
                         {row.no_ktp}
-                      </td>                      
+                      </td>
                       <td className="px-3 py-2 align-middle border-b border-emerald-100">
                         {row.nama_unit}
                       </td>
@@ -187,7 +191,7 @@ export default function TambahKaryawanKeShift() {
                               setSelectedPegawai((prev) => [...prev, row.id]);
                             else
                               setSelectedPegawai((prev) =>
-                                prev.filter((id) => id !== row.id)
+                                prev.filter((id) => id !== row.id),
                               );
                           }}
                           className="w-4 h-4 text-emerald-600 bg-gray-100 border-gray-300 focus:ring-emerald-500 focus:ring-2"
@@ -219,7 +223,7 @@ export default function TambahKaryawanKeShift() {
                     if (link.url) {
                       const url = new URL(link.url);
                       const p = url.searchParams.get("page");
-                      if (p) setPage(Number(p));
+                      if (p) handleClick(Number(p));
                     }
                   }}
                   disabled={!link.url || link.active}

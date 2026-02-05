@@ -19,6 +19,13 @@ const initialState = {
   laporanKehadiran: null,
   laporanKehadiranLoading: false,
   laporanKehadiranError: null,
+  event: [],
+  eventDetail: null,
+  eventDetailLoading: false,
+  eventDetailError: null,
+  eventPegawai: [],
+  eventPegawaiLoading: false,
+  eventPegawaiError: null,
 };
 
 const presensiSlice = createSlice({
@@ -79,6 +86,27 @@ const presensiSlice = createSlice({
     setLaporanKehadiranError: (state, action) => {
       state.laporanKehadiranError = action.payload;
     },
+    setEvent: (state, action) => {
+      state.event = action.payload;
+    },
+    setEventDetail: (state, action) => {
+      state.eventDetail = action.payload;
+    },
+    setEventDetailLoading: (state, action) => {
+      state.eventDetailLoading = action.payload;
+    },
+    setEventDetailError: (state, action) => {
+      state.eventDetailError = action.payload;
+    },
+    setEventPegawai: (state, action) => {
+      state.eventPegawai = action.payload;
+    },
+    setEventPegawaiLoading: (state, action) => {
+      state.eventPegawaiLoading = action.payload;
+    },
+    setEventPegawaiError: (state, action) => {
+      state.eventPegawaiError = action.payload;
+    },
   },
 });
 
@@ -101,5 +129,12 @@ export const {
   setLaporanKehadiran,
   setLaporanKehadiranLoading,
   setLaporanKehadiranError,
+  setEvent,
+  setEventDetail,
+  setEventDetailLoading,
+  setEventDetailError,
+  setEventPegawai,
+  setEventPegawaiLoading,
+  setEventPegawaiError,
 } = presensiSlice.actions;
 export default presensiSlice.reducer;

@@ -182,10 +182,19 @@ export default function RekapLemburPegawai() {
       void 0;
     }
 
-    doc.setFontSize(16);
+    doc.setFontSize(14);
     doc.setFont("times", "bold");
     // Jarak dikurangi setengah: dari 50 menjadi 35 (jarak dari logo 20 ke judul 50 = 30, setengahnya = 15, jadi 20+15=35)
     doc.text("SURAT TUGAS", 105, 25, { align: "center" });
+    doc.setFontSize(8);
+    doc.text("Nomor :", 85, 28, { align: "center" });
+    // Ambil bulan dan tahun hari ini
+    const today = new Date();
+    const monthRoman = [
+      "", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII"
+    ][today.getMonth() + 1];
+    const year = today.getFullYear();
+    doc.text(`/Set-YBW-SA/${monthRoman}/${year}`, 115, 28, { align: "center" });
 
     doc.setFontSize(12);
     doc.setFont("times", "normal");
@@ -235,7 +244,7 @@ export default function RekapLemburPegawai() {
     );
     doc.text("Demikian untuk menjadikan periksa", 20, finalY + 6);
 
-    doc.text("Semarang", 105, finalY + 15, { align: "center" });
+    doc.text("Semarang, tgl", 105, finalY + 15, { align: "center" });
 
     const signatureY = finalY + 25;
     doc.setFontSize(10);

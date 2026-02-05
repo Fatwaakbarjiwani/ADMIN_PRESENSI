@@ -16,7 +16,7 @@ export default function TambahDinas() {
   const pegawaiLoading = useSelector((state) => state.pegawai.loading);
   const units = useSelector((state) => state.unitDetail.units);
 
-  const [page, setPage] = useState(1);
+
 
   // State untuk form dinas
   const [formData, setFormData] = useState({
@@ -35,13 +35,13 @@ export default function TambahDinas() {
   useEffect(() => {
     if (token) {
       dispatch(
-        fetchPegawai2(isSuperAdmin, token, page, searchPegawai, selectedUnit)
+        fetchPegawai2(isSuperAdmin, token, 1, "" , selectedUnit)
       );
       if (isSuperAdmin) {
         dispatch(fetchAllUnit());
       }
     }
-  }, [token, user, dispatch, isSuperAdmin, page, searchPegawai, selectedUnit]);
+  }, [token, user, dispatch, isSuperAdmin, "", selectedUnit]);
 
   // Handle form submit
   const handleSubmit = async (e) => {
@@ -93,7 +93,7 @@ export default function TambahDinas() {
   };
 
   const handlePageChange = (page) => {
-    dispatch(fetchPegawai2(isSuperAdmin, token, page, "", selectedUnit));
+    dispatch(fetchPegawai2(isSuperAdmin, token, page, searchPegawai, selectedUnit));
   };
 
   // Reset form
@@ -289,7 +289,6 @@ export default function TambahDinas() {
                     value={selectedUnit}
                     onChange={(e) => {
                       setSelectedUnit(e.target.value);
-                      setPage(1);
                       setFormData((prev) => ({
                         ...prev,
                         pegawai_ids: [],
@@ -305,17 +304,17 @@ export default function TambahDinas() {
                         // Icon berdasarkan level
                         let icon = "";
                         if (level === 0) {
-                          icon = "🏢"; // Building untuk level 0 (root)
+                          icon = "🏢"; 
                         } else if (level === 1) {
-                          icon = "📁"; // Folder untuk level 1
+                          icon = "📁"; 
                         } else if (level === 2) {
-                          icon = "📂"; // Open folder untuk level 2
+                          icon = "📂"; 
                         } else if (level === 3) {
-                          icon = "📄"; // Document untuk level 3
+                          icon = "📄"; 
                         } else if (level === 4) {
-                          icon = "📋"; // Clipboard untuk level 4
+                          icon = "📋"; 
                         } else {
-                          icon = "🧾"; // Link untuk level 5+
+                          icon = "🧾"; 
                         }
 
                         return (
@@ -343,7 +342,15 @@ export default function TambahDinas() {
                     value={searchPegawai}
                     onChange={(e) => {
                       setSearchPegawai(e.target.value);
-                      setPage(1);
+                      dispatch(
+                        fetchPegawai2(
+                          isSuperAdmin,
+                          token,
+                          1,
+                          e.target.value,
+                          selectedUnit
+                        )
+                      );
                     }}
                     className="w-full px-3 py-2 border-2 border-emerald-300 focus:border-emerald-500 focus:outline-none"
                   />

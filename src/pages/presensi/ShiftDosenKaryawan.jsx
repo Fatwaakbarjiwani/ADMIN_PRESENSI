@@ -15,7 +15,6 @@ export default function ShiftDosenKaryawan() {
   // const loading = useSelector((state) => state.shift.loading);
 
   const [search, setSearch] = useState("");
-  const [page, setPage] = useState(1);
   const [shifts, setShifts] = useState([]);
   const [selectedShift, setSelectedShift] = useState("");
   const [selectedPegawai, setSelectedPegawai] = useState([]);
@@ -26,9 +25,9 @@ export default function ShiftDosenKaryawan() {
   // Fetch karyawan redux
   useEffect(() => {
     if (assignLoading == false || user !== null) {
-      dispatch(fetchPegawai(page));
+      dispatch(fetchPegawai(1,""));
     }
-  }, [dispatch, page, assignLoading, user]);
+  }, [dispatch, assignLoading, user ]);
 
   // Fetch shift list
   useEffect(() => {
@@ -55,6 +54,10 @@ export default function ShiftDosenKaryawan() {
       )
     ).finally(() => setAssignLoading(false));
   };
+
+  const handlePage = (page) => {
+    dispatch(fetchPegawai(page, search));
+  }
  
   return (
     <div className="w-full min-h-screen font-sans bg-gray-50">
@@ -267,7 +270,7 @@ export default function ShiftDosenKaryawan() {
                         if (link.url) {
                           const url = new URL(link.url);
                           const p = url.searchParams.get("page");
-                          if (p) setPage(Number(p));
+                          if (p) handlePage(Number(p));
                         }
                       }}
                       disabled={!link.url || link.active}
@@ -469,7 +472,7 @@ export default function ShiftDosenKaryawan() {
                         if (link.url) {
                           const url = new URL(link.url);
                           const p = url.searchParams.get("page");
-                          if (p) setPage(Number(p));
+                          if (p) handlePage(Number(p));
                         }
                       }}
                       disabled={!link.url || link.active}
