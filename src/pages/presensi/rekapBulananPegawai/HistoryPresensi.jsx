@@ -478,15 +478,15 @@ export default function HistoryPresensi() {
           </div>
 
           <div className="overflow-x-auto">
-            <table className="min-w-full text-xs border-2 border-emerald-200 overflow-hidden shadow-lg">
-              <thead className="sticky top-0 z-10 bg-emerald-50 border-b-2 border-emerald-200">
+            <table className="min-w-full text-xs border border-gray-400 overflow-hidden shadow-lg">
+              <thead className="sticky top-0 z-10 bg-gray-600">
                 <tr>
-                  <th className="px-3 py-2 text-center font-black text-emerald-800 text-xs uppercase tracking-wider border-r border-emerald-200 w-12">
+                  <th className="px-3 py-2.5 text-center font-bold text-white text-xs uppercase tracking-wider border-r border-gray-500 w-12">
                     <span className="material-icons text-base">
                       format_list_numbered
                     </span>
                   </th>
-                  <th className="px-3 py-2 text-left font-black text-emerald-800 text-xs uppercase tracking-wider border-r border-emerald-200 w-56">
+                  <th className="px-3 py-2.5 text-left font-bold text-white text-xs uppercase tracking-wider border-r border-gray-500 w-56">
                     Nama
                   </th>
                   {Array.from({ length: daysInMonth }, (_, i) => {
@@ -495,8 +495,8 @@ export default function HistoryPresensi() {
                     return (
                       <th
                         key={day}
-                        className={`px-2 py-2 text-center font-black text-emerald-800 text-xs border-r border-emerald-200 ${
-                          isWeekendDay ? "bg-gray-200" : ""
+                        className={`px-2 py-2.5 text-center font-bold text-white text-xs border-r border-gray-500 ${
+                          isWeekendDay ? "bg-gray-500" : ""
                         }`}
                       >
                         {day}

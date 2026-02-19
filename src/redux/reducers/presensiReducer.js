@@ -26,6 +26,12 @@ const initialState = {
   eventPegawai: [],
   eventPegawaiLoading: false,
   eventPegawaiError: null,
+  eventHistory: [],
+  eventHistoryLoading: false,
+  eventHistoryError: null,
+  eventRekapPegawai: null,
+  eventRekapPegawaiLoading: false,
+  eventRekapPegawaiError: null,
 };
 
 const presensiSlice = createSlice({
@@ -107,6 +113,24 @@ const presensiSlice = createSlice({
     setEventPegawaiError: (state, action) => {
       state.eventPegawaiError = action.payload;
     },
+    setEventHistory: (state, action) => {
+      state.eventHistory = action.payload;
+    },
+    setEventHistoryLoading: (state, action) => {
+      state.eventHistoryLoading = action.payload;
+    },
+    setEventHistoryError: (state, action) => {
+      state.eventHistoryError = action.payload;
+    },
+    setEventRekapPegawai: (state, action) => {
+      state.eventRekapPegawai = action.payload;
+    },
+    setEventRekapPegawaiLoading: (state, action) => {
+      state.eventRekapPegawaiLoading = action.payload;
+    },
+    setEventRekapPegawaiError: (state, action) => {
+      state.eventRekapPegawaiError = action.payload;
+    },
   },
 });
 
@@ -136,5 +160,11 @@ export const {
   setEventPegawai,
   setEventPegawaiLoading,
   setEventPegawaiError,
+  setEventHistory,
+  setEventHistoryLoading,
+  setEventHistoryError,
+  setEventRekapPegawai,
+  setEventRekapPegawaiLoading,
+  setEventRekapPegawaiError,
 } = presensiSlice.actions;
 export default presensiSlice.reducer;

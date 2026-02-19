@@ -1,4 +1,6 @@
 import axios from "axios";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 import {
   setData,
   setError,
@@ -25,6 +27,12 @@ import {
   setEventPegawai,
   setEventPegawaiLoading,
   setEventPegawaiError,
+  setEventHistory,
+  setEventHistoryLoading,
+  setEventHistoryError,
+  setEventRekapPegawai,
+  setEventRekapPegawaiLoading,
+  setEventRekapPegawaiError,
 } from "../reducers/presensiReducer";
 
 export const fetchPresensiHistoryByUnit =
@@ -316,3 +324,153 @@ export const removePegawaiFromEvent = (events_id, pegawai_ids) => async (dispatc
     return { success: false, message: error.response?.data?.message ?? "Gagal menghapus pegawai dari event" };
   }
 };
+
+export const fetchHistoryPresensiEvent = (unit_id, tipe_event, tanggal, events_id) => async (dispatch, getState) => {
+  const { token } = getState().auth;
+  dispatch(setEventHistoryLoading(true));
+  dispatch(setEventHistoryError(null));
+  try {
+    const params = new URLSearchParams();
+    if (unit_id) params.append("unit_id", unit_id);
+    if (tipe_event) params.append("tipe_event", tipe_event);
+    if (tanggal) params.append("tanggal", tanggal);
+    if (events_id) params.append("events_id", events_id);
+    const query = params.toString();
+    const response = await axios.get(
+      `${import.meta.env.VITE_API_URL}/api/events/history-presensi-event${query ? `?${query}` : ""}`,
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    dispatch(setEventHistory(Array.isArray(response.data) ? response.data : []));
+    dispatch(setEventHistoryLoading(false));
+  } catch (error) {
+    dispatch(setEventHistoryLoading(false));
+    dispatch(setEventHistoryError(error.response?.data?.message ?? "Gagal mengambil history presensi event"));
+    dispatch(setEventHistory([]));
+  }
+};
+
+export const fetchRekapPresensiEventPegawai = (unit_id, pegawai_id, events_id, tanggal_mulai, tanggal_selesai) => async (dispatch, getState) => {
+  const { token } = getState().auth;
+  dispatch(setEventRekapPegawaiLoading(true));
+  dispatch(setEventRekapPegawaiError(null));
+  try {
+    const params = new URLSearchParams();
+    if (unit_id) params.append("unit_id", unit_id);
+    if (pegawai_id) params.append("pegawai_id", pegawai_id);
+    if (events_id) params.append("events_id", events_id);
+    if (tanggal_mulai) params.append("tanggal_mulai", tanggal_mulai);
+    if (tanggal_selesai) params.append("tanggal_selesai", tanggal_selesai);
+    const query = params.toString();
+    const response = await axios.get(
+      `${import.meta.env.VITE_API_URL}/api/events/rekap-presensi-event-pegawai${query ? `?${query}` : ""}`,
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    dispatch(setEventRekapPegawai(response.data));
+    dispatch(setEventRekapPegawaiLoading(false));
+  } catch (error) {
+    dispatch(setEventRekapPegawaiLoading(false));
+    dispatch(setEventRekapPegawaiError(error.response?.data?.message ?? "Gagal mengambil rekap presensi event pegawai"));
+    dispatch(setEventRekapPegawai(null));
+  }
+};
+
+export const downloadRekapPresensiEventPegawai = (unit_id, pegawai_id, events_id, tanggal_mulai, tanggal_selesai) => async (dispatch, getState) => {
+  const { token } = getState().auth;
+  try {
+    const params = new URLSearchParams();
+    if (unit_id) params.append("unit_id", unit_id);
+    if (pegawai_id) params.append("pegawai_id", pegawai_id);
+    if (events_id) params.append("events_id", events_id);
+    if (tanggal_mulai) params.append("tanggal_mulai", tanggal_mulai);
+    if (tanggal_selesai) params.append("tanggal_selesai", tanggal_selesai);
+    const query = params.toString();
+    
+    const dataResponse = await axios.get(
+      `${import.meta.env.VITE_API_URL}/api/events/rekap-presensi-event-pegawai${query ? `?${query}` : ""}`,
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    const data = dataResponse.data;
+    
+    if (!data) {
+      return { success: false, message: "Data tidak tersedia" };
+    }
+    
+    const doc = new jsPDF("p", "mm", "a4");
+    doc.setFontSize(16);
+    doc.text("REKAP PRESENSI EVENT", 105, 20, { align: "center" });
+    
+    if (data.pegawai) {
+      doc.setFontSize(12);
+      doc.text(`Nama: ${data.pegawai.nama || "-"}`, 14, 35);
+      doc.text(`NIK: ${data.pegawai.no_ktp || "-"}`, 14, 42);
+    }
+    
+    // Info Periode
+    if (data.periode) {
+      doc.setFontSize(12);
+      doc.text(`Periode: ${data.periode.tanggal_mulai || "-"} s/d ${data.periode.tanggal_selesai || "-"}`, 14, 49);
+    }
+    
+    if (data.events && Array.isArray(data.events) && data.events.length > 0) {
+      const headers = ["No", "Nama Event", "Jml. Event", "Jml. Hadir", "Jml. Tidak Hadir", "Prosentase Hadir", "Prosentase Tidak Hadir"];
+      const eventRows = data.events.map((event, idx) => [
+        idx + 1,
+        event.nama_event || "-",
+        event.total_event_berlangsung || 0,
+        event.total_hadir || 0,
+        event.total_tidak_hadir || 0,
+        `${event.persentase_hadir ?? 0}%`,
+        `${event.persentase_tidak_hadir ?? 0}%`,
+      ]);
+      const summaryRow = data.summary
+        ? [
+            "-",
+            "SUMMARY",
+            data.summary.total_event_berlangsung || 0,
+            data.summary.total_hadir || 0,
+            data.summary.total_tidak_hadir || 0,
+            `${data.summary.persentase_hadir ?? 0}%`,
+            `${data.summary.persentase_tidak_hadir ?? 0}%`,
+          ]
+        : null;
+      const body = summaryRow ? [...eventRows, summaryRow] : eventRows;
+
+      autoTable(doc, {
+        startY: 56,
+        head: [headers],
+        body,
+        theme: "grid",
+        styles: { fontSize: 9, cellPadding: 2 },
+        headStyles: {
+          fillColor: [5, 150, 105],
+          textColor: [255, 255, 255],
+          fontStyle: "bold",
+          halign: "center",
+        },
+        columnStyles: {
+          0: { halign: "center" },
+          2: { halign: "center" },
+          3: { halign: "center" },
+          4: { halign: "center" },
+          5: { halign: "center" },
+          6: { halign: "center" },
+        },
+        didParseCell: (data) => {
+          if (data.section === "body" && data.row.index === body.length - 1 && summaryRow) {
+            data.cell.styles.fontStyle = "bold";
+            data.cell.styles.fillColor = [209, 250, 229];
+          }
+        },
+      });
+    }
+    
+    const pegawaiName = data.pegawai?.nama?.replace(/[^a-zA-Z0-9]/g, "_") || "pegawai";
+    const fileName = `Rekap Presensi Event - ${pegawaiName} - ${tanggal_mulai || "all"}.pdf`;
+    doc.save(fileName);
+    
+    return { success: true };
+  } catch (error) {
+    return { success: false, message: error.response?.data?.message ?? "Gagal mengunduh rekap presensi event pegawai" };
+  }
+};
+

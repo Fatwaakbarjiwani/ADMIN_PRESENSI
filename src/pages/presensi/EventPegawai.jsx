@@ -181,7 +181,7 @@ export default function EventPegawai() {
       <div className="px-4 sticky z-40 top-0 py-4 border-b-2 border-emerald-200 bg-white flex items-center gap-4">
         <button
           type="button"
-          onClick={() => navigate(`/event/${id}`)}
+          onClick={() => navigate("/event")}
           className="p-2 hover:bg-gray-100 transition"
         >
           <span className="material-icons text-gray-600">arrow_back</span>
@@ -190,7 +190,7 @@ export default function EventPegawai() {
           <span className="material-icons text-white">group_add</span>
         </div>
         <div>
-          <div className="text-2xl font-black text-emerald-800 tracking-tight uppercase">
+          <div className="text-2xl font-black text-emerald-600 tracking-tight uppercase">
             Pegawai Event
           </div>
           <div className="text-emerald-600 text-sm font-medium">
@@ -221,7 +221,6 @@ export default function EventPegawai() {
           </div>
         )}
 
-        {/* Tambah pegawai ke event */}
         <div className="bg-white border-2 border-emerald-200 shadow-lg overflow-hidden">
           <div className="bg-emerald-600 px-4 py-3 border-b-2 border-emerald-700">
             <div className="flex items-center gap-3">
@@ -345,7 +344,6 @@ export default function EventPegawai() {
           </div>
         </div>
 
-        {/* Pegawai dalam event - Hapus dari event */}
         <div className="bg-white border-2 border-amber-200 shadow-lg overflow-hidden">
           <div className="bg-amber-600 px-4 py-3 border-b-2 border-amber-700">
             <div className="flex items-center gap-3">
@@ -435,10 +433,10 @@ export default function EventPegawai() {
         <div className="flex justify-end gap-2">
           <button
             type="button"
-            onClick={() => navigate(`/event/${id}`)}
+            onClick={() => navigate("/event")}
             className="px-4 py-2 border-2 border-emerald-300 text-emerald-700 font-bold hover:bg-emerald-50"
           >
-            Kembali ke Detail Event
+            Kembali ke Daftar Event
           </button>
         </div>
       </div>
