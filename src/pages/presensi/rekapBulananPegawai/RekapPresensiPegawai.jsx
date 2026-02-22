@@ -110,8 +110,8 @@ export default function RekapPresensiPegawai() {
         </div>
       ) : (
         <div className="overflow-x-auto">
-          <table className="min-w-[100%] text-xs border border-gray-400 overflow-hidden shadow-lg">
-            <thead className="sticky top-0 z-10 bg-gray-600">
+          <table className="min-w-[100%] text-xs border border-emerald-200 overflow-hidden shadow-lg">
+            <thead className="sticky top-0 z-10 bg-emerald-600">
               <tr>
                 <th className="px-3 py-2.5 text-center font-bold text-white text-xs uppercase tracking-wider w-12">
                   <span className="material-icons text-base">
@@ -127,13 +127,13 @@ export default function RekapPresensiPegawai() {
                 <th className="px-3 py-2.5 text-left font-bold text-white text-xs uppercase tracking-wider w-40">
                   Unit Kerja
                 </th>
-                <th className="px-3 py-2.5 text-left font-bold text-white text-xs uppercase tracking-wider w-40 border-r border-gray-500">
+                <th className="px-3 py-2.5 text-left font-bold text-white text-xs uppercase tracking-wider w-40 border-r border-emerald-200">
                   Shift
                 </th>
-                <th className="px-3 py-2.5 text-left font-bold text-white text-xs uppercase tracking-wider w-40 border-r border-gray-500">
+                <th className="px-3 py-2.5 text-left font-bold text-white text-xs uppercase tracking-wider w-40 border-r border-emerald-200">
                   Lokasi
                 </th>
-                <th className="px-3 py-2.5 text-center font-bold text-white text-xs uppercase tracking-wider w-40 border-r border-gray-500">
+                <th className="px-3 py-2.5 text-center font-bold text-white text-xs uppercase tracking-wider w-40 border-r border-emerald-200">
                   <div className="flex flex-col leading-tight">
                     <span>REKAP BULANAN</span>
                     <span className="text-xs font-normal text-gray-200 normal-case">
@@ -141,7 +141,7 @@ export default function RekapPresensiPegawai() {
                     </span>
                   </div>
                 </th>
-                <th className="px-3 py-2.5 text-center font-bold text-white text-xs uppercase tracking-wider w-40 border-r border-gray-500">
+                <th className="px-3 py-2.5 text-center font-bold text-white text-xs uppercase tracking-wider w-40 border-r border-emerald-200">
                   <div className="flex flex-col leading-tight">
                     <span>PRESENSI</span>
                     <span className="text-xs font-normal text-gray-200 normal-case">
