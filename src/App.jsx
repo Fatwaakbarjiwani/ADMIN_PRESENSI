@@ -6,6 +6,7 @@ import AturShift from "./pages/presensi/AturShift";
 import DaftarLibur from "./pages/presensi/DaftarLibur";
 import ShiftDosenKaryawan from "./pages/presensi/ShiftDosenKaryawan";
 import RekapPresensiBulanan from "./pages/presensi/RekapPresensiBulanan";
+import MonitoringPresensi from "./pages/presensi/MonitoringPresensi";
 import DataIzin from "./pages/presensi/DataIzin";
 import ImportDataCSV from "./pages/presensi/ImportDataCSV";
 import AturLokasi from "./pages/presensi/AturLokasi";
@@ -165,6 +166,16 @@ function App() {
             <Protected>
               <MainLayout>
                 <RekapPresensiBulanan />
+              </MainLayout>
+            </Protected>
+          }
+        />
+        <Route
+          path="/monitoring_presensi/*"
+          element={
+            <Protected>
+              <MainLayout>
+                <MonitoringPresensi />
               </MainLayout>
             </Protected>
           }

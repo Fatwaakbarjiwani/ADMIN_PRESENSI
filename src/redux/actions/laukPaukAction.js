@@ -45,15 +45,19 @@ export const DELETE_LAUK_PAUK_FAILURE = "DELETE_LAUK_PAUK_FAILURE";
 //     }
 //   };
 export const fetchLaukPauk =
-  (filterUnit, isSuperAdmin) => async (dispatch, getState) => {
+  (filterUnit, isSuperAdmin, unitIdForMonitoring = null) => async (dispatch, getState) => {
     dispatch({ type: FETCH_LAUK_PAUK_REQUEST });
     const { token } = getState().auth;
 
     try {
+      let unitParam = "";
+      if (unitIdForMonitoring) {
+        unitParam = `?unit_id=${unitIdForMonitoring}`;
+      } else if (isSuperAdmin && filterUnit) {
+        unitParam = `?unit_id=${filterUnit}`;
+      }
       const response = await axios.get(
-        `${import.meta.env.VITE_API_URL}/api/lauk-pauk/by-admin-unit${
-          isSuperAdmin ? `?unit_id=${filterUnit}` : ""
-        }`,
+        `${import.meta.env.VITE_API_URL}/api/lauk-pauk/by-admin-unit${unitParam}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }

@@ -78,14 +78,15 @@ export const fetchPresensiRekapByUnit =
   };
 
 export const fetchPresensiRekapBulananPegawai =
-  (pegawai_id, tahun) => async (dispatch, getState) => {
+  (pegawai_id, tahun, unit_id = null) => async (dispatch, getState) => {
     dispatch(setDetailRekapLoading(true));
     dispatch(setDetailRekapError(null));
     const { token } = getState().auth;
     try {
+      const unitParam = unit_id ? `&unit_id=${unit_id}` : "";
       const response = await axios.get(
         `${import.meta.env.VITE_API_URL
-        }/api/presensi/rekap-bulanan-pegawai?pegawai_id=${pegawai_id}&tahun=${tahun}`,
+        }/api/presensi/rekap-bulanan-pegawai?pegawai_id=${pegawai_id}&tahun=${tahun}${unitParam}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -160,13 +161,17 @@ export const fetchDinasData =
     };
 
 export const fetchLembur =
-  (mount, year, filterUnit, isSuperAdmin) => async (dispatch, getState) => {
+  (mount, year, filterUnit, isSuperAdmin, unitId = null) => async (dispatch, getState) => {
     const { token } = getState().auth;
     try {
+      let unitParam = "";
+      if (unitId) {
+        unitParam = `&unit_id=${unitId}`;
+      } else if (isSuperAdmin && filterUnit) {
+        unitParam = `&unit_id=${filterUnit}`;
+      }
       const response = await axios.get(
-        `${import.meta.env.VITE_API_URL
-        }/api/presensi/overtime?bulan=${mount}&tahun=${year}${isSuperAdmin ? `?unit_id=${filterUnit}` : ""
-        }`,
+        `${import.meta.env.VITE_API_URL}/api/presensi/overtime?bulan=${mount}&tahun=${year}${unitParam}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -181,14 +186,15 @@ export const fetchLembur =
   };
 
 export const fetchLaporanKehadiranPegawai =
-  (pegawai_id, bulan, tahun) => async (dispatch, getState) => {
+  (pegawai_id, bulan, tahun, unit_id = null) => async (dispatch, getState) => {
     dispatch(setLaporanKehadiranLoading(true));
     dispatch(setLaporanKehadiranError(null));
     const { token } = getState().auth;
     try {
+      const unitParam = unit_id ? `&unit_id=${unit_id}` : "";
       const response = await axios.get(
         `${import.meta.env.VITE_API_URL
-        }/api/presensi/laporan-kehadiran-karyawan/${pegawai_id}?bulan=${bulan}&tahun=${tahun}`,
+        }/api/presensi/laporan-kehadiran-karyawan/${pegawai_id}?bulan=${bulan}&tahun=${tahun}${unitParam}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }

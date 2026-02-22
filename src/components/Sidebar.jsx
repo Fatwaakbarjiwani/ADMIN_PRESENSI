@@ -11,7 +11,41 @@ export default function Sidebar() {
   const [openSub, setOpenSub] = useState({});
   const { user } = useSelector((state) => state.auth);
   const isSuperAdmin = user?.role === "super_admin";
-  const menu = [
+  const isMonitoring = user?.role === "monitoring";
+
+  const menuMonitoring = [
+    {
+      section: null,
+      items: [{ icon: "dashboard", label: "Dashboard", link: "/" }],
+    },
+    {
+      section: "MONITORING PRESENSI",
+      items: [
+        {
+          icon: "history",
+          label: "History Presensi",
+          link: "/monitoring_presensi?tab=history",
+        },
+        {
+          icon: "people",
+          label: "Rekap Presensi Pegawai",
+          link: "/monitoring_presensi?tab=rekap",
+        },
+        {
+          icon: "schedule",
+          label: "Rekap Lembur Pegawai",
+          link: "/monitoring_presensi?tab=lembur",
+        },
+        {
+          icon: "restaurant",
+          label: "Rekap Lauk Pauk",
+          link: "/monitoring_presensi?tab=laukpauk",
+        },
+      ],
+    },
+  ];
+
+  const menu = isMonitoring ? menuMonitoring : [
     {
       section: null,
       items: [{ icon: "dashboard", label: "Dashboard", link: "/" }],
@@ -140,8 +174,9 @@ export default function Sidebar() {
                 {group.section}
               </div>
             )}
-            {/* User info hanya di atas DATA PEGAWAI */}
-            {group.section === "DATA PEGAWAI" && (
+            {/* User info & logout: di atas DATA PEGAWAI (admin) atau MONITORING PRESENSI (monitoring) */}
+            {(group.section === "DATA PEGAWAI" ||
+              group.section === "MONITORING PRESENSI") && (
               <div className="flex items-center gap-3 px-4 py-3 mb-2 bg-green-800/70 border border-green-700 rounded-lg">
                 <div className="w-8 h-8 rounded-full bg-green-300 flex items-center justify-center shadow text-green-900 font-bold text-base">
                   {user?.name?.charAt(0)?.toUpperCase() || "?"}
@@ -193,6 +228,8 @@ export default function Sidebar() {
                           location.pathname.startsWith(
                             "/presensi/detail-history-presensi/"
                           )
+                        : item.label === "History Presensi"
+                        ? location.pathname === "/monitoring_presensi"
                         : location.pathname === item.link
                     }
                     hasSub={item.label === "Listing Report List"}

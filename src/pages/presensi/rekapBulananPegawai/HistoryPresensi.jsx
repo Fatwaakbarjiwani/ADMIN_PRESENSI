@@ -479,7 +479,7 @@ export default function HistoryPresensi() {
 
           <div className="overflow-x-auto">
             <table className="min-w-full text-xs border border-gray-400 overflow-hidden shadow-lg">
-              <thead className="sticky top-0 z-10 bg-gray-600">
+              <thead className="sticky top-0 z-10 bg-emerald-600">
                 <tr>
                   <th className="px-3 py-2.5 text-center font-bold text-white text-xs uppercase tracking-wider border-r border-gray-500 w-12">
                     <span className="material-icons text-base">
@@ -495,7 +495,7 @@ export default function HistoryPresensi() {
                     return (
                       <th
                         key={day}
-                        className={`px-2 py-2.5 text-center font-bold text-white text-xs border-r border-gray-500 ${
+                        className={`px-2 py-2.5 text-center font-bold text-white text-xs border-r border-emerald-200 ${
                           isWeekendDay ? "bg-gray-500" : ""
                         }`}
                       >

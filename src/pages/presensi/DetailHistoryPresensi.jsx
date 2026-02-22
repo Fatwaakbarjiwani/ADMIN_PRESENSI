@@ -1,12 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { fetchPresensiDetailHistoryByUnit } from "../../redux/actions/presensiAction";
 import { fetchPegawai } from "../../redux/actions/pegawaiAction";
 
 export default function DetailHistoryPresensi() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
   const { pegawai_id } = useParams();
   const { unit_id } = useParams();
 
@@ -17,7 +18,8 @@ export default function DetailHistoryPresensi() {
   const pegawai = useSelector((state) => state.pegawai.data);
   const token = useSelector((state) => state.auth.token);
   const user = useSelector((state) => state.auth.user);
-  const isSuperAdmin = user?.role === "super_admin";
+  const isMonitoring = user?.role === "monitoring";
+  const isSuperAdmin = user?.role === "super_admin" || isMonitoring;
 
   // Tambahkan state untuk filter tanggal
   const today = new Date();
@@ -247,7 +249,7 @@ export default function DetailHistoryPresensi() {
       {/* Header */}
       <div className="px-4 sticky z-40 top-0 py-4 border-b-2 border-emerald-200 bg-white flex items-center gap-4">
         <button
-          onClick={() => navigate(-1)}
+          onClick={() => (isMonitoring ? navigate("/monitoring_presensi") : navigate(-1))}
           className="p-2 hover:bg-gray-100 transition flex items-center"
         >
           <span className="material-icons text-gray-600">arrow_back</span>

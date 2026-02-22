@@ -2,6 +2,18 @@ import axios from "axios";
 
 const BASE = `${import.meta.env.VITE_API_URL}/api/admin/monitoring`;
 
+export const fetchMonitoringUnits = () => async (dispatch, getState) => {
+  try {
+    const { token } = getState().auth;
+    const res = await axios.get(`${BASE}/get-unit`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return res.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const fetchAdminMonitoring = () => async (dispatch, getState) => {
   try {
     const { token } = getState().auth;

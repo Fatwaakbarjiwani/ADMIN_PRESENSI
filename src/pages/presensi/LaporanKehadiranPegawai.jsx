@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { fetchLaporanKehadiranPegawai } from "../../redux/actions/presensiAction";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
@@ -11,6 +11,10 @@ export default function LaporanKehadiranPegawai() {
   const dispatch = useDispatch();
   const { pegawai_id } = useParams();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const unitId = searchParams.get("unit_id");
+  const user = useSelector((state) => state.auth.user);
+  const isMonitoring = user?.role === "monitoring";
   const data = useSelector((state) => state.presensi.laporanKehadiran);
   const loading = useSelector(
     (state) => state.presensi.laporanKehadiranLoading
@@ -35,9 +39,9 @@ export default function LaporanKehadiranPegawai() {
 
   useEffect(() => {
     if (pegawai_id) {
-      dispatch(fetchLaporanKehadiranPegawai(pegawai_id, bulan, tahun));
+      dispatch(fetchLaporanKehadiranPegawai(pegawai_id, bulan, tahun, unitId || undefined));
     }
-  }, [dispatch, pegawai_id, bulan, tahun]);
+  }, [dispatch, pegawai_id, bulan, tahun, unitId]);
 
   const handleDownloadPDF = () => {
     if (!data) return;
@@ -184,7 +188,7 @@ export default function LaporanKehadiranPegawai() {
     <div className="w-full min-h-screen font-sans bg-gray-50">
       <div className="px-4 sticky z-40 top-0 py-4 border-b-2 border-emerald-200 bg-white flex items-center gap-4">
         <button
-          onClick={() => navigate(-1)}
+          onClick={() => (isMonitoring ? navigate("/monitoring_presensi") : navigate(-1))}
           className="p-2 hover:bg-gray-100 rounded-lg transition flex items-center"
         >
           <span className="material-icons text-gray-600">arrow_back</span>
@@ -259,7 +263,7 @@ export default function LaporanKehadiranPegawai() {
                   className="px-4 py-2 bg-emerald-600 text-white font-bold text-xs border-2 border-emerald-700 hover:bg-emerald-700 transition flex items-center gap-2"
                   onClick={() =>
                     dispatch(
-                      fetchLaporanKehadiranPegawai(pegawai_id, bulan, tahun)
+                      fetchLaporanKehadiranPegawai(pegawai_id, bulan, tahun, unitId || undefined)
                     )
                   }
                   disabled={loading}
