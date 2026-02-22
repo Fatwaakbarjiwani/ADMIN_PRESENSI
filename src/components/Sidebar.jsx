@@ -15,10 +15,6 @@ export default function Sidebar() {
 
   const menuMonitoring = [
     {
-      section: null,
-      items: [{ icon: "dashboard", label: "Dashboard", link: "/" }],
-    },
-    {
       section: "MONITORING PRESENSI",
       items: [
         {
@@ -220,6 +216,20 @@ export default function Sidebar() {
                           location.pathname.startsWith(
                             "/tambah-karyawan-ke-shift/"
                           )
+                        : item.label === "History Presensi"
+                        ? (location.pathname === "/monitoring_presensi" ||
+                            location.pathname === "/monitoring_presensi/") &&
+                          (new URLSearchParams(location.search).get("tab") === "history" || !new URLSearchParams(location.search).get("tab"))
+                        : item.label === "Rekap Presensi Pegawai"
+                        ? (location.pathname === "/monitoring_presensi" &&
+                            new URLSearchParams(location.search).get("tab") === "rekap") ||
+                          location.pathname.startsWith("/monitoring_presensi/")
+                        : item.label === "Rekap Lembur Pegawai"
+                        ? location.pathname === "/monitoring_presensi" &&
+                          new URLSearchParams(location.search).get("tab") === "lembur"
+                        : item.label === "Rekap Lauk Pauk"
+                        ? location.pathname === "/monitoring_presensi" &&
+                          new URLSearchParams(location.search).get("tab") === "laukpauk"
                         : item.label === "Rekap Presensi"
                         ? location.pathname === "/rekap_presensi" ||
                           location.pathname.startsWith(
@@ -228,8 +238,6 @@ export default function Sidebar() {
                           location.pathname.startsWith(
                             "/presensi/detail-history-presensi/"
                           )
-                        : item.label === "History Presensi"
-                        ? location.pathname === "/monitoring_presensi"
                         : location.pathname === item.link
                     }
                     hasSub={item.label === "Listing Report List"}

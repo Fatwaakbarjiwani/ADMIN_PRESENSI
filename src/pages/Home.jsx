@@ -13,6 +13,7 @@ import {
 } from "recharts";
 import PropTypes from "prop-types";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import { fetchDashboard } from "../redux/actions/dashboardAction";
 
 function CollapsibleSection({ title, icon, children, defaultOpen = true }) {
@@ -73,8 +74,20 @@ const MONTHS = [
 
 export default function Home() {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const user = useSelector((state) => state.auth.user);
   const dashboard = useSelector((state) => state.dashboard.data);
   const loading = useSelector((state) => state.dashboard.loading);
+
+  useEffect(() => {
+    if (user?.role === "monitoring") {
+      navigate("/monitoring_presensi", { replace: true });
+    }
+  }, [user?.role, navigate]);
+
+  if (user?.role === "monitoring") {
+    return null;
+  }
 
   // Gunakan Date bawaan JS
   const now = new Date();
