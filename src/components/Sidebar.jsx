@@ -15,6 +15,10 @@ export default function Sidebar() {
 
   const menuMonitoring = [
     {
+      section: null,
+      items: [{ icon: "dashboard", label: "Dashboard", link: "/" }],
+    },
+    {
       section: "MONITORING PRESENSI",
       items: [
         {

@@ -13,8 +13,8 @@ import {
 } from "recharts";
 import PropTypes from "prop-types";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
 import { fetchDashboard } from "../redux/actions/dashboardAction";
+import { fetchMonitoringUnits } from "../redux/actions/adminMonitoringAction";
 
 function CollapsibleSection({ title, icon, children, defaultOpen = true }) {
   const [open, setOpen] = useState(defaultOpen);
@@ -74,31 +74,37 @@ const MONTHS = [
 
 export default function Home() {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
   const user = useSelector((state) => state.auth.user);
   const dashboard = useSelector((state) => state.dashboard.data);
   const loading = useSelector((state) => state.dashboard.loading);
+  const token = useSelector((state) => state.auth.token);
 
-  useEffect(() => {
-    if (user?.role === "monitoring") {
-      navigate("/monitoring_presensi", { replace: true });
-    }
-  }, [user?.role, navigate]);
-
-  if (user?.role === "monitoring") {
-    return null;
-  }
-
-  // Gunakan Date bawaan JS
   const now = new Date();
   const [bulan, setBulan] = useState(now.getMonth() + 1); // getMonth() 0-based
   const [tahun, setTahun] = useState(now.getFullYear());
   const [showHeaderInfo, setShowHeaderInfo] = useState(true);
+  const [monitoringUnits, setMonitoringUnits] = useState([]);
+  const [monitoringUnitId, setMonitoringUnitId] = useState("");
 
-  // Fetch dashboard berdasarkan bulan & tahun
+  const isMonitoring = user?.role === "monitoring";
+
   useEffect(() => {
-    dispatch(fetchDashboard(bulan, tahun));
-  }, [dispatch, bulan, tahun]);
+    if (isMonitoring && token) {
+      dispatch(fetchMonitoringUnits())
+        .then((res) => setMonitoringUnits(Array.isArray(res) ? res : []))
+        .catch(() => setMonitoringUnits([]));
+    }
+  }, [isMonitoring, token, dispatch]);
+
+  useEffect(() => {
+    if (!isMonitoring) {
+      dispatch(fetchDashboard(bulan, tahun, null));
+      return;
+    }
+    if (monitoringUnitId) {
+      dispatch(fetchDashboard(bulan, tahun, monitoringUnitId));
+    }
+  }, [dispatch, bulan, tahun, isMonitoring, monitoringUnitId]);
 
   // Summary Data
   const summaryData = dashboard
@@ -281,6 +287,72 @@ export default function Home() {
   // Sisa pengajuan
   const sisaPengajuan = dashboard?.ringkasan?.sisa_pengajuan || {};
 
+  // Monitoring: tampilkan prompt pilih unit jika belum pilih
+  if (isMonitoring && !monitoringUnitId) {
+    return (
+      <div className="w-full min-h-screen font-sans bg-gray-50">
+        <div className="px-4 sticky z-40 top-0 py-4 border-b-2 border-emerald-200 bg-white">
+          <div className="flex items-center gap-4">
+            <div className="bg-emerald-600 p-2 flex items-center justify-center">
+              <span className="material-icons text-white text-lg">dashboard</span>
+            </div>
+            <div>
+              <div className="text-2xl font-black text-emerald-600 tracking-tight uppercase">Dashboard</div>
+              <div className="text-emerald-600 text-sm font-medium">Statistik presensi unit yang Anda akses</div>
+            </div>
+            <div className="ml-auto flex items-center gap-2">
+              <label className="text-xs font-bold text-emerald-700 uppercase tracking-wide">Unit:</label>
+              <select
+                className="border-2 border-emerald-300 px-3 py-2 text-sm font-medium focus:border-emerald-500 focus:outline-none bg-white"
+                value={monitoringUnitId}
+                onChange={(e) => setMonitoringUnitId(e.target.value)}
+              >
+                <option value="">-- Pilih Unit --</option>
+                {monitoringUnits.map((u) => (
+                  <option key={u.id} value={u.id}>
+                    {u.nama || u.name || `Unit ${u.id}`}
+                  </option>
+                ))}
+              </select>
+              <div className="flex gap-2">
+                <select
+                  className="border-2 border-emerald-300 px-3 py-2 text-sm font-medium focus:border-emerald-500 focus:outline-none bg-white"
+                  value={bulan}
+                  onChange={(e) => setBulan(Number(e.target.value))}
+                >
+                  {MONTHS.map((name, i) => (
+                    <option key={i + 1} value={i + 1}>{name}</option>
+                  ))}
+                </select>
+                <select
+                  className="border-2 border-emerald-300 px-3 py-2 text-sm font-medium focus:border-emerald-500 focus:outline-none bg-white"
+                  value={tahun}
+                  onChange={(e) => setTahun(Number(e.target.value))}
+                >
+                  {Array.from({ length: 5 }, (_, i) => {
+                    const y = now.getFullYear() - 2 + i;
+                    return <option key={y} value={y}>{y}</option>;
+                  })}
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="flex flex-col items-center justify-center min-h-[60vh] gap-6 p-8">
+          <div className="w-24 h-24 bg-emerald-100 border-2 border-emerald-200 rounded-full flex items-center justify-center">
+            <span className="material-icons text-emerald-600 text-5xl">business</span>
+          </div>
+          <div className="text-center">
+            <div className="text-emerald-800 font-black text-xl mb-2">Pilih Unit</div>
+            <div className="text-emerald-600 text-sm max-w-md">
+              Pilih unit dari dropdown di atas untuk melihat statistik dan rekapitulasi presensi pegawai
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   // Loading Component - Tampil penuh saat proses loading
   if (loading) {
     return (
@@ -378,9 +450,29 @@ export default function Home() {
               Dashboard
             </div>
             <div className="text-emerald-600 text-sm font-medium">
-              Statistik dan rekapitulasi pegawai YBWSA
+              {isMonitoring ? "Statistik presensi unit yang Anda akses" : "Statistik dan rekapitulasi pegawai YBWSA"}
             </div>
           </div>
+          {/* Filter Unit (Monitoring only) */}
+          {isMonitoring && (
+            <div className="flex items-center gap-2">
+              <label className="text-xs font-bold text-emerald-700 uppercase tracking-wide">
+                Unit:
+              </label>
+              <select
+                className="border-2 border-emerald-300 px-3 py-2 text-sm font-medium focus:border-emerald-500 focus:outline-none transition-colors bg-white"
+                value={monitoringUnitId}
+                onChange={(e) => setMonitoringUnitId(e.target.value)}
+              >
+                <option value="">-- Pilih Unit --</option>
+                {monitoringUnits.map((u) => (
+                  <option key={u.id} value={u.id}>
+                    {u.nama || u.name || `Unit ${u.id}`}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
           {/* Filter Bulan & Tahun */}
           <div className="ml-auto flex gap-3 items-center">
             <div className="flex items-center gap-2">

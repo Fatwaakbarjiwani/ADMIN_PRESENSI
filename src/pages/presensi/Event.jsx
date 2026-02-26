@@ -128,6 +128,11 @@ function Event() {
     });
   };
 
+  const formatLabel = (s) => {
+    if (!s) return "-";
+    return String(s).replace(/_/g, " ");
+  };
+
   const formatEventTime = (event) => {
     if (event.tipe_event === "Sholat Fardhu") {
       const waktuMulai = formatTime(event.waktu_mulai);
@@ -589,6 +594,20 @@ function Event() {
                       )}
                       <div className="flex flex-col">
                         <label className="text-xs font-bold text-emerald-700 uppercase tracking-wide mb-1">
+                          Tipe Event
+                        </label>
+                        <select
+                          className="border-2 border-emerald-300 px-3 py-2 text-sm font-medium focus:border-emerald-500 focus:outline-none transition-colors bg-white"
+                          value={historyTipeEvent}
+                          onChange={(e) => setHistoryTipeEvent(e.target.value)}
+                        >
+                          <option value="">Pilih Tipe</option>
+                          <option value="Sholat Fardhu">Sholat Fardhu</option>
+                          <option value="Event & Kegiatan Islam">Event & Kegiatan Islam</option>
+                        </select>
+                      </div>
+                      <div className="flex flex-col">
+                        <label className="text-xs font-bold text-emerald-700 uppercase tracking-wide mb-1">
                           Event
                         </label>
                         <select
@@ -605,20 +624,7 @@ function Event() {
                           ))}
                         </select>
                       </div>
-                      <div className="flex flex-col">
-                        <label className="text-xs font-bold text-emerald-700 uppercase tracking-wide mb-1">
-                          Tipe Event
-                        </label>
-                        <select
-                          className="border-2 border-emerald-300 px-3 py-2 text-sm font-medium focus:border-emerald-500 focus:outline-none transition-colors bg-white"
-                          value={historyTipeEvent}
-                          onChange={(e) => setHistoryTipeEvent(e.target.value)}
-                        >
-                          <option value="">Pilih Tipe</option>
-                          <option value="Sholat Fardhu">Sholat Fardhu</option>
-                          <option value="Event & Kegiatan Islam">Event & Kegiatan Islam</option>
-                        </select>
-                      </div>
+                      
                       <div className="flex flex-col">
                         <label className="text-xs font-bold text-emerald-700 uppercase tracking-wide mb-1">
                           Tanggal
@@ -648,8 +654,43 @@ function Event() {
                     {eventHistoryError && (
                       <div className="text-center py-4 text-red-600">{eventHistoryError}</div>
                     )}
-                    {!eventHistoryLoading && !eventHistoryError && eventHistory.length > 0 && (
-                      <div className="overflow-x-auto border-2 border-emerald-200 mt-4">
+                    {!eventHistoryLoading && !eventHistoryError && eventHistory.length > 0 && (() => {
+                      const firstItem = eventHistory[0];
+                      const ev = firstItem?.event;
+                      const isEventIslam = ev?.tipe_event === "Event & Kegiatan Islam";
+                      const waktuEventDisplay = ev?.tipe_event === "Sholat Fardhu"
+                        ? (ev?.waktu_mulai ? formatTime(ev.waktu_mulai) : "-")
+                        : isEventIslam
+                          ? (() => {
+                            const masuk = (ev?.waktu_masuk_mulai || ev?.waktu_masuk_selesai)
+                              ? `Masuk: ${formatTime(ev?.waktu_masuk_mulai || "")} - ${formatTime(ev?.waktu_masuk_selesai || "")}`
+                              : "";
+                            const pulang = (ev?.waktu_pulang_mulai || ev?.waktu_pulang_selesai)
+                              ? `Pulang: ${formatTime(ev?.waktu_pulang_mulai || "")} - ${formatTime(ev?.waktu_pulang_selesai || "")}`
+                              : "";
+                            return [masuk, pulang].filter(Boolean).join(" | ") || "-";
+                          })()
+                          : "-";
+                      return (
+                        <div className="mt-4 space-y-4">
+                          <div className="bg-gradient-to-r from-emerald-50 to-emerald-100 border-2 border-emerald-200 p-4">
+                            <div className="text-xs font-bold text-emerald-700 uppercase tracking-wide mb-2">Detail Event</div>
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                              <div>
+                                <div className="text-xs text-emerald-600 font-medium mb-0.5">Nama Event</div>
+                                <div className="text-sm font-bold text-emerald-900">{ev?.nama_event || "-"}</div>
+                              </div>
+                              <div>
+                                <div className="text-xs text-emerald-600 font-medium mb-0.5">Tipe Event</div>
+                                <div className="text-sm font-bold text-emerald-900">{ev?.tipe_event || "-"}</div>
+                              </div>
+                              <div>
+                                <div className="text-xs text-emerald-600 font-medium mb-0.5">Waktu Event</div>
+                                <div className="text-sm font-bold text-emerald-900">{waktuEventDisplay}</div>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="overflow-x-auto border-2 border-emerald-200">
                         <table className="min-w-full text-sm">
                           <thead>
                             <tr className="bg-emerald-600">
@@ -663,12 +704,12 @@ function Event() {
                                 NAMA PEGAWAI
                               </th>
                               <th className="px-3 py-2.5 text-center font-bold text-white text-xs uppercase tracking-wider border-r border-emerald-500">
-                                UNIT KERJA
+                                TANGGAL
                               </th>
                               <th className="px-3 py-2.5 text-center font-bold text-white text-xs uppercase tracking-wider border-r border-emerald-500">
                                 STATUS PRESENSI
                               </th>
-                              {historyTipeEvent === "Event & Kegiatan Islam" && (
+                              {(historyTipeEvent === "Event & Kegiatan Islam" || (eventHistory.length > 0 && eventHistory.some((e) => e?.event?.tipe_event === "Event & Kegiatan Islam"))) && (
                                 <>
                                   <th className="px-3 py-2.5 text-center font-bold text-white text-xs uppercase tracking-wider border-r border-emerald-500">
                                     STATUS MASUK
@@ -678,37 +719,50 @@ function Event() {
                                   </th>
                                 </>
                               )}
-                              <th className="px-3 py-2.5 text-center font-bold text-white text-xs uppercase tracking-wider">
-                                JAM
+                              <th className="px-3 py-2.5 text-center font-bold text-white text-xs uppercase tracking-wider border-r border-emerald-500">
+                                JAM MASUK
                               </th>
+                              {(historyTipeEvent === "Event & Kegiatan Islam" || (eventHistory.length > 0 && eventHistory.some((e) => e?.event?.tipe_event === "Event & Kegiatan Islam"))) && (
+                                <th className="px-3 py-2.5 text-center font-bold text-white text-xs uppercase tracking-wider">
+                                  JAM PULANG
+                                </th>
+                              )}
                             </tr>
                           </thead>
                           <tbody>
-                            {eventHistory.map((item, idx) => (
-                              <tr
-                                key={idx}
-                                className={`border-b border-emerald-100 ${
-                                  idx % 2 === 0 ? "bg-white" : "bg-emerald-50/50"
-                                }`}
-                              >
-                                <td className="px-3 py-2 text-center text-emerald-900">{idx + 1}</td>
-                                <td className="px-3 py-2 text-center text-emerald-900">{item.no_ktp || "-"}</td>
-                                <td className="px-3 py-2 text-emerald-900 font-medium">{item.nama_pegawai || "-"}</td>
-                                <td className="px-3 py-2 text-center text-emerald-900">{item.unit_kerja || item.nama_unit || "-"}</td>
-                                <td className="px-3 py-2 text-center text-emerald-900">{item.status_presensi || "-"}</td>
-                                {historyTipeEvent === "Event & Kegiatan Islam" && (
-                                  <>
-                                    <td className="px-3 py-2 text-center text-emerald-900">{item.status_masuk || "-"}</td>
-                                    <td className="px-3 py-2 text-center text-emerald-900">{item.status_pulang || "-"}</td>
-                                  </>
-                                )}
-                                <td className="px-3 py-2 text-center text-emerald-900">{item.jam || "-"}</td>
-                              </tr>
-                            ))}
+                            {eventHistory.map((item, idx) => {
+                              const isEventIslam = item?.event?.tipe_event === "Event & Kegiatan Islam" || historyTipeEvent === "Event & Kegiatan Islam";
+                              return (
+                                <tr
+                                  key={idx}
+                                  className={`border-b border-emerald-100 ${
+                                    idx % 2 === 0 ? "bg-white" : "bg-emerald-50/50"
+                                  }`}
+                                >
+                                  <td className="px-3 py-2 text-center text-emerald-900">{idx + 1}</td>
+                                  <td className="px-3 py-2 text-center text-emerald-900">{item.no_ktp || "-"}</td>
+                                  <td className="px-3 py-2 text-emerald-900 font-medium">{item.nama_pegawai || "-"}</td>
+                                  <td className="px-3 py-2 text-center text-emerald-900">{item.tanggal ? formatDate(item.tanggal) : "-"}</td>
+                                  <td className="px-3 py-2 text-center text-emerald-900">{formatLabel(item.status_presensi)}</td>
+                                  {isEventIslam && (
+                                    <>
+                                      <td className="px-3 py-2 text-center text-emerald-900">{formatLabel(item.status_masuk)}</td>
+                                      <td className="px-3 py-2 text-center text-emerald-900">{formatLabel(item.status_pulang)}</td>
+                                    </>
+                                  )}
+                                  <td className="px-3 py-2 text-center text-emerald-900">{item.jam || "-"}</td>
+                                  {isEventIslam && (
+                                    <td className="px-3 py-2 text-center text-emerald-900">{item.jam_pulang || "-"}</td>
+                                  )}
+                                </tr>
+                              );
+                            })}
                           </tbody>
                         </table>
                       </div>
-                    )}
+                        </div>
+                      );
+                    })()}
                   </div>
                 </div>
 
@@ -925,10 +979,10 @@ function Event() {
                                         JML. TIDAK HADIR
                                       </th>
                                       <th className="px-2 py-2 text-center font-bold text-white text-[10px] uppercase tracking-wider border-r border-emerald-500">
-                                        PROSENTASE HADIR
+                                        PERSENTASE HADIR
                                       </th>
                                       <th className="px-2 py-2 text-center font-bold text-white text-[10px] uppercase tracking-wider border-r border-emerald-500">
-                                        PROSENTASE TIDAK HADIR
+                                        PERSENTASE TIDAK HADIR
                                       </th>
                                     </Fragment>
                                   ))}
@@ -942,10 +996,10 @@ function Event() {
                                     TOTAL TIDAK HADIR
                                   </th>
                                   <th className="px-2 py-2 text-center font-bold text-white text-[10px] uppercase tracking-wider border-r border-emerald-500">
-                                    PROSENTASE HADIR
+                                    PERSENTASE HADIR
                                   </th>
                                   <th className="px-2 py-2 text-center font-bold text-white text-[10px] uppercase tracking-wider">
-                                    PROSENTASE TIDAK HADIR
+                                    PERSENTASE TIDAK HADIR
                                   </th>
                                 </tr>
                               </thead>
@@ -1017,11 +1071,11 @@ function Event() {
                                   {eventRekapPegawai.summary.total_tidak_hadir || 0}
                                 </div>
                                 <div>
-                                  <span className="font-semibold">Prosentase Hadir:</span>{" "}
+                                  <span className="font-semibold">Persentase Hadir:</span>{" "}
                                   {eventRekapPegawai.summary.persentase_hadir ?? 0}%
                                 </div>
                                 <div>
-                                  <span className="font-semibold">Prosentase Tidak Hadir:</span>{" "}
+                                  <span className="font-semibold">Persentase Tidak Hadir:</span>{" "}
                                   {eventRekapPegawai.summary.persentase_tidak_hadir ?? 0}%
                                 </div>
                               </div>

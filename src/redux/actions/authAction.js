@@ -23,7 +23,7 @@ export const login =
         dispatch(setLoading(false));
         dispatch(setToken(response.data.token));
         notify("success", response.data.message);
-        dispatch(getMe(navigate));
+        dispatch(getMe());
         navigate("/");
       }
     } catch (error) {
@@ -58,7 +58,7 @@ export const logout = (navigate) => async (dispatch) => {
   });
 };
 
-export const getMe = (navigate) => async (dispatch, getState) => {
+export const getMe = () => async (dispatch, getState) => {
   const { token } = getState().auth;
   try {
     const response = await axios.get(
@@ -71,9 +71,6 @@ export const getMe = (navigate) => async (dispatch, getState) => {
     );
     const data = response.data;
     dispatch(setUser(data));
-    if (data.role === "monitoring") {
-      navigate("/monitoring_presensi");
-    }
   } catch (error) {
     if (axios.isAxiosError(error)) {
       return;
