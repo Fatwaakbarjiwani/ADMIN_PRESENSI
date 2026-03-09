@@ -70,17 +70,6 @@ function dateToInput(d) {
   return s;
 }
 
-const HARI_MINGGUAN_OPTIONS = [
-  "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu", "Minggu"
-];
-
-function normalizeHariMingguan(val) {
-  if (!val || typeof val !== "string") return "";
-  const v = val.trim();
-  const found = HARI_MINGGUAN_OPTIONS.find((h) => h.toLowerCase() === v.toLowerCase());
-  return found ?? (v.charAt(0).toUpperCase() + v.slice(1).toLowerCase());
-}
-
 export default function EventEdit() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -110,7 +99,6 @@ export default function EventEdit() {
     waktu_masuk_selesai: "",
     waktu_pulang_mulai: "",
     waktu_pulang_selesai: "",
-    hari_mingguan: "",
     nama_tempat: "",
   });
   const [submitting, setSubmitting] = useState(false);
@@ -138,7 +126,6 @@ export default function EventEdit() {
       waktu_masuk_selesai: timeToInput(eventDetail.waktu_masuk_selesai),
       waktu_pulang_mulai: timeToInput(eventDetail.waktu_pulang_mulai),
       waktu_pulang_selesai: timeToInput(eventDetail.waktu_pulang_selesai),
-      hari_mingguan: normalizeHariMingguan(eventDetail.hari_mingguan),
       nama_tempat: eventDetail.nama_tempat ?? "",
     });
     if (isSuperAdmin && eventDetail.ms_unit_id) {
@@ -521,9 +508,6 @@ export default function EventEdit() {
       payload.waktu_masuk_selesai = form.waktu_masuk_selesai.trim();
       payload.waktu_pulang_mulai = form.waktu_pulang_mulai.trim();
       payload.waktu_pulang_selesai = form.waktu_pulang_selesai.trim();
-      if (form.hari_mingguan?.trim()) {
-        payload.hari_mingguan = form.hari_mingguan.trim();
-      }
     }
 
     const hasLokasi1 = polygonCoords.length > 0 && polygonCoords[0] && polygonCoords[0].length >= 3;
@@ -753,22 +737,6 @@ export default function EventEdit() {
                       className="w-full px-3 py-2.5 border-2 border-emerald-300 focus:border-emerald-500 focus:outline-none bg-white font-medium text-emerald-900"
                     />
                   </div>
-                </div>
-
-                <div className="bg-emerald-50/50 p-4 border border-emerald-200">
-                  <label className="block text-xs font-bold text-emerald-700 uppercase tracking-wide mb-2">
-                    Hari Mingguan (Opsional)
-                  </label>
-                  <select
-                    value={form.hari_mingguan}
-                    onChange={(e) => setForm((f) => ({ ...f, hari_mingguan: e.target.value }))}
-                    className="w-full px-3 py-2.5 border-2 border-emerald-300 focus:border-emerald-500 focus:outline-none bg-white font-medium text-emerald-900"
-                  >
-                    <option value="">Tidak ada</option>
-                    {HARI_MINGGUAN_OPTIONS.map((hari) => (
-                      <option key={hari} value={hari}>{hari}</option>
-                    ))}
-                  </select>
                 </div>
 
                 <div className="space-y-4">

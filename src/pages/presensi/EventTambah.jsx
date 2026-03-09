@@ -13,10 +13,6 @@ import Swal from "sweetalert2";
 
 const kampusCenter = [-6.954089024622504, 110.45883246944116];
 
-const HARI_MINGGUAN_OPTIONS = [
-  "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu", "Minggu"
-];
-
 export default function EventTambah() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -42,7 +38,6 @@ export default function EventTambah() {
     waktu_masuk_selesai: "",
     waktu_pulang_mulai: "",
     waktu_pulang_selesai: "",
-    hari_mingguan: "",
     nama_tempat: "",
   });
   const [submitting, setSubmitting] = useState(false);
@@ -309,9 +304,6 @@ export default function EventTambah() {
       payload.waktu_masuk_selesai = form.waktu_masuk_selesai.trim();
       payload.waktu_pulang_mulai = form.waktu_pulang_mulai.trim();
       payload.waktu_pulang_selesai = form.waktu_pulang_selesai.trim();
-      if (form.hari_mingguan?.trim()) {
-        payload.hari_mingguan = form.hari_mingguan.trim();
-      }
     }
 
     if (polygonCoords.length > 0 && polygonCoords[0] && polygonCoords[0].length >= 3) {
@@ -509,22 +501,6 @@ export default function EventTambah() {
                       className="w-full px-3 py-2 border-2 border-emerald-300 focus:border-emerald-500 focus:outline-none"
                     />
                   </div>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold text-emerald-700 uppercase tracking-wide mb-2">
-                    Hari Mingguan (Opsional)
-                  </label>
-                  <select
-                    value={form.hari_mingguan}
-                    onChange={(e) => setForm((f) => ({ ...f, hari_mingguan: e.target.value }))}
-                    className="w-full px-3 py-2 border-2 border-emerald-300 focus:border-emerald-500 focus:outline-none bg-white"
-                  >
-                    <option value="">Tidak ada</option>
-                    {HARI_MINGGUAN_OPTIONS.map((hari) => (
-                      <option key={hari} value={hari}>{hari}</option>
-                    ))}
-                  </select>
                 </div>
 
                 <div className="space-y-4">
