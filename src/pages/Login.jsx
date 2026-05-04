@@ -7,6 +7,7 @@ import { login } from "../redux/actions/authAction";
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [localError, setLocalError] = useState("");
   const dispatch = useDispatch();
   const { loading, error } = useSelector((state) => state.auth);
@@ -96,15 +97,30 @@ export default function Login() {
               autoComplete="username"
               placeholder="Email Admin"
             />
-            <input
-              id="password"
-              type="password"
-              className="w-full px-4 py-2 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary text-gray-900 bg-white"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              autoComplete="current-password"
-              placeholder="Kata Sandi"
-            />
+            <div className="flex w-full items-stretch overflow-hidden rounded border border-gray-300 bg-white focus-within:outline-none focus-within:ring-2 focus-within:ring-primary">
+              <input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                className="min-w-0 flex-1 border-0 bg-transparent px-4 py-2 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-0"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                autoComplete="current-password"
+                placeholder="Kata Sandi"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((v) => !v)}
+                className="flex shrink-0 items-center justify-center px-3 text-gray-500 transition-colors hover:bg-emerald-50 hover:text-primary focus:outline-none active:bg-emerald-100"
+                aria-label={showPassword ? "Sembunyikan kata sandi" : "Lihat kata sandi"}
+              >
+                <span
+                  className="material-icons block select-none text-[22px] leading-none"
+                  aria-hidden
+                >
+                  {showPassword ? "visibility_off" : "visibility"}
+                </span>
+              </button>
+            </div>
             <button
               type="submit"
               className="w-full py-2 rounded bg-primary hover:bg-green-700 text-white font-bold text-base shadow transition-all duration-200 mt-2"
