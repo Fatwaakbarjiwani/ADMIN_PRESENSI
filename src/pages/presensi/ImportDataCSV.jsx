@@ -11,7 +11,6 @@ export default function ImportDataCSV() {
 
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
-    // Simulasi preview, pada implementasi asli lakukan parsing CSV di sini
     setPreview(dummyPreview);
   };
 
